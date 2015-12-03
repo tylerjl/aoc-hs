@@ -1,0 +1,6 @@
+flags: {}
+packages:
+- '.'
+extra-deps:
+- FindBin-0.0.5
+resolver: lts-3.5
