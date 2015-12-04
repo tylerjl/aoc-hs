@@ -2,8 +2,6 @@
 
 module Y2015.D03 (solve, roboSolve) where
 
-import           Control.Monad
-import           Control.Arrow
 import           Data.Bifunctor
 import           Data.List (foldl')
 import           Data.Map (Map)
