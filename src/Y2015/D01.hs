@@ -1,6 +1,9 @@
 #!/usr/bin/env runhaskell
 
-module Y2015.D01 where
+module Y2015.D01
+    ( level
+    , basement )
+where
 
 import Data.List (foldl')
 

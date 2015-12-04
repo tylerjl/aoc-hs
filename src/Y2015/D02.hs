@@ -1,5 +1,11 @@
 #!/usr/bin/env runhaskell
 
+module Y2015.D02
+    ( parsePresents
+    , surfaceArea
+    , ribbonLength
+) where
+
 import Data.List (foldl', sort)
 import qualified Text.Parsec as P
 import Text.Parsec.Char (char, digit, endOfLine)
