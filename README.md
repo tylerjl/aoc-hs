@@ -1,4 +1,4 @@
-# adventofcode
+# adventofcode [![Build Status](https://travis-ci.org/tylerjl/adventofcode.svg?branch=master)](https://travis-ci.org/tylerjl/adventofcode)
 
 Solutions to advent of code exercises.
 
