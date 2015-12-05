@@ -5,7 +5,7 @@ import Y2015.D04
 import Test.Hspec
 
 spec :: Spec
-spec =
+spec = parallel $ do
     describe "Day 4" $ do
         describe "mine" $ do
             it "should solve abcdef" $

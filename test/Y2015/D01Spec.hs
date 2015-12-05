@@ -5,7 +5,7 @@ import Y2015.D01
 import Test.Hspec
 
 spec :: Spec
-spec =
+spec = parallel $ do
     describe "Day 1" $ do
         describe "level" $ do
             it "navigates to zero correctly" $

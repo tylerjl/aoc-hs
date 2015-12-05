@@ -5,7 +5,7 @@ import Y2015.D03
 import Test.Hspec
 
 spec :: Spec
-spec =
+spec = parallel $ do
     describe "Day 3" $ do
         describe "solve" $ do
             it "should deliver to 2 houses" $

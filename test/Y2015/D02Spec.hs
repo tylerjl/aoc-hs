@@ -5,7 +5,7 @@ import Y2015.D02
 import Test.Hspec
 
 spec :: Spec
-spec =
+spec = parallel $ do
     describe "Day 2" $ do
         describe "surfaceArea" $ do
             it "calculates small presents" $
