@@ -37,7 +37,7 @@ surfaceArea :: [Present] -> Int
 surfaceArea = foldl' (+) 0 . map wrapping
 
 wrapping :: Present -> Int
-wrapping p@(Present l w h) = sqft p + (product $ smallest p)
+wrapping p@(Present l w h) = sqft p + product (smallest p)
 
 smallest :: Present -> [Int]
 smallest (Present l w h) = take 2 $ sort [l, w, h]
@@ -52,7 +52,7 @@ ribbonLength :: [Present] -> Int
 ribbonLength = sum . map presentRibbon
 
 presentRibbon :: Present -> Int
-presentRibbon p = (sum $ map (*2) $ smallest p) + area p
+presentRibbon p = sum (map (*2) $ smallest p) + area p
 
 main :: IO ()
 main = do
@@ -63,5 +63,4 @@ main = do
                print (surfaceArea presents)
                putStr "Part B: total feet of ribbon needed: "
                print (ribbonLength presents)
-            Left _         -> do
-                putStrLn "Error: Malformed input."
+            Left _         -> putStrLn "Error: Malformed input."

@@ -20,7 +20,7 @@ guess = flip (++) . encode . show
 
 solve :: ByteString -> [Word8] -> Int
 solve solution key = find 0
-    where find i | solution `B.isPrefixOf` (hash i key) = i
+    where find i | solution `B.isPrefixOf` hash i key = i
                  | otherwise = find (i+1)
 
 mine :: String -> Int -> Int
