@@ -1,19 +1,23 @@
 #!/usr/bin/env runhaskell
 
 module Y2015.D05
-    ( thriceVoweled
-    , clean
-    , twiceRow
+    ( clean
     , isNice
+    , thriceVoweled
+    , twiceRow
 ) where
 
-import Data.List (group, isInfixOf)
+import Control.Monad (liftM2)
+import Data.List     (group, isInfixOf)
+
+(<&&>) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(<&&>) = liftM2 (&&)
 
 isNice :: String -> Bool
-isNice s = clean s && thriceVoweled s && twiceRow s
+isNice = clean <&&> thriceVoweled <&&> twiceRow
 
 clean :: String -> Bool
-clean s = not $ any (\x -> x `isInfixOf` s) forbiddenStrings
+clean = not . flip any forbiddenStrings . flip isInfixOf
 
 forbiddenStrings :: [String]
 forbiddenStrings = ["ab", "cd", "pq", "xy"]
