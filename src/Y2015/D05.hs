@@ -3,6 +3,7 @@
 module Y2015.D05
     ( clean
     , isNice
+    , isNicer
     , thriceVoweled
     , twiceRow
 ) where
@@ -13,6 +14,21 @@ import Data.List     (group, isInfixOf)
 (<&&>) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
 (<&&>) = liftM2 (&&)
 
+isNicer :: String -> Bool
+isNicer = repeatedPair <&&> repeatedBetween
+
+repeatedPair :: String -> Bool
+repeatedPair []                               = False
+repeatedPair [x]                              = False
+repeatedPair (x:y:zs) | [x, y] `isInfixOf` zs = True
+                      | otherwise             = repeatedPair (y : zs)
+
+repeatedBetween :: String -> Bool
+repeatedBetween []                     = False
+repeatedBetween [x]                    = False
+repeatedBetween [x,y]                  = False
+repeatedBetween (x:y:z:zs) | x == z    = True
+                           | otherwise = repeatedBetween (y : z : zs)
 isNice :: String -> Bool
 isNice = clean <&&> thriceVoweled <&&> twiceRow
 
@@ -36,3 +52,5 @@ main = do
        input <- readFile "src/Y2015/D05_input"
        putStr "Part A - : "
        print (length $ filter isNice $ lines input)
+       putStr "Part B - : "
+       print (length $ filter isNicer $ lines input)

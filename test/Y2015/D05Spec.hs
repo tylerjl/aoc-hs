@@ -34,3 +34,12 @@ spec = parallel $ do
                 isNice "dvszwmarrgswjxmb" `shouldBe` False
             it "validates complicated cases" $
                 isNice "iuvrelxiapllaxbg" `shouldBe` True
+        describe "isNicer" $ do
+            it "validates pairs and exactly one letter of separation" $
+                isNicer "qjhvhtzxzqqjkmpb" `shouldBe` True
+            it "validates with rule overlap" $
+                isNicer "xxyxx" `shouldBe` True
+            it "invalidates without repeated sequences" $
+                isNicer "uurcxstgmygtbstg" `shouldBe` False
+            it "invalidates without pairs" $
+                isNicer "ieodomkazucvgmuy" `shouldBe` False
