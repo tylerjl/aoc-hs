@@ -6,10 +6,10 @@ module Y2015.D02
     , ribbonLength
 ) where
 
-import Data.List (foldl', sort)
-import qualified Text.Parsec as P
-import Text.Parsec.Char (char, digit, endOfLine)
-import Text.Parsec.String (Parser)
+import           Data.List          (foldl', sort)
+import qualified Text.Parsec as     P
+import           Text.Parsec.Char   (char, digit, endOfLine)
+import           Text.Parsec.String (Parser)
 
 data Present = Present Int Int Int deriving (Show)
 
