@@ -1,7 +1,8 @@
 #!/usr/bin/env runhaskell
 
 module Y2015.D02
-    ( parsePresents
+    ( Present(..)
+    , parsePresents
     , surfaceArea
     , ribbonLength
 ) where
@@ -11,7 +12,7 @@ import qualified Text.Parsec as     P
 import           Text.Parsec.Char   (char, digit, endOfLine)
 import           Text.Parsec.String (Parser)
 
-data Present = Present Int Int Int deriving (Show)
+data Present = Present Int Int Int deriving (Show, Eq)
 
 -- |Generic parsing wrapper
 regularParse :: Parser a -> String -> Either P.ParseError a
