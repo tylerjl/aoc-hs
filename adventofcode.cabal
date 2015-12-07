@@ -27,7 +27,7 @@ library
                      , pureMD5
                      , utf8-string
                      , bytestring
-                     , matrix
+                     , repa
   default-language:    Haskell2010
 
 test-suite adventofcode-test

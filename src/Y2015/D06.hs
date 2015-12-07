@@ -3,12 +3,9 @@
 module Y2015.D06 where
 
 import           Control.Applicative ((<|>))
+import           Data.Array.Repa     (Z(..), (:.)(..))
+import qualified Data.Array.Repa as  R
 import           Data.List           (foldl')
-import           Data.Matrix
-                 ( (!)
-                 , Matrix
-                 , fromList
-                 , setElem)
 import qualified Text.Parsec as      P
 import           Text.Parsec.Char    (char, endOfLine)
 import           Text.Parsec.String  (Parser)
@@ -23,8 +20,13 @@ data Instruction = On Range
                  | Toggle Range
                  deriving (Show)
 
-initialGrid :: Matrix Bool
-initialGrid = fromList 1000 1000 $ repeat False
+size :: Int
+size = 1000
+
+initialGrid :: R.Array R.D R.DIM2 Bool
+initialGrid = R.delay $ R.fromListUnboxed
+                  (Z :. size :. size :: R.DIM2)
+                  (replicate (size*size) False)
 
 instructionsParser :: Parser [Instruction]
 instructionsParser = P.many (instruction <* P.optional endOfLine)
@@ -43,32 +45,37 @@ range = Range <$> point <* P.string " through " <*> point
 point :: Parser Point
 point = (,) <$> intParser <* char ',' <*> intParser
 
-mapRange :: (a -> a) -> Range -> Matrix a -> Matrix a
-mapRange f (Range cur@(xa, ya) end@(xz, yz)) m
-    | xa <= xz   = mapRange f (Range (xa+1, ya) (xz, yz)) m'
-    | otherwise  = m
-    where height = yz - ya
-          m'     = mapCol' f cur height m
+configureGrid :: R.Array R.D R.DIM2 Bool
+              -> Instruction
+              -> R.Array R.D R.DIM2 Bool
+configureGrid a (On range)     = switch a (True ||) range
+configureGrid a (Off range)    = switch a (False &&) range
+configureGrid a (Toggle range) = switch a xor range
 
-mapCol' :: (a -> a) -> Point -> Int -> Matrix a -> Matrix a
-mapCol' f (x,y) n m | y <= n    = mapCol' f (x,y') n set
-                    | otherwise = m
-    where matrixIndex = (x+1, y+1)
-          light       = f (m ! matrixIndex)
-          set         = setElem light matrixIndex m
-          y'          = y + 1
+switch :: (R.Source r a)
+       => R.Array r R.DIM2 a
+       -> (a -> a)
+       -> Range
+       -> R.Array R.D R.DIM2 a
+switch a f r = R.traverse a id (set f r)
 
-getLit :: Matrix Bool -> Int
-getLit = foldl (\acc x -> acc + on x) 0
+-- This is pretty confusing:
+--    Custom mapping function (set the lights)
+-- -> Range to apply the function upon
+-- -> Function to retrieve original elements from
+-- -> Original array constructor
+-- -> New (or unchanged) value
+set :: (a -> a) -> Range -> (R.DIM2 -> a) -> R.DIM2 -> a
+set f (Range (x',y') (x'',y'')) g (Z :. x :. y)
+    | withinX && withinY = f orig
+    | otherwise          = orig
+    where withinX = x >= x' && x <= x''
+          withinY = y >= y' && y <= y''
+          orig    = g (Z :. x :. y)
 
 on :: Bool -> Int
 on True  = 1
 on False = 0
-
-configureGrid :: Instruction -> Matrix Bool -> Matrix Bool
-configureGrid (On range)     = mapRange (True ||)  range
-configureGrid (Off range)    = mapRange (False &&) range
-configureGrid (Toggle range) = mapRange xor        range
 
 xor :: Bool -> Bool
 xor True  = False
@@ -80,5 +87,6 @@ main = do
         case regularParse instructionsParser input of
             Right instructions -> do
                 putStr "Part A - total lights lit: "
-                print $ getLit $ foldl' (flip configureGrid) initialGrid instructions
+                s <- R.foldAllP (+) 0 $ R.map (on) $ foldl' (configureGrid) initialGrid instructions
+                print s
             Left e         -> putStrLn "Error: Malformed input:" >> print e
