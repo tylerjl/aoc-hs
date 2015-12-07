@@ -23,10 +23,10 @@ data Instruction = On Range
 size :: Int
 size = 1000
 
-initialGrid :: R.Array R.D R.DIM2 Bool
+initialGrid :: R.Array R.D R.DIM2 Int
 initialGrid = R.delay $ R.fromListUnboxed
                   (Z :. size :. size :: R.DIM2)
-                  (replicate (size*size) False)
+                  (replicate (size*size) 0)
 
 instructionsParser :: Parser [Instruction]
 instructionsParser = P.many (instruction <* P.optional endOfLine)
@@ -45,12 +45,26 @@ range = Range <$> point <* P.string " through " <*> point
 point :: Parser Point
 point = (,) <$> intParser <* char ',' <*> intParser
 
-configureGrid :: R.Array R.D R.DIM2 Bool
+configureGridA :: R.Array R.D R.DIM2 Int
+               -> Instruction
+               -> R.Array R.D R.DIM2 Int
+configureGridA a (On range)     = switch a (const 1) range
+configureGridA a (Off range)    = switch a (const 0) range
+configureGridA a (Toggle range) = switch a toggle    range
+
+configureGridB :: R.Array R.D R.DIM2 Int
               -> Instruction
-              -> R.Array R.D R.DIM2 Bool
-configureGrid a (On range)     = switch a (True ||) range
-configureGrid a (Off range)    = switch a (False &&) range
-configureGrid a (Toggle range) = switch a xor range
+              -> R.Array R.D R.DIM2 Int
+configureGridB a (On range)     = switch a (+1) range
+configureGridB a (Off range)    = switch a dim  range
+configureGridB a (Toggle range) = switch a (+2) range
+
+toggle :: Int -> Int
+toggle 1 = 0
+toggle _ = 1
+
+dim :: Int -> Int
+dim = max 0 . subtract 1
 
 switch :: (R.Source r a)
        => R.Array r R.DIM2 a
@@ -73,20 +87,15 @@ set f (Range (x',y') (x'',y'')) g (Z :. x :. y)
           withinY = y >= y' && y <= y''
           orig    = g (Z :. x :. y)
 
-on :: Bool -> Int
-on True  = 1
-on False = 0
-
-xor :: Bool -> Bool
-xor True  = False
-xor False = True
-
 main :: IO ()
 main = do
         input <- readFile "Y2015/D06_input"
         case regularParse instructionsParser input of
             Right instructions -> do
                 putStr "Part A - total lights lit: "
-                s <- R.foldAllP (+) 0 $ R.map (on) $ foldl' (configureGrid) initialGrid instructions
-                print s
+                a <- R.foldAllP (+) 0 $ foldl' configureGridA initialGrid instructions
+                print a
+                putStr "Part B - total lights lit: "
+                b <- R.foldAllP (+) 0 $ foldl' configureGridB initialGrid instructions
+                print b
             Left e         -> putStrLn "Error: Malformed input:" >> print e
