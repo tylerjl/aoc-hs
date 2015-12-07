@@ -22,6 +22,7 @@ library
                      , Y2015.D04
                      , Y2015.D05
                      , Y2015.D06
+                     , Y2015.D07
   build-depends:       base >= 4.7 && < 5
                      , parsec
                      , containers
@@ -29,6 +30,7 @@ library
                      , utf8-string
                      , bytestring
                      , repa
+                     , memoize
   default-language:    Haskell2010
 
 test-suite adventofcode-test
