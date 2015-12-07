@@ -101,5 +101,8 @@ main = do
         case regularParse circuitParser input of
             Right instructions -> do
                 putStr "Part A - signal on a: "
-                print $ solve "a" instructions
+                let signal_a = solve "a" instructions
+                print $ signal_a
+                putStr "Part B - signal on a is now: "
+                print $ solve "a" (instructions ++ [(Singleton (Val signal_a) "b")])
             Left e         -> putStrLn "Error: Malformed input:" >> print e
