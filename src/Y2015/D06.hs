@@ -100,7 +100,7 @@ testB = R.foldAllS (+) 0 . configureGridB initialGrid
 
 main :: IO ()
 main = do
-        input <- readFile "Y2015/D06_input"
+        input <- readFile "src/Y2015/D06_input"
         case regularParse instructionsParser input of
             Right instructions -> do
                 putStr "Part A - total lights lit: "

@@ -6,7 +6,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-    describe "Day 5" $ do
+    describe "Day 6" $ do
         describe "testA" $ do
             it "turns on every light" $
                 testA (On (Range (0,0) (999,999))) `shouldBe` 1000000
