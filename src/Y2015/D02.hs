@@ -12,22 +12,17 @@ import qualified Text.Parsec as     P
 import           Text.Parsec.Char   (char, digit, endOfLine)
 import           Text.Parsec.String (Parser)
 
-data Present = Present Int Int Int deriving (Show, Eq)
+import           Y2015.Util         (regularParse, intParser)
 
--- |Generic parsing wrapper
-regularParse :: Parser a -> String -> Either P.ParseError a
-regularParse p = P.parse p ""
+data Present = Present Int Int Int deriving (Show, Eq)
 
 presentsParser :: Parser [Present]
 presentsParser = P.many1 (presentParser <* P.optional endOfLine)
 
 presentParser :: Parser Present
-presentParser = Present <$> (dimension <* char 'x')
-                        <*> (dimension <* char 'x')
-                        <*>  dimension
-
-dimension :: Parser Int
-dimension = read <$> P.many1 digit
+presentParser = Present <$> (intParser <* char 'x')
+                        <*> (intParser <* char 'x')
+                        <*>  intParser
 
 parsePresents :: String -> Maybe [Present]
 parsePresents s = case regularParse presentsParser s of
