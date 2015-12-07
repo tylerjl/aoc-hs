@@ -1,6 +1,11 @@
 #!/usr/bin/env runhaskell
 
-module Y2015.D06 where
+module Y2015.D06
+    ( testA
+    , testB
+    , Instruction(..)
+    , Range(..)
+) where
 
 import           Control.Applicative ((<|>))
 import           Data.Array.Repa     (Z(..), (:.)(..))
@@ -86,6 +91,12 @@ set f (Range (x',y') (x'',y'')) g (Z :. x :. y)
     where withinX = x >= x' && x <= x''
           withinY = y >= y' && y <= y''
           orig    = g (Z :. x :. y)
+
+testA :: Instruction -> Int
+testA = R.foldAllS (+) 0 . configureGridA initialGrid
+
+testB :: Instruction -> Int
+testB = R.foldAllS (+) 0 . configureGridB initialGrid
 
 main :: IO ()
 main = do
