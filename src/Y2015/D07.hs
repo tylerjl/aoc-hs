@@ -17,7 +17,8 @@ import           Data.Word             (Word16)
 import           Text.Parsec.Char      (digit, letter, endOfLine)
 import           Text.Parsec.String    (Parser)
 import           Text.Parsec
-    ( many
+    ( lookAhead
+    , many
     , many1
     , optional
     , sepBy
@@ -27,38 +28,35 @@ import           Text.Parsec
     , string
     , try)
 
-type Wire        = String
-data Atom        = Val Word16 | Var String
-                 deriving (Show)
-data Instruction = Singleton Atom      Wire
-                 | And       Atom Atom Wire
-                 | Or        Atom Atom Wire
-                 | LShift    Atom Int  Wire
-                 | RShift    Atom Int  Wire
-                 | Not       Atom      Wire
-                 deriving (Show)
+type Wire = String
 
-class Label a where
-    label :: a -> String
+data Atom = Val Word16 | Var String
+          deriving (Show)
 
-instance Label Instruction where
-    label (Singleton _ s) = s
-    label (And _ _ s)     = s
-    label (Or _ _ s)      = s
-    label (LShift _ _ s)  = s
-    label (RShift _ _ s)  = s
-    label (Not _ s)       = s
+data Gate = Singleton Atom
+          | And       Atom Atom
+          | Or        Atom Atom
+          | LShift    Atom Int
+          | RShift    Atom Int
+          | Not       Atom
+          deriving (Show)
+
+data Instruction = Instruction Gate Wire
+                 deriving (Show)
 
 circuitParser :: Parser [Instruction]
-circuitParser = many (instruction <* optional endOfLine)
+circuitParser = many (pInstruction <* optional endOfLine)
 
-instruction :: Parser Instruction
-instruction = try (Singleton <$> atom                              <*> wire)
-          <|> try (And       <$> atom <* gate "AND"    <*> atom    <*> wire)
-          <|> try (Or        <$> atom <* gate "OR"     <*> atom    <*> wire)
-          <|> try (LShift    <$> atom <* gate "LSHIFT" <*> bits    <*> wire)
-          <|> try (RShift    <$> atom <* gate "RSHIFT" <*> bits    <*> wire)
-          <|> try (Not       <$          gate "NOT"    <*> atom    <*> wire)
+pInstruction :: Parser Instruction
+pInstruction = Instruction <$> pGate <*> wire
+
+pGate :: Parser Gate
+pGate =  try (Singleton <$> atom <* lookAhead arrow)
+     <|> try (And       <$> atom <* gate "AND"    <*> atom)
+     <|> try (Or        <$> atom <* gate "OR"     <*> atom)
+     <|> try (LShift    <$> atom <* gate "LSHIFT" <*> bits)
+     <|> try (RShift    <$> atom <* gate "RSHIFT" <*> bits)
+     <|> try (Not       <$          gate "NOT"    <*> atom)
 
 wire :: Parser Wire
 wire = arrow *> many1 letter
@@ -70,30 +68,30 @@ bits :: Parser Int
 bits = intParser
 
 atom :: Parser Atom
-atom = try (Var <$> many1 letter)
-   <|> try (Val <$> read <$> many1 digit)
+atom =  try (Var <$> many1 letter)
+    <|> try (Val <$> read <$> many1 digit)
 
 arrow :: Parser ()
 arrow = skipMany1 space *> string "->" *> skipMany1 space
 
-voltageOn :: Map String Instruction -> String -> Word16
+voltageOn :: Map String Gate -> String -> Word16
 voltageOn m = resolve
     where eval :: String -> Word16
           eval wire = case M.lookup wire m of
-                      Just (Singleton x _) -> atom x
-                      Just (And x y _)     -> atom x .&. atom y
-                      Just (Or x y _)      -> atom x .|. atom y
-                      Just (LShift x i _)  -> shift (atom x) i
-                      Just (RShift x i _)  -> shift (atom x) (-i)
-                      Just (Not x _)       -> complement (atom x)
-                      Nothing              -> 0
+                      Just (Singleton x) -> atom x
+                      Just (And x y)     -> atom x .&. atom y
+                      Just (Or x y)      -> atom x .|. atom y
+                      Just (LShift x i)  -> shift (atom x) i
+                      Just (RShift x i)  -> shift (atom x) (-i)
+                      Just (Not x)       -> complement (atom x)
+                      Nothing            -> 0
           resolve = memoize eval
           atom (Val i) = i
           atom (Var v) = resolve v
 
 solve :: String -> [Instruction] -> Word16
 solve s = flip voltageOn s . M.fromList . map toPair
-    where toPair inst = (label inst, inst)
+    where toPair (Instruction g w) = (w, g)
 
 main :: IO ()
 main = do
@@ -102,7 +100,8 @@ main = do
             Right instructions -> do
                 putStr "Part A - signal on a: "
                 let signal_a = solve "a" instructions
-                print $ signal_a
+                print signal_a
                 putStr "Part B - signal on a is now: "
-                print $ solve "a" (instructions ++ [(Singleton (Val signal_a) "b")])
+                let override = Instruction (Singleton (Val signal_a)) "b"
+                print $ solve "a" (instructions ++ [override])
             Left e         -> putStrLn "Error: Malformed input:" >> print e
