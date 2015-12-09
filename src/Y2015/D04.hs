@@ -1,34 +1,25 @@
 #!/usr/bin/env runhaskell
 
-module Y2015.D04 (mine) where
+{-# LANGUAGE OverloadedStrings #-}
 
-import           Codec.Binary.UTF8.String (encode, decode)
-import           Data.Digest.Pure.MD5 (md5)
+module Y2015.D04 (crack) where
+
+import           Crypto.Hash.MD5 (hash)
+import           Data.ByteString.Base16 (encode)
 import qualified Data.ByteString.Char8 as C
-import qualified Data.ByteString.Lazy as B
-import           Data.ByteString.Lazy (ByteString)
-import           Data.Word (Word8)
+import           Data.ByteString.Char8 (ByteString, pack, takeWhile)
+import           Data.Monoid ((<>))
 
-prefix :: Int -> ByteString
-prefix n = B.replicate (fromIntegral n) $ head $ encode "0"
+crack :: ByteString -> Int -> Int
+crack prefix d = head $ dropWhile (not . validSuffix) [0..]
+    where validSuffix = check . encode . hash . (prefix <>) . pack . show
+          check       = (>= d) . C.length . C.takeWhile (== '0')
 
-hash :: Int -> [Word8] -> ByteString
-hash i s = B.pack $ encode $ show $ md5 $ B.pack $ guess i s
-
-guess :: Int -> [Word8] -> [Word8]
-guess = flip (++) . encode . show
-
-solve :: ByteString -> [Word8] -> Int
-solve solution key = find 0
-    where find i | solution `B.isPrefixOf` hash i key = i
-                 | otherwise = find (i+1)
-
-mine :: String -> Int -> Int
-mine s n = solve (prefix n) (encode s)
+key = "iwrupvqb"
 
 main :: IO ()
 main = do
-       putStr "Part A - key is: "
-       print (mine "iwrupvqb" 5)
-       putStr "Part B - key is: "
-       print (mine "iwrupvqb" 6)
+    putStr "Part A - integer key is: "
+    print $ crack key 5
+    putStr "Part B - integer key is: "
+    print $ crack key 6
