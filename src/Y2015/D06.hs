@@ -104,9 +104,9 @@ main = do
         case regularParse instructionsParser input of
             Right instructions -> do
                 putStr "Part A - total lights lit: "
-                a <- R.foldAllP (+) 0 $ foldl' configureGridA initialGrid instructions
+                a <- R.sumAllP $ foldl' configureGridA initialGrid instructions
                 print a
                 putStr "Part B - total lights lit: "
-                b <- R.foldAllP (+) 0 $ foldl' configureGridB initialGrid instructions
+                b <- R.sumAllP $ foldl' configureGridB initialGrid instructions
                 print b
             Left e         -> putStrLn "Error: Malformed input:" >> print e
