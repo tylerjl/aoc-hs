@@ -24,6 +24,7 @@ library
                      , Y2015.D06
                      , Y2015.D07
                      , Y2015.D08
+                     , Y2015.D09
   build-depends:       base >= 4.7 && < 5
                      , base16-bytestring
                      , parsec
@@ -32,6 +33,7 @@ library
                      , bytestring
                      , repa
                      , memoize
+                     , safe
   default-language:    Haskell2010
 
 test-suite adventofcode-test
