@@ -26,6 +26,7 @@ library
                      , Y2015.D08
                      , Y2015.D09
                      , Y2015.D10
+                     , Y2015.D11
   build-depends:       base >= 4.7 && < 5
                      , base16-bytestring
                      , parsec

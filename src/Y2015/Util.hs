@@ -1,13 +1,18 @@
 #!/usr/bin/env runhaskell
 
 module Y2015.Util
-    ( regularParse
+    ( (<&&>)
+    , regularParse
     , intParser
 ) where
 
+import           Control.Monad (liftM2)
 import qualified Text.Parsec as     P
 import           Text.Parsec.Char   (digit)
 import           Text.Parsec.String (Parser)
+
+(<&&>) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(<&&>) = liftM2 (&&)
 
 -- |Generic parsing wrapper
 regularParse :: Parser a -> String -> Either P.ParseError a

@@ -8,11 +8,9 @@ module Y2015.D05
     , twiceRow
 ) where
 
-import Control.Monad (liftM2)
-import Data.List     (group, isInfixOf)
+import Y2015.Util ((<&&>))
 
-(<&&>) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
-(<&&>) = liftM2 (&&)
+import Data.List     (group, isInfixOf)
 
 isNicer :: String -> Bool
 isNicer = repeatedPair <&&> repeatedBetween
