@@ -18,9 +18,12 @@ forbidden :: String -> Bool
 forbidden = any (`elem` "iol")
 
 hasStraight :: String -> Bool
-hasStraight = not . null . filterAsc . subSeqs
-    where filterAsc = filter (`isInfixOf` alphabet)
-          subSeqs   = takeWhile ((== 3) . length) . map (take 3) . tails
+hasStraight []                          = False
+hasStraight [x]                         = False
+hasStraight [x,y]                       = False
+hasStraight (x:y:z:zs) | straight x y z = True
+                       | otherwise      = hasStraight (y:z:zs)
+                       where straight a b c = b == succ a && c == succ b
 
 increment :: String -> String
 increment = reverse . step . reverse
