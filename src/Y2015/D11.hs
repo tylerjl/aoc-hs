@@ -9,7 +9,7 @@ alphabet :: String
 alphabet = ['a'..'z']
 
 meetsReqs :: String -> Bool
-meetsReqs = hasPairs <&&> (not . forbidden) <&&> hasStraight
+meetsReqs = hasPairs <&&> (not . forbidden) <&&> hasStraightFast
 
 hasPairs :: String -> Bool
 hasPairs = (1 <) . length . filter ((<) 1 . length) . group
@@ -17,13 +17,18 @@ hasPairs = (1 <) . length . filter ((<) 1 . length) . group
 forbidden :: String -> Bool
 forbidden = any (`elem` "iol")
 
-hasStraight :: String -> Bool
-hasStraight []                          = False
-hasStraight [x]                         = False
-hasStraight [x,y]                       = False
-hasStraight (x:y:z:zs) | straight x y z = True
-                       | otherwise      = hasStraight (y:z:zs)
-                       where straight a b c = b == succ a && c == succ b
+hasStraightFast :: String -> Bool
+hasStraightFast = not . null . filterAsc . subSeqs
+    where filterAsc = filter (`isInfixOf` alphabet)
+          subSeqs   = takeWhile ((== 3) . length) . map (take 3) . tails
+
+hasStraightSlow :: String -> Bool
+hasStraightSlow []                          = False
+hasStraightSlow [x]                         = False
+hasStraightSlow [x,y]                       = False
+hasStraightSlow (x:y:z:zs) | straight x y z = True
+                           | otherwise      = hasStraightSlow (y:z:zs)
+                           where straight a b c = b == succ a && c == succ b
 
 increment :: String -> String
 increment = reverse . step . reverse
