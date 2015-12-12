@@ -4,6 +4,7 @@ module Y2015.D10 (solve)  where
 
 import Data.List (group, iterate)
 
+solve :: String -> Int -> String
 solve = (!!) . iterate (concatMap walk . group)
     where walk s@(h:_) = show (length s) ++ [h]
 
