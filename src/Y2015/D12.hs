@@ -1,5 +1,3 @@
-#!/usr/bin/env runhaskell
-
 {-# LANGUAGE OverloadedStrings #-}
 
 module Y2015.D12 (jsonSum, jsonSumFixed) where

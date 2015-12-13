@@ -1,6 +1,4 @@
-#!/usr/bin/env runhaskell
-
-module Y2015.D08 where
+module Y2015.D08 (difference, encoded) where
 
 body :: [a] -> [a]
 body []  = []

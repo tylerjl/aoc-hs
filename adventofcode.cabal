@@ -24,7 +24,8 @@ executable adventofcode
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Y2015.Util
+  exposed-modules:     Y2015
+                     , Y2015.Util
                      , Y2015.D01
                      , Y2015.D02
                      , Y2015.D03

@@ -6,17 +6,26 @@ import Control.Monad
 import Safe
 import System.Environment  (getArgs)
 import Text.Read           (readMaybe)
-import Y2015.D01
+import Y2015
 
 usage :: String
 usage = "Usage: <day number> [input file or string]"
 
 run :: Int -> String -> IO ()
-run 0 file = do
+run 1 file = do
     input <- try $ readFile file :: IO (Either IOError String)
     case input of
          Left exception -> print $ exception
          Right contents -> print $ (level contents, basement contents)
+run 2 file = do
+    input <- try $ readFile file :: IO (Either IOError String)
+    case input of
+         Left exception -> print $ exception
+         Right contents -> case parsePresents contents of
+                                Nothing -> putStrLn $ "Could not parse" ++ file
+                                Just ps -> print ( surfaceArea ps
+                                                 , ribbonLength ps
+                                                 )
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

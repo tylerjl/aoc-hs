@@ -2,7 +2,7 @@ module Y2015.D12Spec (spec) where
 
 {-# LANGUAGE OverloadedStrings #-}
 
-import Y2015.D12
+import Y2015
 import Test.Hspec
 import Data.ByteString.Lazy.Char8 (pack)
 

@@ -1,6 +1,6 @@
 module Y2015.D08Spec (spec) where
 
-import Y2015.D08
+import Y2015
 
 import Test.Hspec
 

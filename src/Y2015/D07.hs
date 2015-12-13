@@ -1,7 +1,5 @@
-#!/usr/bin/env runhaskell
-
 module Y2015.D07
-    ( solve
+    ( wire
     , circuitParser
 ) where
 
@@ -48,7 +46,7 @@ circuitParser :: Parser [Instruction]
 circuitParser = many (pInstruction <* optional endOfLine)
 
 pInstruction :: Parser Instruction
-pInstruction = Instruction <$> pGate <*> wire
+pInstruction = Instruction <$> pGate <*> pWire
 
 pGate :: Parser Gate
 pGate =  try (Singleton <$> atom <* lookAhead arrow)
@@ -58,8 +56,8 @@ pGate =  try (Singleton <$> atom <* lookAhead arrow)
      <|> try (RShift    <$> atom <* gate "RSHIFT" <*> bits)
      <|> try (Not       <$          gate "NOT"    <*> atom)
 
-wire :: Parser Wire
-wire = arrow *> many1 letter
+pWire :: Parser Wire
+pWire = arrow *> many1 letter
 
 gate :: String -> Parser ()
 gate s = skipMany space *> string s *> skipMany1 space
@@ -89,8 +87,8 @@ voltageOn m = resolve
           atom (Val i) = i
           atom (Var v) = resolve v
 
-solve :: String -> [Instruction] -> Word16
-solve s = flip voltageOn s . M.fromList . map toPair
+wire :: String -> [Instruction] -> Word16
+wire s = flip voltageOn s . M.fromList . map toPair
     where toPair (Instruction g w) = (w, g)
 
 main :: IO ()
@@ -99,9 +97,9 @@ main = do
         case regularParse circuitParser input of
             Right instructions -> do
                 putStr "Part A - signal on a: "
-                let signal_a = solve "a" instructions
+                let signal_a = wire "a" instructions
                 print signal_a
                 putStr "Part B - signal on a is now: "
                 let override = Instruction (Singleton (Val signal_a)) "b"
-                print $ solve "a" (instructions ++ [override])
+                print $ wire "a" (instructions ++ [override])
             Left e         -> putStrLn "Error: Malformed input:" >> print e

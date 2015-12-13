@@ -1,5 +1,3 @@
-#!/usr/bin/env runhaskell
-
 module Y2015.D02
     ( Present(..)
     , parsePresents

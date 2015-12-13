@@ -1,6 +1,4 @@
-#!/usr/bin/env runhaskell
-
-module Y2015.D03 (solve, roboSolve) where
+module Y2015.D03 (santaRun, roboRun) where
 
 import           Data.List   (foldl')
 import           Data.Set    (Set)
@@ -21,11 +19,11 @@ start = Set.singleton (0, 0)
 move :: Point -> Point -> Point
 move (dx, dy) (x, y) = (x + dx, y + dy)
 
-solve :: String -> Int
-solve = Set.size . deliver start . map direction
+santaRun :: String -> Int
+santaRun = Set.size . deliver start . map direction
 
-roboSolve :: String -> Int
-roboSolve = Set.size . teamDelivery . tMap direction . divideWork
+roboRun :: String -> Int
+roboRun = Set.size . teamDelivery . tMap direction . divideWork
     where teamDelivery = uncurry (deliver . deliver start)
 
 tMap :: (a -> b) -> ([a], [a]) -> ([b], [b])
@@ -51,6 +49,6 @@ main :: IO ()
 main = do
        input <- readFile "src/Y2015/D03_input"
        putStrLn "Part A: delivery is: "
-       print (solve input)
+       print (santaRun input)
        putStrLn "Part B: total number delivered as a team is: "
-       print (roboSolve input)
+       print (roboRun input)

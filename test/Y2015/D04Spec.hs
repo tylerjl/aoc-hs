@@ -2,7 +2,7 @@ module Y2015.D04Spec (spec) where
 
 {-# LANGUAGE OverloadedStrings #-}
 
-import Y2015.D04
+import Y2015
 import Test.Hspec
 import Data.ByteString.Char8 (pack)
 

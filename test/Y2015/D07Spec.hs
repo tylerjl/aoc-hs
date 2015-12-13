@@ -1,6 +1,6 @@
 module Y2015.D07Spec (spec) where
 
-import Y2015.D07
+import Y2015
 import Y2015.Util
 
 import Test.Hspec
@@ -22,20 +22,20 @@ instructions = case regularParse circuitParser input of
 spec :: Spec
 spec = parallel $ do
     describe "Day 7" $ do
-        describe "voltageOn" $ do
+        describe "wire" $ do
             it "calculates test case d correctly" $
-                solve "d" instructions `shouldBe` 72
+                wire "d" instructions `shouldBe` 72
             it "calculates test case e correctly" $
-                solve "e" instructions `shouldBe` 507
+                wire "e" instructions `shouldBe` 507
             it "calculates test case f correctly" $
-                solve "f" instructions `shouldBe` 492
+                wire "f" instructions `shouldBe` 492
             it "calculates test case g correctly" $
-                solve "g" instructions `shouldBe` 114
+                wire "g" instructions `shouldBe` 114
             it "calculates test case h correctly" $
-                solve "h" instructions `shouldBe` 65412
+                wire "h" instructions `shouldBe` 65412
             it "calculates test case i correctly" $
-                solve "i" instructions `shouldBe` 65079
+                wire "i" instructions `shouldBe` 65079
             it "calculates test case x correctly" $
-                solve "x" instructions `shouldBe` 123
+                wire "x" instructions `shouldBe` 123
             it "calculates test case y correctly" $
-                solve "y" instructions `shouldBe` 456
+                wire "y" instructions `shouldBe` 456

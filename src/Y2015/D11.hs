@@ -1,9 +1,7 @@
-#!/usr/bin/env runhaskell
-
 module Y2015.D11 (rotate) where
 
 import Y2015.Util ((<&&>))
-import Data.List (elemIndex, foldr, group, isInfixOf, iterate, tails)
+import Data.List  (elemIndex, foldr, group, isInfixOf, iterate, tails)
 
 alphabet :: String
 alphabet = ['a'..'z']

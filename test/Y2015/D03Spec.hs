@@ -1,24 +1,24 @@
 module Y2015.D03Spec (spec) where
 
-import Y2015.D03
+import Y2015
 
 import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
     describe "Day 3" $ do
-        describe "solve" $ do
+        describe "santaRun" $ do
             it "should deliver to 2 houses" $
-                solve ">" `shouldBe` 2
+                santaRun ">" `shouldBe` 2
             it "should deliver to 4 houses in a square" $
-                solve "^>v<" `shouldBe` 4
+                santaRun "^>v<" `shouldBe` 4
             it "should deliver many presents to 2 houses" $
-                solve "^v^v^v^v^v" `shouldBe` 2
+                santaRun "^v^v^v^v^v" `shouldBe` 2
 
         describe "roboSolve" $ do
             it "should deliver to 3 houses" $
-                roboSolve "^v" `shouldBe` 3
+                roboRun "^v" `shouldBe` 3
             it "should deliver to 3 houses and return to origin" $
-                roboSolve "^>v<" `shouldBe` 3
+                roboRun "^>v<" `shouldBe` 3
             it "should deliver 11 presents" $
-                roboSolve "^v^v^v^v^v" `shouldBe` 11
+                roboRun "^v^v^v^v^v" `shouldBe` 11

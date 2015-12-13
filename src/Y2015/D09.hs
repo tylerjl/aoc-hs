@@ -1,5 +1,3 @@
-#!/usr/bin/env runhaskell
-
 {-# LANGUAGE FlexibleContexts #-}
 
 module Y2015.D09 (longestRoute, routeParser, shortestRoute) where

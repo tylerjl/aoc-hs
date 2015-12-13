@@ -1,14 +1,14 @@
 module Y2015.D10Spec (spec) where
 
-import Y2015.D10
+import Y2015
 import Test.Hspec
 
-input = solve "1"
+input = lookSay "1"
 
 spec :: Spec
 spec = parallel $ do
     describe "Day 10" $ do
-        describe "solve" $ do
+        describe "lookSay" $ do
             it "iterates once correctly" $
                 input 1 `shouldBe` "11"
             it "iterates twice correctly" $

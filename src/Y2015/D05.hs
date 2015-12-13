@@ -1,5 +1,3 @@
-#!/usr/bin/env runhaskell
-
 module Y2015.D05
     ( clean
     , isNice
@@ -10,7 +8,7 @@ module Y2015.D05
 
 import Y2015.Util ((<&&>))
 
-import Data.List     (group, isInfixOf)
+import Data.List (group, isInfixOf)
 
 isNicer :: String -> Bool
 isNicer = repeatedPair <&&> repeatedBetween
