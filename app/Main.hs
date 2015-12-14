@@ -30,6 +30,8 @@ run 13 file = do contents <- readFile file
                               ++ "Yourself would gain 0 happiness units "
                               ++ "by sitting next to Yourself."
                  print $ (solveSeating contents, solveSeating withMe)
+run 14 file = do contents <- readFile file
+                 print (reinRace contents 2503)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
