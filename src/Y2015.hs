@@ -12,6 +12,7 @@ module Y2015
     , module Y2015.D10
     , module Y2015.D11
     , module Y2015.D12
+    , module Y2015.D13
 ) where
 
 import Y2015.Util
@@ -27,3 +28,4 @@ import Y2015.D09
 import Y2015.D10
 import Y2015.D11
 import Y2015.D12
+import Y2015.D13

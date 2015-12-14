@@ -26,6 +26,11 @@ run 2 file = do
                                 Just ps -> print ( surfaceArea ps
                                                  , ribbonLength ps
                                                  )
+run 13 file = do
+    input <- try $ readFile file :: IO (Either IOError String)
+    case input of
+         Left exception -> print $ exception
+         Right contents -> print $ solveSeating contents
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
