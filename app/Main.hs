@@ -1,8 +1,8 @@
 module Main where
 
 import Control.Applicative ((<*>))
-import Control.Exception   (try)
 import Control.Monad
+import qualified Data.ByteString as B
 import Safe
 import System.Environment  (getArgs)
 import Text.Read           (readMaybe)
@@ -12,29 +12,24 @@ usage :: String
 usage = "Usage: <day number> [input file or string]"
 
 run :: Int -> String -> IO ()
-run 1 file = do
-    input <- try $ readFile file :: IO (Either IOError String)
-    case input of
-         Left exception -> print $ exception
-         Right contents -> print $ (level contents, basement contents)
-run 2 file = do
-    input <- try $ readFile file :: IO (Either IOError String)
-    case input of
-         Left exception -> print $ exception
-         Right contents -> case parsePresents contents of
-                                Nothing -> putStrLn $ "Could not parse" ++ file
-                                Just ps -> print ( surfaceArea ps
-                                                 , ribbonLength ps
-                                                 )
-run 13 file = do
-    input <- try $ readFile file :: IO (Either IOError String)
-    case input of
-         Left exception -> print $ exception
-         Right contents -> do
-             let withMe = contents
-                          ++ "Yourself would gain 0 happiness units "
-                          ++ "by sitting next to Yourself."
-             print $ (solveSeating contents, solveSeating withMe)
+run 1 file = do contents <- readFile file
+                print (level contents, basement contents)
+run 2 file = do contents <- readFile file
+                case parsePresents contents of
+                     Nothing -> putStrLn $ "Could not parse" ++ file
+                     Just ps -> print ( surfaceArea ps
+                                      , ribbonLength ps
+                                      )
+run 3 file = do c <- readFile file
+                let contents = filter (/= '\n') c
+                print (santaRun contents, roboRun contents)
+run 4 file = do contents <- B.readFile file
+                print (crack contents 5, crack contents 6)
+run 13 file = do contents <- readFile file
+                 let withMe = contents
+                              ++ "Yourself would gain 0 happiness units "
+                              ++ "by sitting next to Yourself."
+                 print $ (solveSeating contents, solveSeating withMe)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

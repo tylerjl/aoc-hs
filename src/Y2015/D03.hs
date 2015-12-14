@@ -44,11 +44,3 @@ navigate origin history (dir:plans) =
         let newPoint = move dir origin
             step     = Set.insert newPoint history
         in  navigate newPoint step plans
-
-main :: IO ()
-main = do
-       input <- readFile "src/Y2015/D03_input"
-       putStrLn "Part A: delivery is: "
-       print (santaRun input)
-       putStrLn "Part B: total number delivered as a team is: "
-       print (roboRun input)
