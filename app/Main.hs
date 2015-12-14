@@ -30,7 +30,11 @@ run 13 file = do
     input <- try $ readFile file :: IO (Either IOError String)
     case input of
          Left exception -> print $ exception
-         Right contents -> print $ solveSeating contents
+         Right contents -> do
+             let withMe = contents
+                          ++ "Yourself would gain 0 happiness units "
+                          ++ "by sitting next to Yourself."
+             print $ (solveSeating contents, solveSeating withMe)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
