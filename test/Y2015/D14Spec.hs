@@ -10,6 +10,9 @@ input = unlines [ "Comet can fly 14 km/s for 10 seconds, but then must rest for 
 spec :: Spec
 spec = parallel $ do
     describe "Day 14" $ do
-        describe "reinRace" $ do
-            it "returns comet's winning distance after 1000 seconds" $
-                reinRace input 1000 `shouldBe` 1120
+        describe "distanceRace" $ do
+            it "returns Comet's winning distance after 1000 seconds" $
+                distanceRace input 1000 `shouldBe` 1120
+        describe "leadingRace" $ do
+            it "returns Dancer's points 1000 seconds" $
+                leadingRace input 1000 `shouldBe` 689
