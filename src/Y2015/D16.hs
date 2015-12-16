@@ -1,6 +1,6 @@
 module Y2015.D16 (findAunt, findRealAunt) where
 
-import Data.List (sortBy)
+import Data.List (maximumBy, sortBy)
 import Data.Map.Strict (Map, differenceWith, differenceWithKey, fromList, size)
 
 type Aunt = Map String Int
@@ -23,7 +23,7 @@ sameNothing a b | a == b    = Nothing
                 | otherwise = Just a
 
 findGifter :: (Aunt -> Int) -> String -> Int
-findGifter f aunts = snd . last . sortBy (flip compare)
+findGifter f aunts = snd . maximumBy (flip compare)
                    $ zip (map f (toAunts aunts)) [1..]
 
 gifter :: Aunt
