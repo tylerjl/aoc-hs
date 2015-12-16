@@ -1,17 +1,30 @@
-module Y2015.D16 where
+module Y2015.D16 (findAunt, findRealAunt) where
 
 import Data.List (sortBy)
-import Data.Map.Strict (Map, differenceWith, fromList, size)
+import Data.Map.Strict (Map, differenceWith, differenceWithKey, fromList, size)
 
 type Aunt = Map String Int
 
-findAunt :: String -> Int
-findAunt = (flip findGifter gifter) . toAunts
+findRealAunt :: String -> Int
+findRealAunt = findGifter (size . differenceWithKey match gifter)
+    where match "cats"        target candidate = candidate `gtNothing` target
+          match "trees"       target candidate = candidate `gtNothing` target
+          match "pomeranians" target candidate = target `gtNothing` candidate
+          match "goldfish"    target candidate = target `gtNothing` candidate
+          match _             target candidate = candidate `sameNothing` target
+          gtNothing a b | a > b     = Nothing
+                        | otherwise = Just a
 
-findGifter :: [Aunt] -> Aunt -> Int
-findGifter aunts needle = snd $ last $ sortBy (flip compare) $ zip (map (size . differenceWith match needle) aunts) [1..]
-    where match target candidate | target == candidate = Nothing
-                                 | otherwise           = Just candidate
+findAunt :: String -> Int
+findAunt = findGifter (size . differenceWith sameNothing gifter)
+
+sameNothing :: (Eq a) => a -> a -> Maybe a
+sameNothing a b | a == b    = Nothing
+                | otherwise = Just a
+
+findGifter :: (Aunt -> Int) -> String -> Int
+findGifter f aunts = snd . last . sortBy (flip compare)
+                   $ zip (map f (toAunts aunts)) [1..]
 
 gifter :: Aunt
 gifter = toAunt $ words ("Sue 0: children: 3 cats: 7 samoyeds: 2 "
