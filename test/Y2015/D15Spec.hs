@@ -11,5 +11,8 @@ spec :: Spec
 spec = parallel $ do
     describe "Day 15" $ do
         describe "cookieScore" $ do
-            it "finds the ideal ration in the example case" $
+            it "finds the ideal ratio in the example case" $
                 cookieScore input `shouldBe` 62842880
+        describe "calorieScore" $ do
+            it "finds the ideal ratio in the example case with 500 calories" $
+                calorieScore input `shouldBe` 57600000
