@@ -34,6 +34,8 @@ run 14 file = do contents <- readFile file
                  print (distanceRace contents 2503, leadingRace contents 2503)
 run 15 file = do contents <- readFile file
                  print (cookieScore contents, calorieScore contents)
+run 16 file = do contents <- readFile file
+                 print (findAunt contents)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

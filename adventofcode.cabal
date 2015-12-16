@@ -42,6 +42,7 @@ library
                      , Y2015.D13
                      , Y2015.D14
                      , Y2015.D15
+                     , Y2015.D16
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
