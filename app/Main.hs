@@ -36,6 +36,8 @@ run 15 file = do contents <- readFile file
                  print (cookieScore contents, calorieScore contents)
 run 16 file = do contents <- readFile file
                  print (findAunt contents, findRealAunt contents)
+run 17 file = do contents <- readFile file
+                 print (150 `filledAmong` contents)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
