@@ -11,3 +11,6 @@ spec = parallel $ do
         describe "filledAmong" $ do
             it "distributes 25 liters among four combinations" $
                 25 `filledAmong` input `shouldBe` 4
+        describe "minFilledAmong" $ do
+            it "distributes 25 liters among 3 combinations of 2 containers" $
+                25 `minFilledAmong` input `shouldBe` 3

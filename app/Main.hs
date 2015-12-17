@@ -37,7 +37,7 @@ run 15 file = do contents <- readFile file
 run 16 file = do contents <- readFile file
                  print (findAunt contents, findRealAunt contents)
 run 17 file = do contents <- readFile file
-                 print (150 `filledAmong` contents)
+                 print (150 `filledAmong` contents, 150 `minFilledAmong` contents)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
