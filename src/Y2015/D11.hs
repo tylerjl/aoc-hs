@@ -38,7 +38,7 @@ increment = reverse . step . reverse
 
 rotate :: String -> String
 rotate = nextValid . increment
-    where nextValid = head . filter meetsReqs . iterate (increment)
+    where nextValid = head . filter meetsReqs . iterate increment
 
 main :: IO ()
 main = do

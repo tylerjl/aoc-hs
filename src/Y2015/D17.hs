@@ -9,8 +9,8 @@ filledAmong t = containersBy length t . c
 
 minFilledAmong :: Int -> String -> Int
 minFilledAmong t s =  containersBy (length . filter ((==) minFilled . length)) t c
-    where minFilled = containersBy (length . minimumBy (compare `on` length)) t c
-          c = map read $ lines s
+    where c         = map read $ lines s
+          minFilled = containersBy (length . minimumBy (compare `on` length))  t c
 
 containersBy :: ([[Int]] -> a) -> Int -> [Int] -> a
 containersBy f t s = f [x | x <- subsequences s, sum x == t]

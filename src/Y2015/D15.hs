@@ -6,19 +6,20 @@ data Ingredient = Ingredient { capacity   :: Int
                              , durability :: Int
                              , flavor     :: Int
                              , texture    :: Int
-                             , calories    :: Int
+                             , calories   :: Int
                              } deriving (Show, Eq)
 
 calorieScore :: String -> Int
-calorieScore = maximum . map (product . init) . filter ((==) 500 . last) . recipeCombos
+calorieScore = recipeCombos ((==) 500 . last)
 
 cookieScore :: String -> Int
-cookieScore = maximum . map (product . init) . recipeCombos
+cookieScore = recipeCombos (const True)
 
-recipeCombos :: String -> [[Int]]
-recipeCombos s = [ingredients `recipeSum` x | x <- measurements]
-    where ingredients = toIngredients s
+recipeCombos :: ([Int] -> Bool) -> String -> Int
+recipeCombos f s = maximum $ map (product . init) $ filter f mixtures
+    where ingredients  = toIngredients s
           measurements = length ingredients `partsOf` 100
+          mixtures     = [ingredients `recipeSum` x | x <- measurements]
 
 recipeSum :: [Ingredient] -> [Int] -> [Int]
 recipeSum i p = map (max 0) $ foldl' (zipWith (+)) [0,0,0,0,0] portions
