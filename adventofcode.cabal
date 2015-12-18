@@ -25,6 +25,7 @@ executable adventofcode
 
 library
   hs-source-dirs:      src
+  default-extensions:  QuasiQuotes
   exposed-modules:     Y2015
                      , Y2015.Util
                      , Y2015.D01
@@ -44,6 +45,7 @@ library
                      , Y2015.D15
                      , Y2015.D16
                      , Y2015.D17
+                     , Y2015.D18
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
