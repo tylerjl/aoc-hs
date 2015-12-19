@@ -1,6 +1,6 @@
-module Y2015.D18 (animateLights, animateStuckLights) where
-
 {-# LANGUAGE QuasiQuotes #-}
+
+module Y2015.D18 (animateLights, animateStuckLights) where
 
 import           Data.Array.Repa              ((:.)(..), Array, DIM2, U, Z(..))
 import qualified Data.Array.Repa as           R
