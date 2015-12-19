@@ -39,7 +39,7 @@ run 16 file = do contents <- readFile file
 run 17 file = do contents <- readFile file
                  print (150 `filledAmong` contents, 150 `minFilledAmong` contents)
 run 18 file = do contents <- readFile file
-                 print (animateLights contents 100)
+                 print (animateLights contents 100, animateStuckLights contents 100)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

@@ -11,3 +11,6 @@ spec = parallel $ do
         describe "animateLights" $ do
             it "lights four lights after four steps" $
                 animateLights input 4 `shouldBe` 4
+        describe "animateStuckLights" $ do
+            it "lights four lights after four steps" $
+                animateStuckLights input 5 `shouldBe` 17
