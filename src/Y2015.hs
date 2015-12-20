@@ -18,6 +18,7 @@ module Y2015
     , module Y2015.D16
     , module Y2015.D17
     , module Y2015.D18
+    , module Y2015.D19
 ) where
 
 import Y2015.Util
@@ -39,3 +40,4 @@ import Y2015.D15
 import Y2015.D16
 import Y2015.D17
 import Y2015.D18
+import Y2015.D19
