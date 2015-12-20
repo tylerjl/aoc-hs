@@ -7,10 +7,10 @@ license:             MIT
 license-file:        LICENSE
 author:              Tyler Langlois
 maintainer:          ty@tjll.net
--- copyright:           
+-- copyright:
 category:            Web
 build-type:          Simple
--- extra-source-files:  
+-- extra-source-files:
 cabal-version:       >=1.10
 
 executable adventofcode

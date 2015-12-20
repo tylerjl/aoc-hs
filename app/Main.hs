@@ -29,7 +29,7 @@ run 13 file = do contents <- readFile file
                  let withMe = contents
                               ++ "Yourself would gain 0 happiness units "
                               ++ "by sitting next to Yourself."
-                 print $ (solveSeating contents, solveSeating withMe)
+                 print (solveSeating contents, solveSeating withMe)
 run 14 file = do contents <- readFile file
                  print (distanceRace contents 2503, leadingRace contents 2503)
 run 15 file = do contents <- readFile file
@@ -48,6 +48,6 @@ main = do
     let mDay = (readMaybe <=< headMay) args
         mInp = args `atMay` 1
     case (mDay, mInp) of
-         (Nothing, _)     -> putStr $ unlines $ ["Error: missing day number.", usage]
-         (_, Nothing)     -> putStr $ unlines $ ["Error: missing input.", usage]
+         (Nothing, _)     -> putStr $ unlines ["Error: missing day number.", usage]
+         (_, Nothing)     -> putStr $ unlines ["Error: missing input.", usage]
          (Just d, Just i) -> run d i
