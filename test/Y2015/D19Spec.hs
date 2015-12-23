@@ -19,7 +19,7 @@ spec = parallel $
                 distinctMols part1 `shouldBe` 4
         describe "stepsTo" $ do
             it "finds minimal steps to 'HOH'" $
-                molSteps part2 `shouldBe` 3
+                molSteps part2 `shouldBe` 2
             it "finds minimal steps to 'HOHOHO'" $
                 molSteps (unlines (init (lines part2) ++ ["HOHOHO"]))
-                  `shouldBe` 6
+                  `shouldBe` 5

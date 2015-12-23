@@ -11,6 +11,13 @@ type Mol       = [String]
 type Repls     = Map String (Set String)
 type Compounds = Set Mol
 
+molSteps :: String -> Int
+molSteps = (+) (-1) . sum . map replCount . toMol . last . lines
+  where replCount "Rn" =  0
+        replCount "Ar" =  0
+        replCount "Y"  = -1
+        replCount _    =  1
+
 distinctMols :: String -> Int
 distinctMols s = S.size $ compounds mols repls
   where input = lines s
