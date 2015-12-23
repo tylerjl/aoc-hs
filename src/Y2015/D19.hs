@@ -1,4 +1,4 @@
-module Y2015.D19 (distinctMols) where
+module Y2015.D19 (distinctMols, molSteps) where
 
 import Data.Char (isLower, isUpper)
 import Data.List (foldl', inits, tails)
@@ -28,10 +28,10 @@ subRepl (pre,sub,post) = foldl' (flip S.insert) S.empty
   where construct repl = pre ++ [repl] ++ post
 
 toRepls :: [String] -> Repls
-toRepls = M.fromListWith S.union . map (molPair . words)
+toRepls = M.fromListWith S.union . map (molPair S.singleton . words)
 
-molPair :: [String] -> (String, Set String)
-molPair [from,_,to] = (from, S.singleton to)
+molPair :: (a -> b) -> [a] -> (a, b)
+molPair f [from,_,to] = (from, f to)
 
 toMol :: String -> Mol
 toMol []                                = []
