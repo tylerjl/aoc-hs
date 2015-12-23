@@ -55,6 +55,7 @@ library
                      , containers
                      , cryptohash
                      , memoize
+                     , MissingH
                      , parsec
                      , repa
                      , safe
