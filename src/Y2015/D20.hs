@@ -1,40 +1,48 @@
-module Y2015.D20 (withMinPresents) where
+module Y2015.D20 (withMinPresents, withMinPresents2) where
 
-import Data.List (foldl')
+-- Original credit for most of this due to aepsilon:
+-- https://www.reddit.com/r/adventofcode/comments/3xjpp2/day_20_solutions/cy5brqe
+
+import           Data.List   (group, null)
+import           Data.Set    (Set)
+import qualified Data.Set as Set
 
 withMinPresents :: Int -> Int
-withMinPresents n = head houseSums
-  where houseSums = [x | x <- [1..]
-                       , giftsTo x * 10 >= n]
+withMinPresents n = head $ filter ((>=n `divCeil` 10) . divisorSum) [1..]
 
-giftsTo :: Int -> Int
-giftsTo n = sum . map (!! (n-1))
-        $ [take n $ paddedStep x | x <- [1..n]]
+divCeil :: Int -> Int -> Int
+n `divCeil` d = (n-1) `div` d + 1
 
-paddedStep :: Int -> [Int]
-paddedStep n = map nonzeroToN $ zipStepped [n,n+n..] [1..]
-  where nonzeroToN 0 = 0
-        nonzeroToN _ = n
+divisorSum :: Int -> Int
+divisorSum = sum . divisorList
 
-zipStepped :: (Eq a, Num a) => [a] -> [a] -> [a]
-zipStepped (x:xs) (y:ys) | y == x = x : zipStepped xs ys
-                         | otherwise = 0 : zipStepped (x:xs) ys
+divisorList :: Int -> [Int]
+divisorList = map product . mapM (scanl (*) 1) . group . factorize
 
--- houseWith :: Int -> Int
--- houseWith n = head [x | x <- [1..], factorize x >= (n `div` 10)]
---   where factorize 1 = 1
---         factorize 2 = 3
---         factorize i | isPrime i = i + 1
---                     | otherwise = sum $ i : divisors i
+factorize :: Int -> [Int]
+factorize 1                = []
+factorize n | null factors = [n]
+            | otherwise    = p : factorize q
+  where factors = [ (p,q) | p <- takeWhile (<= intsqrt n) primes
+                          , let (q,r) = quotRem n p
+                          , r == 0 ]
+        p = fst $ head factors
+        q = snd $ head factors
 
--- Souce: http://stackoverflow.com/a/1480620
--- divisors :: Int -> [Int]
--- divisors n = 1 : filter ((==0) . rem n) [2 .. n `div` 2]
+intsqrt :: Int -> Int
+intsqrt = floor . sqrt . fromIntegral
 
--- Source: http://stackoverflow.com/a/4695002
--- isPrime k = null [ x | x <- [2..k - 1], k `mod`x  == 0]
+primes :: [Int]
+primes = 2 : 3 : [ p | p <- [5,7..]
+                     , and [p `rem` d /= 0 | d <- takeWhile (<= intsqrt p) primes]
+                 ]
 
--- Source: http://stackoverflow.com/a/3596536
--- primes :: [Integer]
--- primes = sieve [2..]
---   where sieve (p:xs) = p : sieve [x | x <- xs, x `mod` p > 0]
+withMinPresents2 :: Int -> Int
+withMinPresents2 n = head $ filter ((>=n `divCeil` 11)
+                          . divisorSumLimit 50) [1..]
+
+divisorSumLimit :: Int -> Int -> Int
+divisorSumLimit limit n = sum . snd . Set.split ((n-1)`div`limit) . divisors $ n
+
+divisors :: Int -> Set Int
+divisors = Set.fromList . divisorList

@@ -42,6 +42,9 @@ run 18 file = do contents <- readFile file
                  print (animateLights contents 100, animateStuckLights contents 100)
 run 19 file = do contents <- readFile file
                  print (distinctMols contents)
+run 20 file = print ( withMinPresents 36000000
+                    , withMinPresents2 36000000
+                    )
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
