@@ -45,6 +45,8 @@ run 19 file = do contents <- readFile file
 run 20 file = print ( withMinPresents 36000000
                     , withMinPresents2 36000000
                     )
+run 21 file = do contents <- readFile file
+                 print (cheapestVictory contents)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

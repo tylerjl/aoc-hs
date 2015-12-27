@@ -2,10 +2,15 @@ module Y2015.D21
   ( Combatant(..)
   , Item(..)
   , battle
+  , cheapestVictory
   , item
   , toBoss
   )
 where
+
+import Control.Monad (replicateM)
+import Data.Maybe    (catMaybes)
+import Safe          (minimumMay)
 
 data Item = Item { cost   :: Int
                  , armor  :: Int
@@ -15,6 +20,15 @@ data Item = Item { cost   :: Int
 data Combatant = Combatant { hp    :: Int
                            , items :: [Item]
                            } deriving (Show)
+
+cheapestVictory :: String -> Maybe Int
+cheapestVictory = minimumMay . catMaybes . flip map tests . battle . toBoss
+  where tests = map (equip player) loadouts
+
+loadouts :: [[Item]]
+loadouts = [ w:a:rs | w  <- weapons
+                    , a  <- armory
+                    , rs <- replicateM 2 rings]
 
 player :: Combatant
 player = Combatant { hp = 100, items = [] }
@@ -26,7 +40,7 @@ toBoss s = Combatant { hp = hp, items = i }
         i     = map (toI . words) $ tail input
         toI ["Damage:",d] = item { damage = read d }
         toI ["Armor:", a] = item { armor  = read a }
-        toI _ = item
+        toI _             = item
 
 item :: Item
 item = Item {cost = 0, damage = 0, armor = 0}
@@ -55,21 +69,19 @@ rings = [ item {cost = 25,  damage = 1}
         , item {cost = 20,   armor = 1}
         , item {cost = 40,   armor = 2}
         , item {cost = 80,   armor = 3}
+        , item -- Dummy piece since rings are optional
         ]
 
-attack :: Combatant -> Int
-attack = attr damage
-
-defense :: Combatant -> Int
-defense = attr armor
+equip :: Combatant -> [Item] -> Combatant
+equip c@(Combatant {items = is}) i = c {items = i ++ is}
 
 attr :: (Item -> Int) -> Combatant -> Int
 attr f = sum . map f . items
 
-battle :: Combatant -> Combatant -> Bool
-battle p b | (p `hits` b) <= (b `hits` p) = True
-           | otherwise                    = False
+battle :: Combatant -> Combatant -> Maybe Int
+battle b p | (p `hits` b) <= (b `hits` p) = Just $ attr cost p
+           | otherwise                    = Nothing
 
 hits :: Combatant -> Combatant -> Int
 hits a d = ceiling $ fromIntegral (hp d) / fromIntegral minDmg
-  where minDmg = max 1 (attack a - defense d)
+  where minDmg = max 1 (attr damage a - attr armor d)
