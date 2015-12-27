@@ -17,4 +17,4 @@ spec = parallel $
     describe "Day 21" $
         describe "battle" $
           it "correctly simulates a player victory" $
-            battle (toBoss input) player `shouldBe` Just 0
+            battle (toBoss input) player `shouldBe` (True, 0)
