@@ -3,13 +3,16 @@ module Y2015.D21
   , Item(..)
   , battle
   , cheapestVictory
+  , highestLoss
   , item
   , toBoss
   )
 where
 
 import Control.Monad (replicateM)
+import Data.List     (maximumBy, minimumBy)
 import Data.Maybe    (catMaybes)
+import Data.Ord      (comparing)
 import Safe          (minimumMay)
 
 data Item = Item { cost   :: Int
@@ -21,14 +24,19 @@ data Combatant = Combatant { hp    :: Int
                            , items :: [Item]
                            } deriving (Show)
 
-cheapestVictory :: String -> Maybe Int
-cheapestVictory = minimumMay . catMaybes . flip map tests . battle . toBoss
-  where tests = map (equip player) loadouts
+highestLoss :: String -> Int
+highestLoss = battleCostBy maximumBy (not . fst)
 
-loadouts :: [[Item]]
-loadouts = [ w:a:rs | w  <- weapons
-                    , a  <- armory
-                    , rs <- replicateM 2 rings]
+cheapestVictory :: String -> Int
+cheapestVictory = battleCostBy minimumBy fst
+
+battleCostBy f g = snd . f (comparing snd) . filter g
+                 . flip map loadouts . battle . toBoss
+
+loadouts :: [Combatant]
+loadouts = map (equip player) [ w:a:rs | w  <- weapons
+                                       , a  <- armory
+                                       , rs <- replicateM 2 rings]
 
 player :: Combatant
 player = Combatant { hp = 100, items = [] }
@@ -78,9 +86,10 @@ equip c@(Combatant {items = is}) i = c {items = i ++ is}
 attr :: (Item -> Int) -> Combatant -> Int
 attr f = sum . map f . items
 
-battle :: Combatant -> Combatant -> Maybe Int
-battle b p | (p `hits` b) <= (b `hits` p) = Just $ attr cost p
-           | otherwise                    = Nothing
+battle :: Combatant -> Combatant -> (Bool, Int)
+battle b p | (p `hits` b) <= (b `hits` p) = (True,  price)
+           | otherwise                    = (False, price)
+           where price = attr cost p
 
 hits :: Combatant -> Combatant -> Int
 hits a d = ceiling $ fromIntegral (hp d) / fromIntegral minDmg
