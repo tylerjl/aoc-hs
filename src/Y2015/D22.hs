@@ -1,4 +1,4 @@
-module Y2015.D22 (exInstructions) where
+module Y2015.D22 (exInstructions, exInstructions2) where
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
@@ -15,6 +15,9 @@ data Instruction = Half      Register
 
 exInstructions :: String -> Registers
 exInstructions = runInsts 0 M.empty . toInstructions
+
+exInstructions2 :: String -> Registers
+exInstructions2 = runInsts 0 (M.singleton 'a' 1) . toInstructions
 
 runInsts :: Int -> Registers -> [Instruction] -> Registers
 runInsts eip rs is | eip < 0 || eip >= length is = rs
