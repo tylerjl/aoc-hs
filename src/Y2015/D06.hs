@@ -3,6 +3,10 @@ module Y2015.D06
     , testB
     , Instruction(..)
     , Range(..)
+    , parseInstructions
+    , configureGridA
+    , configureGridB
+    , lightSimulation
 ) where
 
 import           Control.Applicative ((<|>))
@@ -97,15 +101,6 @@ testA = R.foldAllS (+) 0 . configureGridA initialGrid
 testB :: Instruction -> Int
 testB = R.foldAllS (+) 0 . configureGridB initialGrid
 
-main :: IO ()
-main = do
-        input <- readFile "src/Y2015/D06_input"
-        case regularParse instructionsParser input of
-            Right instructions -> do
-                putStr "Part A - total lights lit: "
-                a <- R.sumAllP $ foldl' configureGridA initialGrid instructions
-                print a
-                putStr "Part B - total lights lit: "
-                b <- R.sumAllP $ foldl' configureGridB initialGrid instructions
-                print b
-            Left e         -> putStrLn "Error: Malformed input:" >> print e
+parseInstructions = regularParse instructionsParser
+
+lightSimulation f = R.sumAllP . foldl' f initialGrid

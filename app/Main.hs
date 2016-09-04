@@ -25,6 +25,16 @@ run 3 file = do c <- readFile file
                 print (santaRun contents, roboRun contents)
 run 4 file = do contents <- B.readFile file
                 print (crack contents 5, crack contents 6)
+run 5 file = let check f = length . filter f . lines
+             in do contents <- readFile file
+                   print (check isNice contents, check isNicer contents)
+run 6 file = do contents <- readFile file
+                case parseInstructions contents of
+                     Left e -> putStrLn $ "Could not parse: " ++ show e
+                     Right insts -> do
+                         a <- lightSimulation configureGridA insts
+                         b <- lightSimulation configureGridB insts
+                         print (a, b)
 run 13 file = do contents <- readFile file
                  let withMe = contents
                               ++ "Yourself would gain 0 happiness units "

@@ -42,11 +42,3 @@ thriceVoweled = (>2) . length . filter isVowel
 
 isVowel :: Char -> Bool
 isVowel = flip elem "aeiou"
-
-main :: IO ()
-main = do
-       input <- readFile "src/Y2015/D05_input"
-       putStr "Part A - : "
-       print (length $ filter isNice $ lines input)
-       putStr "Part B - : "
-       print (length $ filter isNicer $ lines input)
