@@ -1,7 +1,6 @@
 module Y2015.D07Spec (spec) where
 
 import Y2015
-import Y2015.Util
 
 import Test.Hspec
 
