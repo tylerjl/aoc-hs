@@ -10,6 +10,12 @@ Run the test suite to confirm the code conforms to the problem set examples:
 
     stack test
 
-Run the solver for a problem set:
+If everything looks good, go ahead and either install the solver binary and run it against problem input (in my case, I've committed my problem input, so I can do this):
 
-    stack exec src/Y2015/D01.hs
+    stack install
+    adventofcode 1 dist/resources/day1
+
+Alternatively, you can build the source and run `Main.sh` standalone against problem set input:
+
+    stack build
+    stack runhaskell app/Main.sh 1 dist/resources/day1
