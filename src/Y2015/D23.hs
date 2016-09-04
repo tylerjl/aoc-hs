@@ -1,4 +1,4 @@
-module Y2015.D22 (exInstructions, exInstructions2) where
+module Y2015.D23 (exInstructions, exInstructions2) where
 
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M

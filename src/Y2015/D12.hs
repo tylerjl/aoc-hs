@@ -42,11 +42,3 @@ sumValue _          = 0
 
 valAcc :: Int -> Value -> Int
 valAcc = flip ((+) . sumValue)
-
-main :: IO ()
-main = do
-    input <- L.readFile "src/Y2015/D12_input"
-    putStr "Part A - total sum is: "
-    print $ jsonSum input
-    putStr "Part B - total sum without red objects is: "
-    print $ jsonSumFixed input

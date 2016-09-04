@@ -21,6 +21,7 @@ executable adventofcode
                      , base
                      , bytestring
                      , safe
+                     , MissingH
   default-language:    Haskell2010
 
 library
@@ -49,7 +50,7 @@ library
                      , Y2015.D19
                      , Y2015.D20
                      , Y2015.D21
-                     , Y2015.D22
+                     , Y2015.D23
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring

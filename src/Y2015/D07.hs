@@ -1,6 +1,8 @@
 module Y2015.D07
     ( wire
     , circuitParser
+    , parseCircuits
+    , override
 ) where
 
 import Y2015.Util (regularParse, intParser)
@@ -91,15 +93,6 @@ wire :: String -> [Instruction] -> Word16
 wire s = flip voltageOn s . M.fromList . map toPair
     where toPair (Instruction g w) = (w, g)
 
-main :: IO ()
-main = do
-        input <- readFile "src/Y2015/D07_input"
-        case regularParse circuitParser input of
-            Right instructions -> do
-                putStr "Part A - signal on a: "
-                let signal_a = wire "a" instructions
-                print signal_a
-                putStr "Part B - signal on a is now: "
-                let override = Instruction (Singleton (Val signal_a)) "b"
-                print $ wire "a" (instructions ++ [override])
-            Left e         -> putStrLn "Error: Malformed input:" >> print e
+parseCircuits = regularParse circuitParser
+
+override s = Instruction (Singleton (Val s)) "b"

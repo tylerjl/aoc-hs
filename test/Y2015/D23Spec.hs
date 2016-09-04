@@ -1,4 +1,4 @@
-module Y2015.D22Spec (spec) where
+module Y2015.D23Spec (spec) where
 
 import Y2015
 import Test.Hspec
@@ -12,7 +12,7 @@ input = unlines [ "inc a"
 
 spec :: Spec
 spec = parallel $
-    describe "Day 22" $
+    describe "Day 23" $
         describe "exInstructions" $
           it "calcuates the example instruction set" $
             exInstructions input `shouldBe` M.singleton 'a' 2

@@ -39,11 +39,3 @@ difference = solve (-) (escape . body)
 
 encoded :: String -> Int
 encoded = solve (flip (-)) encode
-
-main :: IO ()
-main = do
-        input <- readFile "src/Y2015/D08_input"
-        putStr "Part A - difference in characters is: "
-        print $ difference input
-        putStr "Part B - encoded difference in characters is: "
-        print $ encoded input

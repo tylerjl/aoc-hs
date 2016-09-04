@@ -60,14 +60,3 @@ chart routes = mapMaybe (plot . (zip <*> tail)) . permutations . keys $ worldMap
           plot          = fmap sum . mapM travel
           travel (a, b) | a `Map.member` worldMap = Map.lookup b (worldMap ! a)
                         | otherwise               = Nothing
-
-main :: IO ()
-main = do
-        input <- readFile "src/Y2015/D09_input"
-        case regularParse routeParser input of
-            Right routes -> do
-                putStr "Part A - shortest route is: "
-                print $ shortestRoute routes
-                putStr "Part A - longest route is: "
-                print $ longestRoute routes
-            Left e       -> putStrLn "Error: Malformed input:" >> print e

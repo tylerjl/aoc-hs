@@ -3,6 +3,8 @@ module Main where
 import Control.Applicative ((<*>))
 import Control.Monad
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as L
+import Data.String.Utils (rstrip)
 import Safe
 import System.Environment  (getArgs)
 import Text.Read           (readMaybe)
@@ -35,6 +37,31 @@ run 6 file = do contents <- readFile file
                          a <- lightSimulation configureGridA insts
                          b <- lightSimulation configureGridB insts
                          print (a, b)
+run 7 file = do contents <- readFile file
+                case parseCircuits contents of
+                     Left e -> putStrLn $ "Could not parse: " ++ show e
+                     Right insts -> let a = wire "a" insts in do
+                         print
+                             ( a
+                             , wire "a" (insts ++ [override a])
+                             )
+run 8 file = do contents <- readFile file
+                print (difference contents, encoded contents)
+run 9 file = do contents <- readFile file
+                case regularParse routeParser contents of
+                     Left e -> putStrLn $ "Could not parse: " ++ show e
+                     Right rs -> print (shortestRoute rs,  longestRoute rs)
+run 10 file = do
+    contents <- readFile file
+    let stem = lookSay $ rstrip contents
+    print (length $ stem 40, length $ stem 50)
+run 11 file = do
+    contents <- readFile file
+    let pw = rotate $ rstrip contents
+    print (pw, rotate pw)
+run 12 file = do
+    contents <- L.readFile file
+    print (jsonSum contents, jsonSumFixed contents)
 run 13 file = do contents <- readFile file
                  let withMe = contents
                               ++ "Yourself would gain 0 happiness units "
@@ -51,13 +78,13 @@ run 17 file = do contents <- readFile file
 run 18 file = do contents <- readFile file
                  print (animateLights contents 100, animateStuckLights contents 100)
 run 19 file = do contents <- readFile file
-                 print (distinctMols contents)
+                 print (distinctMols contents, molSteps contents)
 run 20 file = print ( withMinPresents 36000000
                     , withMinPresents2 36000000
                     )
 run 21 file = do contents <- readFile file
                  print (cheapestVictory contents, highestLoss contents)
-run 22 file = do contents <- readFile file
+run 23 file = do contents <- readFile file
                  print (exInstructions contents, exInstructions2 contents)
 run _ p   = putStrLn "Not implemented yet."
 

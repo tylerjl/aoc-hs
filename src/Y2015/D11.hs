@@ -39,12 +39,3 @@ increment = reverse . step . reverse
 rotate :: String -> String
 rotate = nextValid . increment
     where nextValid = head . filter meetsReqs . iterate increment
-
-main :: IO ()
-main = do
-    putStr "Part A - next best password is: "
-    let pw  = "hepxcrrq"
-        pw1 = rotate pw
-    print pw1
-    putStr "Part B - next best password is: "
-    print $ rotate pw1
