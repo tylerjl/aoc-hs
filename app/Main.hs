@@ -40,7 +40,7 @@ run 6 file = do contents <- readFile file
 run 7 file = do contents <- readFile file
                 case parseCircuits contents of
                      Left e -> putStrLn $ "Could not parse: " ++ show e
-                     Right insts -> let a = wire "a" insts in do
+                     Right insts -> let a = wire "a" insts in
                          print
                              ( a
                              , wire "a" (insts ++ [override a])
