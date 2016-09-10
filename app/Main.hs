@@ -87,7 +87,9 @@ run 21 file = do contents <- readFile file
 run 23 file = do contents <- readFile file
                  print (exInstructions contents, exInstructions2 contents)
 run 24 file = do contents <- readFile file
-                 print (idealEntanglement 3 contents)
+                 print ( idealEntanglement 3 contents
+                       , idealEntanglement 4 contents
+                       )
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

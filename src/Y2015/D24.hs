@@ -1,8 +1,6 @@
-module Y2015.D24  (idealEntanglement) where
+module Y2015.D24 (idealEntanglement) where
 
-import Data.List  (minimumBy, permutations)
-import Data.Maybe (mapMaybe)
-import Data.Ord   (comparing)
+import Data.List (sortBy, subsequences)
 
 idealEntanglement :: Int    -- ^ How many compartments to divide amongst.
                   -> String -- ^ Input as a string containing newlined-separated
@@ -10,19 +8,13 @@ idealEntanglement :: Int    -- ^ How many compartments to divide amongst.
                   -> Int    -- ^ Ideal entanglement value for the resulting
                             --   package distribution.
 idealEntanglement compartments input =
-    product $ head $ filter isBalanced $ head $
-        filter (any isBalanced) $
-        allSplits $ permutations weights
+    product $ head seqs
     where weights  = map read $ lines input
           balanced = sum weights `quot` compartments
           isBalanced = (==) balanced . sum
+          seqs = sortBy idealPackage $
+              filter isBalanced $
+              subsequences weights
 
-allSplits :: [[a]] -> [[[a]]]
-allSplits = flip concatMap [1..] . go
-    where go ps n = map (splitEvery n) ps
-
--- Credit to: https://stackoverflow.com/a/8700618
-splitEvery :: Int -> [a] -> [[a]]
-splitEvery n = takeWhile (not . null)
-             . map (take n)
-             . iterate (drop n)
+idealPackage a b | length a == length b = product a `compare` product b
+                 | otherwise = length a `compare` length b
