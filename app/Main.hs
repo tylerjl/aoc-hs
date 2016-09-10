@@ -86,6 +86,8 @@ run 21 file = do contents <- readFile file
                  print (cheapestVictory contents, highestLoss contents)
 run 23 file = do contents <- readFile file
                  print (exInstructions contents, exInstructions2 contents)
+run 24 file = do contents <- readFile file
+                 print (idealEntanglement 3 contents)
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()

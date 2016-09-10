@@ -10,4 +10,4 @@ spec = parallel $
     describe "Day 24" $
         describe "idealEntanglement" $
           it "finds the ideal example arrangement entanglement" $
-            idealEntanglement input `shouldBe` 99
+            idealEntanglement 3 input `shouldBe` 99
