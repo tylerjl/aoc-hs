@@ -24,3 +24,4 @@ import Y2015.D20 as X
 import Y2015.D21 as X
 import Y2015.D23 as X
 import Y2015.D24 as X
+import Y2015.D25 as X

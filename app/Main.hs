@@ -90,6 +90,9 @@ run 24 file = do contents <- readFile file
                  print ( idealEntanglement 3 contents
                        , idealEntanglement 4 contents
                        )
+run 25 file = do contents <- readFile file
+                 print ( manualCodeFrom contents
+                       )
 run _ p   = putStrLn "Not implemented yet."
 
 main :: IO ()
