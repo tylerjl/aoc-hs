@@ -50,6 +50,7 @@ library
                      , Y2015.D19
                      , Y2015.D20
                      , Y2015.D21
+                     , Y2015.D22
                      , Y2015.D23
                      , Y2015.D24
                      , Y2015.D25
@@ -59,6 +60,7 @@ library
                      , bytestring
                      , containers
                      , cryptohash
+                     , lens
                      , memoize
                      , parsec
                      , repa

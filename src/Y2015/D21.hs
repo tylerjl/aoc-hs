@@ -1,11 +1,9 @@
 module Y2015.D21
-  ( Combatant(..)
-  , Item(..)
-  , battle
+  ( battle
   , cheapestVictory
   , highestLoss
-  , item
   , toBoss
+  , mkTestCombatant
   )
 where
 
@@ -23,6 +21,13 @@ data Item = Item { cost   :: Int
 data Combatant = Combatant { hp    :: Int
                            , items :: [Item]
                            } deriving (Show)
+
+mkTestCombatant :: Combatant
+mkTestCombatant =
+    Combatant
+        { hp    = 8
+        , items = [ item {damage = 5, armor  = 5} ]
+        }
 
 highestLoss :: String -> Int
 highestLoss = battleCostBy maximumBy (not . fst)
