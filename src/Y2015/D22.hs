@@ -1,13 +1,18 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Y2015.D22 (spellBattle, testPlayer, Result(..)) where
+module Y2015.D22
+    ( Result(..)
+    , spellBattle
+    , testPlayer
+    )
+where
 
 import           Control.Lens
-import           Data.List  (minimumBy)
-import           Data.Maybe (catMaybes)
-import           Data.Ord   (comparing)
-import           Data.Set   (Set, insert, member)
-import qualified Data.Set   as S
+import           Data.List    (foldr, minimumBy)
+import           Data.Maybe   (catMaybes)
+import           Data.Ord     (comparing)
+import           Data.Map     (Map, insert, keys, member)
+import qualified Data.Map     as M
 
 data Boss = Boss
     { _damage :: Int
@@ -21,22 +26,13 @@ data Player = Player
     , _spent :: Int
     } deriving (Eq, Show)
 
-data Effect = Effect Spell Integer
-            deriving (Show)
-
-instance Eq Effect where
-    (Effect a _) == (Effect b _) = a == b
-
-instance Ord Effect where
-    (Effect a _) `compare` (Effect b _) = a `compare` b
-
 data State = PlayerTurn
            | BossTurn
            deriving (Show)
 
 data Game = Game
     { _boss    :: Boss
-    , _effects :: Set Effect
+    , _effects :: Map Spell Int
     , _hard    :: Bool
     , _player  :: Player
     , _state   :: State
@@ -68,25 +64,19 @@ cast spell = action
             Shield       -> (e Shield 6, 113)
             Poison       -> (e Poison 6, 173)
             Recharge     -> (e Recharge 5, 229)
-        e s t = effects %~ insert (Effect s t)
+        e s t = effects %~ insert s t
 
-affect :: Effect -> Game -> Game
-affect (Effect Shield _)   = player.armor .~ 7
-affect (Effect Poison _)   = boss.hp -~ 3
-affect (Effect Recharge _) = player.mana +~ 101
-affect (Effect _ _)        = id
+affect :: Spell -> Game -> Game
+affect Shield   = player.armor .~ 7
+affect Poison   = boss.hp -~ 3
+affect Recharge = player.mana +~ 101
+affect _        = id
 
 stepEffects :: Game -> Game
 stepEffects game =
-    S.foldr affect (game' & effects %~ step) (game^.effects)
+    foldr affect (game' & effects %~ step) (keys $ game^.effects)
     where game' = game & player.armor .~ 0
-          step  = S.filter (not.expired) . S.map decay
-
-decay :: Effect -> Effect
-decay (Effect e ttl) = Effect e (ttl - 1)
-
-expired :: Effect -> Bool
-expired (Effect _ ttl) = ttl <= 0
+          step  = M.filter (0 <) . M.map pred
 
 stepGame :: Game -> [Result]
 stepGame game
@@ -99,7 +89,7 @@ stepGame game
             BossTurn   -> stepGame $ strike game' & state .~ PlayerTurn
             PlayerTurn ->
                 [ result | spell <- [ s | s <- [MagicMissile ..]
-                                        , not $ s `inEffect` game'
+                                        , not $ member s $ game'^.effects
                                         ]
                          , let nextTurn = cast spell game' & state .~ BossTurn
                          , result <- stepGame nextTurn
@@ -107,10 +97,6 @@ stepGame game
             where game' = stepEffects $ case (game^.hard, game^.state) of
                               (True, PlayerTurn) -> game & player.life -~ 1
                               _ -> game
-
-inEffect :: Spell -> Game -> Bool
-inEffect spell = not . S.null . S.filter active . view effects
-    where active (Effect s ttl) = s == spell
 
 strike :: Game -> Game
 strike g =
@@ -133,7 +119,7 @@ newGame hardMode input =
             , _spent = 0
             }
         , _boss    = boss
-        , _effects = S.empty
+        , _effects = M.empty
         , _state   = PlayerTurn
         , _hard    = hardMode
         }
