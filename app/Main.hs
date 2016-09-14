@@ -84,6 +84,8 @@ run 20 file = print ( withMinPresents 36000000
                     )
 run 21 file = do contents <- readFile file
                  print (cheapestVictory contents, highestLoss contents)
+run 22 file = do contents <- readFile file
+                 print (spellBattle False contents, spellBattle True contents)
 run 23 file = do contents <- readFile file
                  print (exInstructions contents, exInstructions2 contents)
 run 24 file = do contents <- readFile file

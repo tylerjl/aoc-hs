@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Y2015.D22 where
+module Y2015.D22 (spellBattle) where
 
 import           Control.Lens
 import           Data.List  (minimumBy)
@@ -37,6 +37,7 @@ data State = PlayerTurn
 data Game = Game
     { _boss    :: Boss
     , _effects :: Set Effect
+    , _hard    :: Bool
     , _player  :: Player
     , _state   :: State
     } deriving (Show)
@@ -103,7 +104,9 @@ stepGame game
                          , let nextTurn = cast spell game' & state .~ BossTurn
                          , result <- stepGame nextTurn
                          ]
-            where game'  = stepEffects game
+            where game' = stepEffects $ case (game^.hard, game^.state) of
+                              (True, PlayerTurn) -> game & player.life -~ 1
+                              _ -> game
 
 inEffect :: Spell -> Game -> Bool
 inEffect spell = not . S.null . S.filter active . view effects
@@ -120,8 +123,8 @@ lost :: Game -> Bool
 lost game = game^.player.life <= 0 ||
                 game^.player.mana < 0
 
-newGame :: String -> Game
-newGame input =
+newGame :: Bool -> String -> Game
+newGame hardMode input =
     Game
         { _player  = Player
             { _life = 50
@@ -132,6 +135,7 @@ newGame input =
         , _boss    = boss
         , _effects = S.empty
         , _state   = PlayerTurn
+        , _hard    = hardMode
         }
     where boss = pBoss input
 
@@ -140,3 +144,6 @@ pBoss input = Boss { _hp = hp, _damage = dmg }
     where parse f = read $ last $ words $ f $ lines input
           hp      = parse head
           dmg     = parse last
+
+spellBattle :: Bool -> String -> Result
+spellBattle hardMode = minimum . stepGame . newGame hardMode
