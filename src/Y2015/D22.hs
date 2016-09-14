@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Y2015.D22 (spellBattle) where
+module Y2015.D22 (spellBattle, testPlayer, Result(..)) where
 
 import           Control.Lens
 import           Data.List  (minimumBy)
@@ -147,3 +147,6 @@ pBoss input = Boss { _hp = hp, _damage = dmg }
 
 spellBattle :: Bool -> String -> Result
 spellBattle hardMode = minimum . stepGame . newGame hardMode
+
+testPlayer :: Bool -> String -> Game
+testPlayer d = (player.mana .~ 250) . (player.life .~ 10) . newGame d
