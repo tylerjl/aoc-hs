@@ -80,34 +80,31 @@ stepEffects game =
 
 stepGame :: Game -> [Result]
 stepGame game
-    | won game =
+    | game^.boss.hp <= 0 =
         [Won $ game^.player.spent]
-    | lost game =
+    | game^.player.life <= 0 || game^.player.mana < 0 =
         [Lost]
     | otherwise =
         case game^.state of
             BossTurn   -> stepGame $ strike game' & state .~ PlayerTurn
-            PlayerTurn ->
-                [ result | spell <- [ s | s <- [MagicMissile ..]
-                                        , not $ member s $ game'^.effects
-                                        ]
-                         , let nextTurn = cast spell game' & state .~ BossTurn
-                         , result <- stepGame nextTurn
-                         ]
+            PlayerTurn -> stepSpells game'
             where game' = stepEffects $ case (game^.hard, game^.state) of
                               (True, PlayerTurn) -> game & player.life -~ 1
                               _ -> game
 
+stepSpells :: Game -> [Result]
+stepSpells game =
+    [ result | spell <-
+        [ s | s <- [MagicMissile ..]
+            , not $ member s $ game^.effects
+            ]
+        , let nextTurn = cast spell game & state .~ BossTurn
+        , result <- stepGame nextTurn
+    ]
+
 strike :: Game -> Game
 strike g =
     player.life -~ max 1 (g^.boss.damage - g^.player.armor) $ g
-
-won :: Game -> Bool
-won g = g^.boss.hp <= 0
-
-lost :: Game -> Bool
-lost game = game^.player.life <= 0 ||
-                game^.player.mana < 0
 
 newGame :: Bool -> String -> Game
 newGame hardMode input =
