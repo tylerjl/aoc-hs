@@ -1,10 +1,13 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeSynonymInstances #-}
 
 module Y2015.D22 where
 
-import Control.Lens
+import           Control.Lens
+import           Data.List  (minimumBy)
+import           Data.Maybe (catMaybes)
+import           Data.Ord   (comparing)
+import           Data.Set   (Set, insert, member)
+import qualified Data.Set   as S
 
 data Boss = Boss
     { _damage :: Int
@@ -15,82 +18,120 @@ data Player = Player
     { _armor :: Int
     , _life  :: Int
     , _mana  :: Int
+    , _spent :: Int
     } deriving (Eq, Show)
 
-data Spell = Spell
-    { _cost   :: Int
-    , _effect :: Effect
-    , _ttl    :: Int
-    } deriving (Show)
+data Effect = Effect Spell Integer
+            deriving (Show)
 
-type Effect = Game -> Game
+instance Eq Effect where
+    (Effect a _) == (Effect b _) = a == b
 
-instance Show Effect where
-    show e = "<effect>"
+instance Ord Effect where
+    (Effect a _) `compare` (Effect b _) = a `compare` b
+
+data State = PlayerTurn
+           | BossTurn
+           deriving (Show)
 
 data Game = Game
-    { _player  :: Player
-    , _boss    :: Boss
-    , _effects :: [Spell]
+    { _boss    :: Boss
+    , _effects :: Set Effect
+    , _player  :: Player
+    , _state   :: State
     } deriving (Show)
+
+data Spell = MagicMissile
+           | Drain
+           | Shield
+           | Poison
+           | Recharge
+           deriving (Enum, Eq, Ord, Show)
+
+data Result = Won Int
+            | Lost
+            deriving (Eq, Ord, Show)
 
 makeLenses ''Boss
 makeLenses ''Game
 makeLenses ''Player
-makeLenses ''Spell
 
-spMagicMissle :: Spell
-spMagicMissle =
-    Spell
-        { _cost   = 53
-        , _effect = boss.hp -~ 4
-        , _ttl    = 0
-        }
+cast :: Spell -> Game -> Game
+cast spell = action
+           . (player.mana -~ cost)
+           . (player.spent +~ cost)
+    where
+        (action, cost) = case spell of
+            MagicMissile -> (boss.hp -~ 4, 53)
+            Drain        -> ((boss.hp -~ 2) . (player.life +~ 2), 73)
+            Shield       -> (e Shield 6, 113)
+            Poison       -> (e Poison 6, 173)
+            Recharge     -> (e Recharge 5, 229)
+        e s t = effects %~ insert (Effect s t)
 
-spDrain :: Spell
-spDrain =
-    Spell
-        { _cost   = 73
-        , _effect = (boss.hp -~ 2) . (player.life +~ 2)
-        , _ttl    = 0
-        }
+affect :: Effect -> Game -> Game
+affect (Effect Shield _)   = player.armor .~ 7
+affect (Effect Poison _)   = boss.hp -~ 3
+affect (Effect Recharge _) = player.mana +~ 101
+affect (Effect _ _)        = id
 
-spShield :: Spell
-spShield =
-    Spell
-        { _cost   = 113
-        , _effect = player.armor .~ 7
-        , _ttl    = 6
-        }
+stepEffects :: Game -> Game
+stepEffects game =
+    S.foldr affect (game' & effects %~ step) (game^.effects)
+    where game' = game & player.armor .~ 0
+          step  = S.filter (not.expired) . S.map decay
 
-spPoison :: Spell
-spPoison =
-    Spell
-        { _cost   = 173
-        , _effect = boss.hp -~ 3
-        , _ttl    = 6
-        }
+decay :: Effect -> Effect
+decay (Effect e ttl) = Effect e (ttl - 1)
 
-spRecharge :: Spell
-spRecharge =
-    Spell
-        { _cost   = 229
-        , _effect = player.mana +~ 101
-        , _ttl    = 5
-        }
+expired :: Effect -> Bool
+expired (Effect _ ttl) = ttl <= 0
 
-spells :: [Spell]
-spells = [spMagicMissle, spDrain, spShield, spPoison, spRecharge]
+stepGame :: Game -> [Result]
+stepGame game
+    | won game =
+        [Won $ game^.player.spent]
+    | lost game =
+        [Lost]
+    | otherwise =
+        case game^.state of
+            BossTurn   -> stepGame $ strike game' & state .~ PlayerTurn
+            PlayerTurn ->
+                [ result | spell <- [ s | s <- [MagicMissile ..]
+                                        , not $ s `inEffect` game'
+                                        ]
+                         , let nextTurn = cast spell game' & state .~ BossTurn
+                         , result <- stepGame nextTurn
+                         ]
+            where game'  = stepEffects game
 
-castSpell :: Spell -> Effect
-castSpell spell = spell ^. effect
+inEffect :: Spell -> Game -> Bool
+inEffect spell = not . S.null . S.filter active . view effects
+    where active (Effect s ttl) = s == spell
+
+strike :: Game -> Game
+strike g =
+    player.life -~ max 1 (g^.boss.damage - g^.player.armor) $ g
+
+won :: Game -> Bool
+won g = g^.boss.hp <= 0
+
+lost :: Game -> Bool
+lost game = game^.player.life <= 0 ||
+                game^.player.mana < 0
 
 newGame :: String -> Game
 newGame input =
     Game
-        { _player = Player { _life = 50, _armor = 0, _mana = 500 }
-        , _boss   = boss
-        , _effects = []
+        { _player  = Player
+            { _life = 50
+            , _armor = 0
+            , _mana = 500
+            , _spent = 0
+            }
+        , _boss    = boss
+        , _effects = S.empty
+        , _state   = PlayerTurn
         }
     where boss = pBoss input
 
