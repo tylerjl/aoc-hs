@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D11
+Description: Advent of Code Day 11 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 11 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D11 (rotate) where
 
 import Y2015.Util ((<&&>))
@@ -36,6 +45,8 @@ increment = reverse . step . reverse
           step (x:xs) | x /= 'z'  = succ x :      xs
                       | otherwise = 'a'    : step xs
 
-rotate :: String -> String
+-- |Rotate a password within specific rules
+rotate :: String -- ^ Starting password
+       -> String -- ^ Next valid password
 rotate = nextValid . increment
     where nextValid = head . filter meetsReqs . iterate increment

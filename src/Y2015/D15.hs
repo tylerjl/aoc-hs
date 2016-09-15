@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D15
+Description: Advent of Code Day 15 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 15 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D15 (calorieScore, cookieScore) where
 
 import Data.List (foldl')
@@ -9,10 +18,14 @@ data Ingredient = Ingredient { capacity   :: Int
                              , calories   :: Int
                              } deriving (Show, Eq)
 
-calorieScore :: String -> Int
+-- |Finds a calorie score for a cookie recipe
+calorieScore :: String -- ^ Raw string of recipe
+             -> Int    -- ^ Calorie score
 calorieScore = recipeCombos ((==) 500 . last)
 
-cookieScore :: String -> Int
+-- |Calculates a cookie score
+cookieScore :: String -- ^ Cookie recipe input
+            -> Int    -- ^ Calculated cookie score
 cookieScore = recipeCombos (const True)
 
 recipeCombos :: ([Int] -> Bool) -> String -> Int

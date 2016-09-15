@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D02
+Description: Advent of Code Day 02 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 02 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D02
     ( Present(..)
     , parsePresents
@@ -12,7 +21,9 @@ import           Text.Parsec.String (Parser)
 
 import           Y2015.Util         (regularParse, intParser)
 
-data Present = Present Int Int Int deriving (Show, Eq)
+-- |Represents a present in three dimensions
+data Present = Present Int Int Int
+             deriving (Show, Eq)
 
 presentsParser :: Parser [Present]
 presentsParser = P.many1 (presentParser <* P.optional endOfLine)
@@ -22,12 +33,16 @@ presentParser = Present <$> (intParser <* char 'x')
                         <*> (intParser <* char 'x')
                         <*>  intParser
 
-parsePresents :: String -> Maybe [Present]
+-- |Parse presents from an input string
+parsePresents :: String          -- ^ Raw input of present dimensions
+              -> Maybe [Present] -- ^ Possible list of 'Present's
 parsePresents s = case regularParse presentsParser s of
                        Right ps -> Just ps
                        Left _   -> Nothing
 
-surfaceArea :: [Present] -> Int
+-- |Find total surface area from list of 'Present's
+surfaceArea :: [Present] -- ^ List of 'Present's
+            -> Int       -- ^ Total surface area of all 'Present's
 surfaceArea = foldl' (+) 0 . map wrapping
 
 wrapping :: Present -> Int
@@ -42,7 +57,9 @@ sqft (Present l w h) = 2*l*w + 2*w*h + 2*h*l
 area :: Present -> Int
 area (Present l w h) = l*w*h
 
-ribbonLength :: [Present] -> Int
+-- |Find required length of ribbon for a list of presents.
+ribbonLength :: [Present] -- ^ List of 'Present's
+             -> Int       -- ^ Total length of required ribbon
 ribbonLength = sum . map presentRibbon
 
 presentRibbon :: Present -> Int

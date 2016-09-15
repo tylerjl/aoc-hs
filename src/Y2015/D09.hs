@@ -1,6 +1,20 @@
+{-|
+Module:      Y2015.D09
+Description: Advent of Code Day 09 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 09 set of problems for <adventofcode.com>.
+-}
+
 {-# LANGUAGE FlexibleContexts #-}
 
-module Y2015.D09 (longestRoute, routeParser, shortestRoute) where
+module Y2015.D09
+    ( longestRoute
+    , routeParser
+    , shortestRoute
+    )
+where
 
 import Y2015.Util (regularParse, intParser)
 
@@ -19,7 +33,8 @@ type Distance = Int
 data Route    = Route City City Distance
               deriving (Show, Eq)
 
-routeParser :: Parser [Route]
+-- |Parsec parser for the 'Route' type
+routeParser :: Parser [Route] -- ^ 'Route' parser
 routeParser = many1 (parseRoute <* optional endOfLine)
 
 parseRoute :: Parser Route
@@ -42,10 +57,14 @@ drawMap = fromListWith union . map toMap . concatMap backTrack
           backTrack (Route x y d) = [ Route x y d
                                     , Route y x d ]
 
-shortestRoute :: [Route] -> Maybe Distance
+-- |Finds the shortest route given a list of routes
+shortestRoute :: [Route]        -- ^ List of route flight paths
+              -> Maybe Distance -- ^ Possibly shortest distance
 shortestRoute = minimumMay . chart
 
-longestRoute :: [Route] -> Maybe Distance
+-- |Finds the longest route given a list of routes
+longestRoute :: [Route]        -- ^ List of route flight paths
+             -> Maybe Distance -- ^ Possibly longest distance
 longestRoute = maximumMay . chart
 
 -- Create the map structure, gather a permutation of all cities,

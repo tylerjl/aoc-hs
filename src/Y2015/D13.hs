@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D13
+Description: Advent of Code Day 13 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 13 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D13 (solveSeating) where
 
 import           Data.List   (nub, permutations)
@@ -10,7 +19,9 @@ type Happiness   = Int
 type Edge        = (Guest, Guest)
 type Preferences = Map Edge Happiness
 
-solveSeating :: String -> Int
+-- |Find optimal seating happiness!
+solveSeating :: String -- ^ Input of seating happiness stats
+             -> Int    -- ^ Optimal possible happiness
 solveSeating i = maximum $ map sum guestMoods
     where prefs        = toSeating i
           guests       = nub . uncurry (++) . unzip $ keys prefs

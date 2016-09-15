@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D24
+Description: Advent of Code Day 24 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 24 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D24 (idealEntanglement) where
 
 import Data.List   (minimumBy, subsequences)

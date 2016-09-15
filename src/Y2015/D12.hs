@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D12
+Description: Advent of Code Day 12 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 12 set of problems for <adventofcode.com>.
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 
 module Y2015.D12 (jsonSum, jsonSumFixed) where
@@ -9,12 +18,16 @@ import qualified Data.HashMap.Strict  as M
 import           Data.Scientific      (floatingOrInteger)
 import qualified Data.Vector          as V
 
-jsonSum :: ByteString -> Int
+-- |Sum all numbers in a JSON-like structure
+jsonSum :: ByteString -- ^ JSON input string
+        -> Int        -- ^ Summation of all nested numeric values
 jsonSum = jSum . decode
     where jSum Nothing  = 0
           jSum (Just v) = sumValue v
 
-jsonSumFixed :: ByteString -> Int
+-- |Sums all numbers in a JSON-like structure with a specific filter
+jsonSumFixed :: ByteString -- ^ JSON input string
+             -> Int        -- ^ Summation of all nested numeric values
 jsonSumFixed = jSum . decode
     where jSum Nothing  = 0
           jSum (Just v) = sumValue $ filterV v

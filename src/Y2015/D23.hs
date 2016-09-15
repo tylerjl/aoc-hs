@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D23
+Description: Advent of Code Day 23 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 23 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D23 (exInstructions, exInstructions2) where
 
 import           Data.Map.Strict (Map)
@@ -13,10 +22,14 @@ data Instruction = Half      Register
                  | JIO       Register Int
                  deriving (Show)
 
-exInstructions :: String -> Registers
+-- |Solver for part a set of instructions.
+exInstructions :: String    -- ^ Raw instruction/register input string.
+               -> Registers -- ^ Resulting set of register values.
 exInstructions = runInsts 0 M.empty . toInstructions
 
-exInstructions2 :: String -> Registers
+-- |Solver for part b set of instructions.
+exInstructions2 :: String    -- ^ Raw instruction/register input string.
+                -> Registers -- ^ Resulting set of register values.
 exInstructions2 = runInsts 0 (M.singleton 'a' 1) . toInstructions
 
 runInsts :: Int -> Registers -> [Instruction] -> Registers

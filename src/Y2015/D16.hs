@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D16
+Description: Advent of Code Day 16 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 16 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D16 (findAunt, findRealAunt) where
 
 import Data.List (maximumBy, sortBy)
@@ -5,7 +14,9 @@ import Data.Map.Strict (Map, differenceWith, differenceWithKey, fromList, size)
 
 type Aunt = Map String Int
 
-findRealAunt :: String -> Int
+-- |Finds the real Aunt given altered targeting criteria
+findRealAunt :: String -- ^ Raw input of list of Aunts
+             -> Int    -- ^ Id of the gifting Aunt
 findRealAunt = findGifter (size . differenceWithKey match gifter)
     where match "cats"        target candidate = candidate `gtNothing` target
           match "trees"       target candidate = candidate `gtNothing` target
@@ -15,7 +26,9 @@ findRealAunt = findGifter (size . differenceWithKey match gifter)
           gtNothing a b | a > b     = Nothing
                         | otherwise = Just a
 
-findAunt :: String -> Int
+-- |Given a list of Aunts, find the Id of the gifting Aunt.
+findAunt :: String -- ^ Raw input of list of Aunts
+         -> Int    -- ^ Id of the gifting Aunt
 findAunt = findGifter (size . differenceWith sameNothing gifter)
 
 sameNothing :: (Eq a) => a -> a -> Maybe a

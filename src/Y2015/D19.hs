@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D19
+Description: Advent of Code Day 19 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 19 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D19 (distinctMols, molSteps) where
 
 import Data.Char (isLower, isUpper)
@@ -11,14 +20,18 @@ type Mol       = [String]
 type Repls     = Map String (Set String)
 type Compounds = Set Mol
 
-molSteps :: String -> Int
+-- |Returns the number of steps required to form a specified molecule
+molSteps :: String -- ^ Target molecule composition as a raw string
+         -> Int    -- ^ Number of steps required to create indicated molecule
 molSteps = (+) (-1) . sum . map replCount . toMol . last . lines
   where replCount "Rn" =  0
         replCount "Ar" =  0
         replCount "Y"  = -1
         replCount _    =  1
 
-distinctMols :: String -> Int
+-- |Finds the number of possible distinct molecules
+distinctMols :: String -- ^ List of starting molecules as a raw string
+             -> Int    -- ^ Number of distinct modules that can be formed
 distinctMols s = S.size $ compounds mols repls
   where input = lines s
         mols  = toMol $ last input

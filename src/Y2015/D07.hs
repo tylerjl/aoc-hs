@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D07
+Description: Advent of Code Day 07 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 07 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D07
     ( wire
     , circuitParser
@@ -17,7 +26,8 @@ import           Data.Word             (Word16)
 import           Text.Parsec.Char      (digit, letter, endOfLine)
 import           Text.Parsec.String    (Parser)
 import           Text.Parsec
-    ( lookAhead
+    ( ParseError(..)
+    , lookAhead
     , many
     , many1
     , optional
@@ -44,7 +54,8 @@ data Gate = Singleton Atom
 data Instruction = Instruction Gate Wire
                  deriving (Show)
 
-circuitParser :: Parser [Instruction]
+-- |Parsec parser for list of 'Instruction's
+circuitParser :: Parser [Instruction] -- ^ Parser
 circuitParser = many (pInstruction <* optional endOfLine)
 
 pInstruction :: Parser Instruction
@@ -89,10 +100,19 @@ voltageOn m = resolve
           atom (Val i) = i
           atom (Var v) = resolve v
 
-wire :: String -> [Instruction] -> Word16
+-- |Constructs then returns resulting voltage from wiring spec
+wire :: String        -- ^ Wire to find voltage on
+     -> [Instruction] -- ^ List of instructions
+     -> Word16        -- ^ Resulting voltage on indicated wire
 wire s = flip voltageOn s . M.fromList . map toPair
     where toPair (Instruction g w) = (w, g)
 
+-- |Helper function to parse 'Instruction's
+parseCircuits :: String                            -- ^ Input string
+              -> Either ParseError [Instruction] -- ^ Either parse error or 'Instruction's
 parseCircuits = regularParse circuitParser
 
+-- |Inject a manual instruction.
+override :: Word16      -- ^ Value to inject into 'Instruction'.
+         -> Instruction -- ^ Resulting 'Instruction'.
 override s = Instruction (Singleton (Val s)) "b"

@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D14
+Description: Advent of Code Day 14 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 14 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D14 (distanceRace, leadingRace) where
 
 import Data.List (foldl', maximumBy)
@@ -19,10 +28,16 @@ data Race     = Race [Racer] Int
 instance Ord Racer where
     Racer { score = a } `compare` Racer { score = b } = a `compare` b
 
-distanceRace :: String -> Int -> Int
+-- |Finds the winning deer in a distance race
+distanceRace :: String -- ^ Deer stats as raw string input
+             -> Int    -- ^ Distance to run race
+             -> Int    -- ^ Dat winning deer doe
 distanceRace d t = maximum $ map (flyFor t) $ toDeer d
 
-leadingRace :: String -> Int -> Int
+-- |Finds the winning deer in a race by most time spent in the lead
+leadingRace :: String -- ^ Deer stats as raw string input
+            -> Int    -- ^ Distance to run race
+            -> Int    -- ^ Dat winning deer doe
 leadingRace d t = score $ getWinner $ foldl' raceStep race [0..t]
     where race = (Race (map toRacer $ toDeer d) 0)
           getWinner (Race racers _) = maximum racers

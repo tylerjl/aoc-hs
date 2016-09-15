@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D21
+Description: Advent of Code Day 21 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 21 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D21
   ( battle
   , cheapestVictory
@@ -22,17 +31,22 @@ data Combatant = Combatant { hp    :: Int
                            , items :: [Item]
                            } deriving (Show)
 
-mkTestCombatant :: Combatant
+-- |Utility function to generate a cheap test 'Combatant'.
+mkTestCombatant :: Combatant -- ^ Low-complexity 'Combatant'.
 mkTestCombatant =
     Combatant
         { hp    = 8
         , items = [ item {damage = 5, armor  = 5} ]
         }
 
-highestLoss :: String -> Int
+-- |Finds the worst possible loss given combatant stats.
+highestLoss :: String -- ^ Raw combatant stats.
+            -> Int    -- ^ Highest possible loss as an Int
 highestLoss = battleCostBy maximumBy (not . fst)
 
-cheapestVictory :: String -> Int
+-- |Finds the cheapest possible victory given combatant stats.
+cheapestVictory :: String -- ^ Raw combatant stats.
+                -> Int    -- ^ Cheapest possible victory as an Int
 cheapestVictory = battleCostBy minimumBy fst
 
 battleCostBy f g = snd . f (comparing snd) . filter g
@@ -46,7 +60,9 @@ loadouts = map (equip player) [ w:a:rs | w  <- weapons
 player :: Combatant
 player = Combatant { hp = 100, items = [] }
 
-toBoss :: String -> Combatant
+-- |Parses a string into a 'Combatant'
+toBoss :: String    -- ^ Raw combatant stats
+       -> Combatant -- ^ Resultant combatant record
 toBoss s = Combatant { hp = hp, items = i }
   where input = lines s
         hp    = read $ last $ words $ head input
@@ -91,7 +107,11 @@ equip c@(Combatant {items = is}) i = c {items = i ++ is}
 attr :: (Item -> Int) -> Combatant -> Int
 attr f = sum . map f . items
 
-battle :: Combatant -> Combatant -> (Bool, Int)
+-- |Simulates the outcome of two 'Combatant's dueling.
+battle :: Combatant   -- ^ Player 1
+       -> Combatant   -- ^ Player 2
+       -> (Bool, Int) -- ^ Tuple containing whether first player won, and
+                      -- ^ at what price.
 battle b p | (p `hits` b) <= (b `hits` p) = (True,  price)
            | otherwise                    = (False, price)
            where price = attr cost p

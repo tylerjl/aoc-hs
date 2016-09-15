@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D03
+Description: Advent of Code Day 03 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 03 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D03 (santaRun, roboRun) where
 
 import           Data.List   (foldl')
@@ -19,10 +28,14 @@ start = Set.singleton (0, 0)
 move :: Point -> Point -> Point
 move (dx, dy) (x, y) = (x + dx, y + dy)
 
-santaRun :: String -> Int
+-- |Find number of deliverables for santa's route
+santaRun :: String -- ^ Route input
+         -> Int    -- ^ Number of stops
 santaRun = Set.size . deliver start . map direction
 
-roboRun :: String -> Int
+-- |Find number of deliverables for the robot's route
+roboRun :: String -- ^ Route input
+        -> Int    -- ^ Number of stops
 roboRun = Set.size . teamDelivery . tMap direction . divideWork
     where teamDelivery = uncurry (deliver . deliver start)
 

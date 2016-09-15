@@ -1,9 +1,18 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+{-|
+Module:      Y2015.D22
+Description: Advent of Code Day 22 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 22 set of problems for <adventofcode.com>.
+-}
+
 module Y2015.D22
     ( Result(..)
     , spellBattle
-    , testPlayer
+    , testSpellBattle
     )
 where
 
@@ -45,8 +54,9 @@ data Spell = MagicMissile
            | Recharge
            deriving (Enum, Eq, Ord, Show)
 
-data Result = Won Int
-            | Lost
+-- |Represents the final result of a sequence of player moves.
+data Result = Won Int -- ^ Indicates a player win with the total mana spent.
+            | Lost    -- ^ Player loss.
             deriving (Eq, Ord, Show)
 
 makeLenses ''Boss
@@ -128,8 +138,16 @@ pBoss input = Boss { _hp = hp, _damage = dmg }
           hp      = parse head
           dmg     = parse last
 
-spellBattle :: Bool -> String -> Result
+-- |Finds the minimum required mana to win a game.
+spellBattle :: Bool   -- ^ Whether to run the game in "hard mode"
+            -> String -- ^ Boss stats input string
+            -> Result -- ^ Best possible battle outcome
 spellBattle hardMode = minimum . stepGame . newGame hardMode
 
-testPlayer :: Bool -> String -> Game
-testPlayer d = (player.mana .~ 250) . (player.life .~ 10) . newGame d
+-- |Provided as a quicker method for testing shorter player battles.
+testSpellBattle :: Bool   -- ^ Whether to run the game in "hard mode"
+                -> String -- ^ Boss stats input string
+                -> Result -- ^ Best possible battle outcome
+testSpellBattle d = minimum . stepGame
+                  . (player.mana .~ 250) . (player.life .~ 10)
+                  . newGame d

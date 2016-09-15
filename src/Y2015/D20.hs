@@ -1,13 +1,24 @@
-module Y2015.D20 (withMinPresents, withMinPresents2) where
+{-|
+Module:      Y2015.D20
+Description: Advent of Code Day 20 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
 
--- Original credit for most of this due to aepsilon:
--- https://www.reddit.com/r/adventofcode/comments/3xjpp2/day_20_solutions/cy5brqe
+Solutions to the day 20 set of problems for <adventofcode.com>.
+
+Original credit for most of this due to aepsilon:
+<https://www.reddit.com/r/adventofcode/comments/3xjpp2/day_20_solutions/cy5brqe>
+-}
+
+module Y2015.D20 (withMinPresents, withMinPresents2) where
 
 import           Data.List   (group, null)
 import           Data.Set    (Set)
 import qualified Data.Set as Set
 
-withMinPresents :: Int -> Int
+-- |Finds lowest house number that receives as many as the given presents
+withMinPresents :: Int -- ^ Minimum number of presents house should receive
+                -> Int -- ^ Position of house
 withMinPresents n = head $ filter ((>=n `divCeil` 10) . divisorSum) [1..]
 
 divCeil :: Int -> Int -> Int
@@ -37,7 +48,10 @@ primes = 2 : 3 : [ p | p <- [5,7..]
                      , and [p `rem` d /= 0 | d <- takeWhile (<= intsqrt p) primes]
                  ]
 
-withMinPresents2 :: Int -> Int
+-- |Finds lowest house number that receives as many as the given presents
+-- |given the special delivery case.
+withMinPresents2 :: Int -- ^ Minimum number of presents house should receive
+                 -> Int -- ^ Position of house
 withMinPresents2 n = head $ filter ((>=n `divCeil` 11)
                           . divisorSumLimit 50) [1..]
 

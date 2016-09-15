@@ -1,3 +1,12 @@
+{-|
+Module:      Y2015.D18
+Description: Advent of Code Day 18 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 18 set of problems for <adventofcode.com>.
+-}
+
 {-# LANGUAGE QuasiQuotes #-}
 
 module Y2015.D18 (animateLights, animateStuckLights) where
@@ -11,10 +20,16 @@ import           Data.Vector.Unboxed.Base     (Unbox)
 
 type Lights a = Array U DIM2 a
 
-animateLights :: String -> Int -> Int
+-- |Animates an example light grid
+animateLights :: String -- ^ Raw string representing starting state
+              -> Int    -- ^ Number of cycles to let animations repeat
+              -> Int    -- ^ Number of lit lights
 animateLights s n = R.sumAllS $ iterate animate (initialGrid s) !! n
 
-animateStuckLights :: String -> Int -> Int
+-- |Animates an example light grid with stuck lights
+animateStuckLights :: String -- ^ Raw string representing starting state
+                   -> Int    -- ^ Number of cycles to let animations repeat
+                   -> Int    -- ^ Number of lit lights
 animateStuckLights s n = R.sumAllS $ iterate (stuck e . animate) g' !! n
     where g  = initialGrid s
           e  = R.extent g
