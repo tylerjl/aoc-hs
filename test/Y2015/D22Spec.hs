@@ -16,6 +16,6 @@ spec = parallel $
     describe "Day 22" $
         describe "spellBattle" $ do
           it "finds the most efficient play in the first case" $
-            spellBattle False input1 `shouldBe` Won 212
+            testSpellBattle False input1 `shouldBe` Won 226
           it "finds the most efficient play in the second case" $
-            spellBattle False input2 `shouldBe` Won 212
+            testSpellBattle False input2 `shouldBe` Won 641
