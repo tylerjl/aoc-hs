@@ -23,6 +23,7 @@ main = do
         Fold.list
     let output = map unpack text
         avg = average $ match output
+    putStrLn $ "\nAverage documentation coverage: " ++ show avg
     if avg >= expected
         then exitSuccess
         else exitFailure
