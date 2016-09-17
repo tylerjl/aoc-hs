@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D05
+<span class="lineno">    3 </span>Description: Advent of Code Day 05 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 05 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D05
+<span class="lineno">   11 </span>    ( clean
+<span class="lineno">   12 </span>    , isNice
+<span class="lineno">   13 </span>    , isNicer
+<span class="lineno">   14 </span>    , thriceVoweled
+<span class="lineno">   15 </span>    , twiceRow
+<span class="lineno">   16 </span>) where
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>import Y2015.Util ((&lt;&amp;&amp;&gt;))
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>import Data.List (group, isInfixOf)
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>-- |Whether a given string is &quot;nice&quot; per the spec.
+<span class="lineno">   23 </span>isNicer :: String -- ^ Test input string
+<span class="lineno">   24 </span>        -&gt; Bool   -- ^ Whether string is nice
+<span class="lineno">   25 </span><span class="decl"><span class="istickedoff">isNicer = repeatedPair &lt;&amp;&amp;&gt; repeatedBetween</span></span>
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>repeatedPair :: String -&gt; Bool
+<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">repeatedPair []                               = <span class="nottickedoff">False</span></span>
+<span class="lineno">   29 </span><span class="spaces"></span><span class="istickedoff">repeatedPair [x]                              = False</span>
+<span class="lineno">   30 </span><span class="spaces"></span><span class="istickedoff">repeatedPair (x:y:zs) | [x, y] `isInfixOf` zs = True</span>
+<span class="lineno">   31 </span><span class="spaces">                      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span>             = repeatedPair (y : zs)</span></span>
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>repeatedBetween :: String -&gt; Bool
+<span class="lineno">   34 </span><span class="decl"><span class="istickedoff">repeatedBetween []                     = <span class="nottickedoff">False</span></span>
+<span class="lineno">   35 </span><span class="spaces"></span><span class="istickedoff">repeatedBetween [x]                    = <span class="nottickedoff">False</span></span>
+<span class="lineno">   36 </span><span class="spaces"></span><span class="istickedoff">repeatedBetween [x,y]                  = False</span>
+<span class="lineno">   37 </span><span class="spaces"></span><span class="istickedoff">repeatedBetween (x:y:z:zs) | x == z    = True</span>
+<span class="lineno">   38 </span><span class="spaces">                           </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = repeatedBetween (y : z : zs)</span></span>
+<span class="lineno">   39 </span>
+<span class="lineno">   40 </span>-- |Predicate to determine whether a given string is &quot;nice&quot;.
+<span class="lineno">   41 </span>isNice :: String -- ^ Test input string.
+<span class="lineno">   42 </span>       -&gt; Bool   -- ^ Whether the given input string is nice.
+<span class="lineno">   43 </span><span class="decl"><span class="istickedoff">isNice = clean &lt;&amp;&amp;&gt; thriceVoweled &lt;&amp;&amp;&gt; twiceRow</span></span>
+<span class="lineno">   44 </span>
+<span class="lineno">   45 </span>-- |Predicate to determine whether a string eschews forbidden strings.
+<span class="lineno">   46 </span>clean :: String -- ^ Input string.
+<span class="lineno">   47 </span>      -&gt; Bool   -- ^ Whether the string is clean.
+<span class="lineno">   48 </span><span class="decl"><span class="istickedoff">clean = not . flip any forbiddenStrings . flip isInfixOf</span></span>
+<span class="lineno">   49 </span>
+<span class="lineno">   50 </span>forbiddenStrings :: [String]
+<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">forbiddenStrings = [&quot;ab&quot;, &quot;cd&quot;, &quot;pq&quot;, &quot;xy&quot;]</span></span>
+<span class="lineno">   52 </span>
+<span class="lineno">   53 </span>-- |Predicate to determine whether a given string contains two letters
+<span class="lineno">   54 </span>-- |in a row.
+<span class="lineno">   55 </span>twiceRow :: String -- ^ Input string to test.
+<span class="lineno">   56 </span>         -&gt; Bool   -- ^ Whether the given string passes the predicate.
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">twiceRow = any ((&gt;1) . length) . group</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>-- |Predicate to determine whether the given string contains at least three
+<span class="lineno">   60 </span>-- |vowels.
+<span class="lineno">   61 </span>thriceVoweled :: String -- ^ Input string to test.
+<span class="lineno">   62 </span>              -&gt; Bool   -- ^ Whether the string passes the predicate.
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">thriceVoweled = (&gt;2) . length . filter isVowel</span></span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>isVowel :: Char -&gt; Bool
+<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">isVowel = flip elem &quot;aeiou&quot;</span></span>
+
+</pre>
+</body>
+</html>

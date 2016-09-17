@@ -1,0 +1,99 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D14
+<span class="lineno">    3 </span>Description: Advent of Code Day 14 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 14 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D14 (distanceRace, leadingRace) where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>import Data.List (foldl', maximumBy)
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>data Reindeer = Reindeer
+<span class="lineno">   15 </span>              { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">name</span></span></span>      :: String
+<span class="lineno">   16 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">velocity</span></span></span>  :: Int
+<span class="lineno">   17 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">endurance</span></span></span> :: Int
+<span class="lineno">   18 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">cooldown</span></span></span>  :: Int
+<span class="lineno">   19 </span>              } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   20 </span>data Racer    = Racer
+<span class="lineno">   21 </span>              { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">deer</span></span></span>     :: Reindeer
+<span class="lineno">   22 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">score</span></span></span>    :: Int
+<span class="lineno">   23 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">position</span></span></span> :: Int
+<span class="lineno">   24 </span>              } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   25 </span>data Race     = Race [Racer] Int
+<span class="lineno">   26 </span>              deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>instance Ord Racer where
+<span class="lineno">   29 </span>    <span class="decl"><span class="istickedoff">Racer { score = a } `compare` Racer { score = b } = a `compare` b</span></span>
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>-- |Finds the winning deer in a distance race
+<span class="lineno">   32 </span>distanceRace :: String -- ^ Deer stats as raw string input
+<span class="lineno">   33 </span>             -&gt; Int    -- ^ Distance to run race
+<span class="lineno">   34 </span>             -&gt; Int    -- ^ Dat winning deer doe
+<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">distanceRace d t = maximum $ map (flyFor t) $ toDeer d</span></span>
+<span class="lineno">   36 </span>
+<span class="lineno">   37 </span>-- |Finds the winning deer in a race by most time spent in the lead
+<span class="lineno">   38 </span>leadingRace :: String -- ^ Deer stats as raw string input
+<span class="lineno">   39 </span>            -&gt; Int    -- ^ Distance to run race
+<span class="lineno">   40 </span>            -&gt; Int    -- ^ Dat winning deer doe
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">leadingRace d t = score $ getWinner $ foldl' raceStep race [0..t]</span>
+<span class="lineno">   42 </span><span class="spaces">    </span><span class="istickedoff">where race = (Race (map toRacer $ toDeer d) <span class="nottickedoff">0</span>)</span>
+<span class="lineno">   43 </span><span class="spaces">          </span><span class="istickedoff">getWinner (Race racers _) = maximum racers</span></span>
+<span class="lineno">   44 </span>
+<span class="lineno">   45 </span>raceStep :: Race -&gt; Int -&gt; Race
+<span class="lineno">   46 </span><span class="decl"><span class="istickedoff">raceStep (Race racers time) tick = distPoints $ Race (map step racers) <span class="nottickedoff">(time+1)</span></span>
+<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">where step r@(Racer { deer = d, score = s, position = pos })</span>
+<span class="lineno">   48 </span><span class="spaces">              </span><span class="istickedoff">| isResting d tick = r</span>
+<span class="lineno">   49 </span><span class="spaces">              </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span>        = r { position = (pos + velocity d) }</span>
+<span class="lineno">   50 </span><span class="spaces">          </span><span class="istickedoff">distPoints (Race rs n) = Race (map (award $ position $ maximumBy leader rs) rs) <span class="nottickedoff">n</span></span>
+<span class="lineno">   51 </span><span class="spaces">          </span><span class="istickedoff">award pos r@(Racer { position = p, score = s })</span>
+<span class="lineno">   52 </span><span class="spaces">              </span><span class="istickedoff">| pos == p  = r { score = s + 1 }</span>
+<span class="lineno">   53 </span><span class="spaces">              </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = r</span></span>
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>leader :: Racer -&gt; Racer -&gt; Ordering
+<span class="lineno">   56 </span><span class="decl"><span class="istickedoff">leader Racer { position = a } Racer { position = b } =</span>
+<span class="lineno">   57 </span><span class="spaces">    </span><span class="istickedoff">a `compare` b</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>isResting :: Reindeer -&gt; Int -&gt; Bool
+<span class="lineno">   60 </span><span class="decl"><span class="istickedoff">isResting d t = t `mod` (endurance d + cooldown d) &gt;= endurance d</span></span>
+<span class="lineno">   61 </span>
+<span class="lineno">   62 </span>toRacer :: Reindeer -&gt; Racer
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">toRacer d = Racer { deer = d, score = 0, position = 0 }</span></span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>flyFor :: Int -&gt; Reindeer -&gt; Int
+<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">flyFor t d = v * e * spans + v * minimum [stretch, e]</span>
+<span class="lineno">   67 </span><span class="spaces">    </span><span class="istickedoff">where [v,e,c]  = [velocity d, endurance d, cooldown d]</span>
+<span class="lineno">   68 </span><span class="spaces">          </span><span class="istickedoff">deerTime = e + c</span>
+<span class="lineno">   69 </span><span class="spaces">          </span><span class="istickedoff">stretch  = t `mod` deerTime</span>
+<span class="lineno">   70 </span><span class="spaces">          </span><span class="istickedoff">spans    = t `quot` deerTime</span></span>
+<span class="lineno">   71 </span>
+<span class="lineno">   72 </span>toDeer :: String -&gt; [Reindeer]
+<span class="lineno">   73 </span><span class="decl"><span class="istickedoff">toDeer = map (parseDeer . words . init) . lines</span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="istickedoff">where parseDeer [n,_,_,v,_,_,e,_,_,_,_,_,_,cd,_] =</span>
+<span class="lineno">   75 </span><span class="spaces">              </span><span class="istickedoff">Reindeer { name      = <span class="nottickedoff">n</span></span>
+<span class="lineno">   76 </span><span class="spaces">                       </span><span class="istickedoff">, velocity  = read v</span>
+<span class="lineno">   77 </span><span class="spaces">                       </span><span class="istickedoff">, endurance = read e</span>
+<span class="lineno">   78 </span><span class="spaces">                       </span><span class="istickedoff">, cooldown  = read cd</span>
+<span class="lineno">   79 </span><span class="spaces">                       </span><span class="istickedoff">}</span></span>
+
+</pre>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D09
+<span class="lineno">    3 </span>Description: Advent of Code Day 09 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 09 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>{-# LANGUAGE FlexibleContexts #-}
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>module Y2015.D09
+<span class="lineno">   13 </span>    ( longestRoute
+<span class="lineno">   14 </span>    , routeParser
+<span class="lineno">   15 </span>    , shortestRoute
+<span class="lineno">   16 </span>    )
+<span class="lineno">   17 </span>where
+<span class="lineno">   18 </span>
+<span class="lineno">   19 </span>import Y2015.Util (regularParse, intParser)
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>import           Control.Applicative ((&lt;*&gt;))
+<span class="lineno">   22 </span>import           Data.List           (concatMap, permutations)
+<span class="lineno">   23 </span>import           Data.Map            ((!), Map, fromListWith, keys, singleton, union)
+<span class="lineno">   24 </span>import qualified Data.Map as         Map
+<span class="lineno">   25 </span>import           Data.Maybe          (mapMaybe)
+<span class="lineno">   26 </span>import           Safe                (maximumMay, minimumMay)
+<span class="lineno">   27 </span>import           Text.Parsec         (many1, optional, skipMany1, string)
+<span class="lineno">   28 </span>import           Text.Parsec.Char    (char, digit, endOfLine, letter, space)
+<span class="lineno">   29 </span>import           Text.Parsec.String  (Parser)
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>type City     = String
+<span class="lineno">   32 </span>type Distance = Int
+<span class="lineno">   33 </span>data Route    = Route City City Distance
+<span class="lineno">   34 </span>              deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>-- |Parsec parser for the 'Route' type
+<span class="lineno">   37 </span>routeParser :: Parser [Route] -- ^ 'Route' parser
+<span class="lineno">   38 </span><span class="decl"><span class="istickedoff">routeParser = many1 (parseRoute &lt;* optional endOfLine)</span></span>
+<span class="lineno">   39 </span>
+<span class="lineno">   40 </span>parseRoute :: Parser Route
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">parseRoute = Route &lt;$&gt; many1 letter &lt;* pSep &quot;to&quot;</span>
+<span class="lineno">   42 </span><span class="spaces">                   </span><span class="istickedoff">&lt;*&gt; many1 letter &lt;* pSep &quot;=&quot;</span>
+<span class="lineno">   43 </span><span class="spaces">                   </span><span class="istickedoff">&lt;*&gt; intParser</span>
+<span class="lineno">   44 </span><span class="spaces">    </span><span class="istickedoff">where pSep s = many1 space *&gt; string s *&gt; skipMany1 space</span></span>
+<span class="lineno">   45 </span>
+<span class="lineno">   46 </span>parseRoutes :: String -&gt; Maybe [Route]
+<span class="lineno">   47 </span><span class="decl"><span class="nottickedoff">parseRoutes s = case regularParse routeParser s of</span>
+<span class="lineno">   48 </span><span class="spaces">                     </span><span class="nottickedoff">Right routes -&gt; Just routes</span>
+<span class="lineno">   49 </span><span class="spaces">                     </span><span class="nottickedoff">Left _       -&gt; Nothing</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>-- Each key represents the start, with possible destination values,
+<span class="lineno">   52 </span>-- which are keys to the distance to that destination.
+<span class="lineno">   53 </span>-- We flip destinations to fully express all available routes.
+<span class="lineno">   54 </span>drawMap :: [Route] -&gt; Map City (Map City Distance)
+<span class="lineno">   55 </span><span class="decl"><span class="istickedoff">drawMap = fromListWith union . map toMap . concatMap backTrack</span>
+<span class="lineno">   56 </span><span class="spaces">    </span><span class="istickedoff">where toMap (Route x y d) = (x, singleton y d)</span>
+<span class="lineno">   57 </span><span class="spaces">          </span><span class="istickedoff">backTrack (Route x y d) = [ Route x y d</span>
+<span class="lineno">   58 </span><span class="spaces">                                    </span><span class="istickedoff">, Route y x d ]</span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>-- |Finds the shortest route given a list of routes
+<span class="lineno">   61 </span>shortestRoute :: [Route]        -- ^ List of route flight paths
+<span class="lineno">   62 </span>              -&gt; Maybe Distance -- ^ Possibly shortest distance
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">shortestRoute = minimumMay . chart</span></span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>-- |Finds the longest route given a list of routes
+<span class="lineno">   66 </span>longestRoute :: [Route]        -- ^ List of route flight paths
+<span class="lineno">   67 </span>             -&gt; Maybe Distance -- ^ Possibly longest distance
+<span class="lineno">   68 </span><span class="decl"><span class="istickedoff">longestRoute = maximumMay . chart</span></span>
+<span class="lineno">   69 </span>
+<span class="lineno">   70 </span>-- Create the map structure, gather a permutation of all cities,
+<span class="lineno">   71 </span>-- and build the distance for each permutation. There's a chance
+<span class="lineno">   72 </span>-- some cities will be unroutable (a partition on the routes), so
+<span class="lineno">   73 </span>-- there's a possibility we may return an empty list (this is an internal
+<span class="lineno">   74 </span>-- function though, so we account for that in the above wrapper
+<span class="lineno">   75 </span>-- functions.)
+<span class="lineno">   76 </span>chart :: [Route] -&gt; [Distance]
+<span class="lineno">   77 </span><span class="decl"><span class="istickedoff">chart routes = mapMaybe (plot . (zip &lt;*&gt; tail)) . permutations . keys $ worldMap</span>
+<span class="lineno">   78 </span><span class="spaces">    </span><span class="istickedoff">where worldMap      = drawMap routes</span>
+<span class="lineno">   79 </span><span class="spaces">          </span><span class="istickedoff">plot          = fmap sum . mapM travel</span>
+<span class="lineno">   80 </span><span class="spaces">          </span><span class="istickedoff">travel (a, b) | <span class="tickonlytrue">a `Map.member` worldMap</span> = Map.lookup b (worldMap ! a)</span>
+<span class="lineno">   81 </span><span class="spaces">                        </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span>               = <span class="nottickedoff">Nothing</span></span></span>
+
+</pre>
+</body>
+</html>

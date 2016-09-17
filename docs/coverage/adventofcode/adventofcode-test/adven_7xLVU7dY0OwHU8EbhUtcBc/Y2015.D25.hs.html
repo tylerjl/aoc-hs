@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D25
+<span class="lineno">    3 </span>Description: Advent of Code Day 25 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 25 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>
+<span class="lineno">    9 </span>Implements a simple function to return the machine code at a position
+<span class="lineno">   10 </span>indicated by plaintext input for a row and column.
+<span class="lineno">   11 </span>-}
+<span class="lineno">   12 </span>
+<span class="lineno">   13 </span>module Y2015.D25 (manualCodeFrom) where
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>type Point = (Int, Int)
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>-- |Return the manual code found at the indicated row and column
+<span class="lineno">   18 </span>-- |from human-readable input.
+<span class="lineno">   19 </span>manualCodeFrom :: String  -- ^ Plaintext instruction input.
+<span class="lineno">   20 </span>               -&gt; Integer -- ^ Numerical code found at the indicated position.
+<span class="lineno">   21 </span><span class="decl"><span class="istickedoff">manualCodeFrom = (!!) manualSeq . toPos . toPoint</span>
+<span class="lineno">   22 </span><span class="spaces">    </span><span class="istickedoff">where toPos (x, y) = (i - 1) * (i - 2) `div` 2 + i - x - 1</span>
+<span class="lineno">   23 </span><span class="spaces">                       </span><span class="istickedoff">where i = x + y</span></span>
+<span class="lineno">   24 </span>
+<span class="lineno">   25 </span>toPoint :: String -&gt; Point
+<span class="lineno">   26 </span><span class="decl"><span class="istickedoff">toPoint = go . words</span>
+<span class="lineno">   27 </span><span class="spaces">    </span><span class="istickedoff">where go s = (grab 15, grab 17)</span>
+<span class="lineno">   28 </span><span class="spaces">                 </span><span class="istickedoff">where grab = read . init . (!!) s</span></span>
+<span class="lineno">   29 </span>
+<span class="lineno">   30 </span>manualSeq :: [Integer]
+<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">manualSeq = iterate f 20151125 where</span>
+<span class="lineno">   32 </span><span class="spaces">    </span><span class="istickedoff">f = flip mod 33554393 . (*) 252533</span></span>
+
+</pre>
+</body>
+</html>

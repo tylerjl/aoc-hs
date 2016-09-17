@@ -1,0 +1,63 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D13
+<span class="lineno">    3 </span>Description: Advent of Code Day 13 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 13 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D13 (solveSeating) where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>import           Data.List   (nub, permutations)
+<span class="lineno">   13 </span>import           Data.Map    (Map, findWithDefault, fromList, keys)
+<span class="lineno">   14 </span>import qualified Data.Map as Map
+<span class="lineno">   15 </span>import           Data.Tuple  (swap)
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>type Guest       = String
+<span class="lineno">   18 </span>type Happiness   = Int
+<span class="lineno">   19 </span>type Edge        = (Guest, Guest)
+<span class="lineno">   20 </span>type Preferences = Map Edge Happiness
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>-- |Find optimal seating happiness!
+<span class="lineno">   23 </span>solveSeating :: String -- ^ Input of seating happiness stats
+<span class="lineno">   24 </span>             -&gt; Int    -- ^ Optimal possible happiness
+<span class="lineno">   25 </span><span class="decl"><span class="istickedoff">solveSeating i = maximum $ map sum guestMoods</span>
+<span class="lineno">   26 </span><span class="spaces">    </span><span class="istickedoff">where prefs        = toSeating i</span>
+<span class="lineno">   27 </span><span class="spaces">          </span><span class="istickedoff">guests       = nub . uncurry (++) . unzip $ keys prefs</span>
+<span class="lineno">   28 </span><span class="spaces">          </span><span class="istickedoff">pairs        = map (zip &lt;*&gt; tail . cycle) $ permutations guests</span>
+<span class="lineno">   29 </span><span class="spaces">          </span><span class="istickedoff">arrangements = map rePair pairs</span>
+<span class="lineno">   30 </span><span class="spaces">          </span><span class="istickedoff">guestMoods   = map (map (flip (findWithDefault <span class="nottickedoff">0</span>) prefs)) arrangements</span></span>
+<span class="lineno">   31 </span>
+<span class="lineno">   32 </span>rePair :: [(a, a)] -&gt; [(a, a)]
+<span class="lineno">   33 </span><span class="decl"><span class="istickedoff">rePair []         = []</span>
+<span class="lineno">   34 </span><span class="spaces"></span><span class="istickedoff">rePair ((x,y):xs) = [(x,y),(y,x)] ++ rePair xs</span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>toSeating :: String -&gt; Preferences
+<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">toSeating = fromList . map (parseSeating . words . init) . lines</span></span>
+<span class="lineno">   38 </span>
+<span class="lineno">   39 </span>parseSeating :: [String] -&gt; (Edge, Happiness)
+<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">parseSeating [a,_,s,h,_,_,_,_,_,_,b] = ((a, b), hap s)</span>
+<span class="lineno">   41 </span><span class="spaces">    </span><span class="istickedoff">where change = read h</span>
+<span class="lineno">   42 </span><span class="spaces">          </span><span class="istickedoff">hap &quot;gain&quot; = change</span>
+<span class="lineno">   43 </span><span class="spaces">          </span><span class="istickedoff">hap &quot;lose&quot; = negate change</span></span>
+
+</pre>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D11
+<span class="lineno">    3 </span>Description: Advent of Code Day 11 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 11 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D11 (rotate) where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>import Y2015.Util ((&lt;&amp;&amp;&gt;))
+<span class="lineno">   13 </span>import Data.List  (elemIndex, foldr, group, isInfixOf, iterate, tails)
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>alphabet :: String
+<span class="lineno">   16 </span><span class="decl"><span class="istickedoff">alphabet = ['a'..'z']</span></span>
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>meetsReqs :: String -&gt; Bool
+<span class="lineno">   19 </span><span class="decl"><span class="istickedoff">meetsReqs = hasPairs &lt;&amp;&amp;&gt; (not . forbidden) &lt;&amp;&amp;&gt; hasStraightFast</span></span>
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>hasPairs :: String -&gt; Bool
+<span class="lineno">   22 </span><span class="decl"><span class="istickedoff">hasPairs = (1 &lt;) . length . filter ((&lt;) 1 . length) . group</span></span>
+<span class="lineno">   23 </span>
+<span class="lineno">   24 </span>forbidden :: String -&gt; Bool
+<span class="lineno">   25 </span><span class="decl"><span class="istickedoff">forbidden = any (`elem` &quot;iol&quot;)</span></span>
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>hasStraightFast :: String -&gt; Bool
+<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">hasStraightFast = not . null . filterAsc . subSeqs</span>
+<span class="lineno">   29 </span><span class="spaces">    </span><span class="istickedoff">where filterAsc = filter (`isInfixOf` alphabet)</span>
+<span class="lineno">   30 </span><span class="spaces">          </span><span class="istickedoff">subSeqs   = takeWhile ((== 3) . length) . map (take 3) . tails</span></span>
+<span class="lineno">   31 </span>
+<span class="lineno">   32 </span>hasStraightSlow :: String -&gt; Bool
+<span class="lineno">   33 </span><span class="decl"><span class="nottickedoff">hasStraightSlow []                          = False</span>
+<span class="lineno">   34 </span><span class="spaces"></span><span class="nottickedoff">hasStraightSlow [x]                         = False</span>
+<span class="lineno">   35 </span><span class="spaces"></span><span class="nottickedoff">hasStraightSlow [x,y]                       = False</span>
+<span class="lineno">   36 </span><span class="spaces"></span><span class="nottickedoff">hasStraightSlow (x:y:z:zs) | straight x y z = True</span>
+<span class="lineno">   37 </span><span class="spaces">                           </span><span class="nottickedoff">| otherwise      = hasStraightSlow (y:z:zs)</span>
+<span class="lineno">   38 </span><span class="spaces">                           </span><span class="nottickedoff">where straight a b c = b == succ a &amp;&amp; c == succ b</span></span>
+<span class="lineno">   39 </span>
+<span class="lineno">   40 </span>increment :: String -&gt; String
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">increment = reverse . step . reverse</span>
+<span class="lineno">   42 </span><span class="spaces">    </span><span class="istickedoff">where step []                 = <span class="nottickedoff">[]</span></span>
+<span class="lineno">   43 </span><span class="spaces">          </span><span class="istickedoff">step [x]    | <span class="nottickedoff">x == 'z'</span>  = <span class="nottickedoff">&quot;aa&quot;</span></span>
+<span class="lineno">   44 </span><span class="spaces">                      </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span> = <span class="nottickedoff">[succ x]</span></span>
+<span class="lineno">   45 </span><span class="spaces">          </span><span class="istickedoff">step (x:xs) | x /= 'z'  = succ x :      xs</span>
+<span class="lineno">   46 </span><span class="spaces">                      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = 'a'    : step xs</span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>-- |Rotate a password within specific rules
+<span class="lineno">   49 </span>rotate :: String -- ^ Starting password
+<span class="lineno">   50 </span>       -&gt; String -- ^ Next valid password
+<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">rotate = nextValid . increment</span>
+<span class="lineno">   52 </span><span class="spaces">    </span><span class="istickedoff">where nextValid = head . filter meetsReqs . iterate increment</span></span>
+
+</pre>
+</body>
+</html>
