@@ -29,6 +29,10 @@ benchmarks =
                 , bench "large"  $ nf level (Prelude.take 100 levels)
                 , bench "huge"   $ nf level levels
                 ]
+            , bgroup "Day 11"
+                [ bench "short" $ nf rotate "abd"
+                , bench "long"  $ nf rotate "abcdef"
+                ]
             , bgroup "Day 22"
                 [ bench "simple" $ whnf (testSpellBattle False)
                     (unlines ["Hit Points: 13", "Damage: 8"])
