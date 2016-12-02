@@ -22,4 +22,4 @@ coverage:
 .PHONY: docs
 docs:
 	rm -rf docs/haddock/*
-	cp -r $$(stack path --local-doc-root)/* docs/haddock
+	cp -r $$(stack path --local-doc-root)/adventofcode-*/* docs/haddock
