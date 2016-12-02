@@ -1,0 +1,74 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D08
+<span class="lineno">    3 </span>Description: Advent of Code Day 08 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 08 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D08 (difference, encoded) where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>body :: [a] -&gt; [a]
+<span class="lineno">   13 </span><span class="decl"><span class="istickedoff">body []  = <span class="nottickedoff">[]</span></span>
+<span class="lineno">   14 </span><span class="spaces"></span><span class="istickedoff">body [_] = <span class="nottickedoff">[]</span></span>
+<span class="lineno">   15 </span><span class="spaces"></span><span class="istickedoff">body xs  = tail $ init xs</span></span>
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>hexChars :: String
+<span class="lineno">   18 </span><span class="decl"><span class="istickedoff">hexChars = &quot;0123456789abcdef&quot;</span></span>
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>escape :: String -&gt; String
+<span class="lineno">   21 </span><span class="decl"><span class="istickedoff">escape []                                   = []</span>
+<span class="lineno">   22 </span><span class="spaces"></span><span class="istickedoff">escape [x]                                  = [x]</span>
+<span class="lineno">   23 </span><span class="spaces"></span><span class="istickedoff">escape (v:w:x:y:zs) | [v,w] == &quot;\\x&quot; &amp;&amp; hex = '.'  : escape zs</span>
+<span class="lineno">   24 </span><span class="spaces">                    </span><span class="istickedoff">where hex = all (`elem` hexChars) [x,y]</span>
+<span class="lineno">   25 </span><span class="spaces"></span><span class="istickedoff">escape (x:y:zs)     | [x,y] == &quot;\\\&quot;&quot;       = '&quot;'  : escape zs</span>
+<span class="lineno">   26 </span><span class="spaces">                    </span><span class="istickedoff">| <span class="tickonlyfalse">[x,<span class="nottickedoff">y</span>] == &quot;\\\\&quot;</span>       = <span class="nottickedoff">'\\' : escape zs</span></span>
+<span class="lineno">   27 </span><span class="spaces">                    </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span>             = x    : escape (y:zs)</span></span>
+<span class="lineno">   28 </span>
+<span class="lineno">   29 </span>encode :: String -&gt; String
+<span class="lineno">   30 </span><span class="decl"><span class="istickedoff">encode = (++) &quot;\&quot;&quot; . (:) '&quot;' . encode'</span></span>
+<span class="lineno">   31 </span>
+<span class="lineno">   32 </span>encode' :: String -&gt; String
+<span class="lineno">   33 </span><span class="decl"><span class="istickedoff">encode' []                 = []</span>
+<span class="lineno">   34 </span><span class="spaces"></span><span class="istickedoff">encode' (x:xs) | x == '&quot;'  = '\\' : '&quot;' : encode' xs</span>
+<span class="lineno">   35 </span><span class="spaces">               </span><span class="istickedoff">| x == '\\' = &quot;\\\\&quot;    ++ encode' xs</span>
+<span class="lineno">   36 </span><span class="spaces">               </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = x          : encode' xs</span></span>
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>squish :: String -&gt; String
+<span class="lineno">   39 </span><span class="decl"><span class="istickedoff">squish = filter (/= '\n')</span></span>
+<span class="lineno">   40 </span>
+<span class="lineno">   41 </span>solve :: (Int -&gt; Int -&gt; Int) -&gt; (String -&gt; String) -&gt; String -&gt; Int
+<span class="lineno">   42 </span><span class="decl"><span class="istickedoff">solve g f s = g (original s) (new s)</span>
+<span class="lineno">   43 </span><span class="spaces">    </span><span class="istickedoff">where original = length . squish</span>
+<span class="lineno">   44 </span><span class="spaces">          </span><span class="istickedoff">new      = length . squish . unlines . map f . lines</span></span>
+<span class="lineno">   45 </span>
+<span class="lineno">   46 </span>-- |Finds the length difference between escaped and unescaped string
+<span class="lineno">   47 </span>difference :: String -- ^ Input string with escapes
+<span class="lineno">   48 </span>           -&gt; Int    -- ^ Unescaped length difference
+<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">difference = solve (-) (escape . body)</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>-- |Same as 'encoded', but different
+<span class="lineno">   52 </span>encoded :: String -- ^ Input string with escapes
+<span class="lineno">   53 </span>        -&gt; Int    -- ^ Length difference to encoded string
+<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">encoded = solve (flip (-)) encode</span></span>
+
+</pre>
+</body>
+</html>

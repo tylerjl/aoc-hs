@@ -1,0 +1,55 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.Util
+<span class="lineno">    3 </span>Description: Shared functions for Advent of Code Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Shared functions that support solutions to problems for  the
+<span class="lineno">    8 </span>&lt;adventofcode.com&gt; challenges.
+<span class="lineno">    9 </span>-}
+<span class="lineno">   10 </span>
+<span class="lineno">   11 </span>module Y2015.Util
+<span class="lineno">   12 </span>    ( (&lt;&amp;&amp;&gt;)
+<span class="lineno">   13 </span>    , regularParse
+<span class="lineno">   14 </span>    , intParser
+<span class="lineno">   15 </span>) where
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>import           Control.Monad (liftM2)
+<span class="lineno">   18 </span>import qualified Text.Parsec as     P
+<span class="lineno">   19 </span>import           Text.Parsec.Char   (digit)
+<span class="lineno">   20 </span>import           Text.Parsec.String (Parser)
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>-- |Combinator operator for predicates
+<span class="lineno">   23 </span>(&lt;&amp;&amp;&gt;) :: (a -&gt; Bool) -- ^ Predicate 1
+<span class="lineno">   24 </span>       -&gt; (a -&gt; Bool) -- ^ Predicate 2
+<span class="lineno">   25 </span>       -&gt; a           -- ^ Predicate target
+<span class="lineno">   26 </span>       -&gt; Bool        -- ^ Logical and for predicates
+<span class="lineno">   27 </span><span class="decl"><span class="istickedoff">(&lt;&amp;&amp;&gt;) = liftM2 (&amp;&amp;)</span></span>
+<span class="lineno">   28 </span>
+<span class="lineno">   29 </span>-- |Generic parsing wrapper
+<span class="lineno">   30 </span>regularParse :: Parser a -&gt; String -&gt; Either P.ParseError a
+<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">regularParse p = P.parse p <span class="nottickedoff">&quot;&quot;</span></span></span>
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>-- |Generic 'Int' parser
+<span class="lineno">   34 </span>intParser :: Parser Int -- ^ Parsec parser for 'Int' types
+<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">intParser = read &lt;$&gt; P.many1 digit</span></span>
+
+</pre>
+</body>
+</html>

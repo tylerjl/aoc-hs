@@ -1,0 +1,83 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D23
+<span class="lineno">    3 </span>Description: Advent of Code Day 23 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 23 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D23 (exInstructions, exInstructions2) where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>import           Data.Map.Strict (Map)
+<span class="lineno">   13 </span>import qualified Data.Map.Strict as M
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>type Registers   = Map Register Int
+<span class="lineno">   16 </span>type Register    = Char
+<span class="lineno">   17 </span>data Instruction = Half      Register
+<span class="lineno">   18 </span>                 | Triple    Register
+<span class="lineno">   19 </span>                 | Increment Register
+<span class="lineno">   20 </span>                 | Jump      Int
+<span class="lineno">   21 </span>                 | JIE       Register Int
+<span class="lineno">   22 </span>                 | JIO       Register Int
+<span class="lineno">   23 </span>                 deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   24 </span>
+<span class="lineno">   25 </span>-- |Solver for part a set of instructions.
+<span class="lineno">   26 </span>exInstructions :: String    -- ^ Raw instruction/register input string.
+<span class="lineno">   27 </span>               -&gt; Registers -- ^ Resulting set of register values.
+<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">exInstructions = runInsts 0 M.empty . toInstructions</span></span>
+<span class="lineno">   29 </span>
+<span class="lineno">   30 </span>-- |Solver for part b set of instructions.
+<span class="lineno">   31 </span>exInstructions2 :: String    -- ^ Raw instruction/register input string.
+<span class="lineno">   32 </span>                -&gt; Registers -- ^ Resulting set of register values.
+<span class="lineno">   33 </span><span class="decl"><span class="nottickedoff">exInstructions2 = runInsts 0 (M.singleton 'a' 1) . toInstructions</span></span>
+<span class="lineno">   34 </span>
+<span class="lineno">   35 </span>runInsts :: Int -&gt; Registers -&gt; [Instruction] -&gt; Registers
+<span class="lineno">   36 </span><span class="decl"><span class="istickedoff">runInsts eip rs is | eip &lt; 0 || eip &gt;= length is = rs</span>
+<span class="lineno">   37 </span><span class="spaces">                   </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = case is !! eip of</span>
+<span class="lineno">   38 </span><span class="spaces">  </span><span class="istickedoff">(Half r)      -&gt; <span class="nottickedoff">runInsts (eip+1) (M.adjust (`div` 2) r   rs) is</span></span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">(Triple r)    -&gt; <span class="nottickedoff">runInsts (eip+1) (M.adjust (*3)      r   rs) is</span></span>
+<span class="lineno">   40 </span><span class="spaces">  </span><span class="istickedoff">(Increment r) -&gt; runInsts (eip+1) (M.insertWith (+)   r 1 rs) is</span>
+<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">(Jump j)      -&gt; <span class="nottickedoff">runInsts (eip+j) rs is</span></span>
+<span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">(JIE r i)     -&gt; <span class="nottickedoff">runInsts (eip+jumpTest i even   r) rs is</span></span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">(JIO r i)     -&gt; runInsts (eip+jumpTest i (== 1) r) rs is</span>
+<span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">where jumpTest offset f reg = if <span class="tickonlytrue">f $ M.findWithDefault <span class="nottickedoff">0</span> reg rs</span></span>
+<span class="lineno">   45 </span><span class="spaces">                                </span><span class="istickedoff">then offset</span>
+<span class="lineno">   46 </span><span class="spaces">                                </span><span class="istickedoff">else <span class="nottickedoff">1</span></span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>toInstructions :: String -&gt; [Instruction]
+<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">toInstructions = map (toOperation . words) . lines</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>toOperation :: [String] -&gt; Instruction
+<span class="lineno">   52 </span><span class="decl"><span class="istickedoff">toOperation [&quot;hlf&quot;,[r]]          = <span class="nottickedoff">Half r</span></span>
+<span class="lineno">   53 </span><span class="spaces"></span><span class="istickedoff">toOperation [&quot;tpl&quot;,[r]]          = <span class="nottickedoff">Triple r</span></span>
+<span class="lineno">   54 </span><span class="spaces"></span><span class="istickedoff">toOperation [&quot;inc&quot;,[r]]          = Increment r</span>
+<span class="lineno">   55 </span><span class="spaces"></span><span class="istickedoff">toOperation [&quot;jmp&quot;,offset]       = <span class="nottickedoff">Jump  $ toInt offset</span></span>
+<span class="lineno">   56 </span><span class="spaces"></span><span class="istickedoff">toOperation [&quot;jie&quot;,r:&quot;,&quot;,offset] = <span class="nottickedoff">JIE r $ toInt offset</span></span>
+<span class="lineno">   57 </span><span class="spaces"></span><span class="istickedoff">toOperation [&quot;jio&quot;,r:&quot;,&quot;,offset] = JIO r $ toInt offset</span>
+<span class="lineno">   58 </span><span class="spaces"></span><span class="istickedoff">toOperation _ = <span class="nottickedoff">Jump 0</span></span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>toInt :: String -&gt; Int
+<span class="lineno">   61 </span><span class="decl"><span class="istickedoff">toInt ('-':s) = <span class="nottickedoff">negate $ read s</span></span>
+<span class="lineno">   62 </span><span class="spaces"></span><span class="istickedoff">toInt ('+':s) = read s</span>
+<span class="lineno">   63 </span><span class="spaces"></span><span class="istickedoff">toInt s = <span class="nottickedoff">read s</span></span></span>
+
+</pre>
+</body>
+</html>

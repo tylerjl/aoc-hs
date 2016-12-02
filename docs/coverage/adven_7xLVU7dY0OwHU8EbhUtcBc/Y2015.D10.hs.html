@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D10
+<span class="lineno">    3 </span>Description: Advent of Code Day 10 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 10 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2015.D10
+<span class="lineno">   10 </span>  ( lookSay
+<span class="lineno">   11 </span>  ) where
+<span class="lineno">   12 </span>
+<span class="lineno">   13 </span>import Data.List (group)
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>-- |Play the &quot;looksay&quot; game
+<span class="lineno">   16 </span>lookSay
+<span class="lineno">   17 </span>  :: String -- ^ List of initial numbers
+<span class="lineno">   18 </span>  -&gt; Int -- ^ Iterations
+<span class="lineno">   19 </span>  -&gt; String -- ^ Resulting looksay game string
+<span class="lineno">   20 </span><span class="decl"><span class="istickedoff">lookSay = (!!) . iterate (concatMap walk . group)</span>
+<span class="lineno">   21 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   22 </span><span class="spaces">    </span><span class="istickedoff">walk s@(h:_) = show (length s) ++ [h]</span>
+<span class="lineno">   23 </span><span class="spaces">    </span><span class="istickedoff">walk _ = <span class="nottickedoff">&quot;0&quot;</span></span></span>
+
+</pre>
+</body>
+</html>

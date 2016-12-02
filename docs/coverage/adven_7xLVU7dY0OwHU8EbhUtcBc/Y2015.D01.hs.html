@@ -1,0 +1,57 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D01
+<span class="lineno">    3 </span>Description: Advent of Code Day 01 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 01 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2015.D01
+<span class="lineno">   10 </span>  ( level
+<span class="lineno">   11 </span>  , basement
+<span class="lineno">   12 </span>  ) where
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>import Data.List (foldl')
+<span class="lineno">   15 </span>
+<span class="lineno">   16 </span>move :: Char -&gt; Int
+<span class="lineno">   17 </span><span class="decl"><span class="istickedoff">move c</span>
+<span class="lineno">   18 </span><span class="spaces">  </span><span class="istickedoff">| c == '(' = 1</span>
+<span class="lineno">   19 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">c == ')'</span> = -1</span>
+<span class="lineno">   20 </span><span class="spaces">  </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span> = <span class="nottickedoff">0</span></span></span>
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>-- |Find final level from list of elevator movements
+<span class="lineno">   23 </span>level
+<span class="lineno">   24 </span>  :: String -- ^ List of input open/close parens
+<span class="lineno">   25 </span>  -&gt; Int -- ^ Final elevator level
+<span class="lineno">   26 </span><span class="decl"><span class="istickedoff">level = foldl' (+) 0 . map move</span></span>
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>-- |Find position that arrives at level 0
+<span class="lineno">   29 </span>basement
+<span class="lineno">   30 </span>  :: String -- ^ List of input open/close parens
+<span class="lineno">   31 </span>  -&gt; Maybe Int -- ^ Possible position in string that arrives at zero
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">basement = find 0 1 . map move</span>
+<span class="lineno">   33 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   34 </span><span class="spaces">    </span><span class="istickedoff">find current idx (x:xs)</span>
+<span class="lineno">   35 </span><span class="spaces">      </span><span class="istickedoff">| current + x &lt; 0 = Just idx</span>
+<span class="lineno">   36 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = find (current + x) (idx + 1) xs</span>
+<span class="lineno">   37 </span><span class="spaces">    </span><span class="istickedoff">find _ _ [] = <span class="nottickedoff">Nothing</span></span></span>
+
+</pre>
+</body>
+</html>

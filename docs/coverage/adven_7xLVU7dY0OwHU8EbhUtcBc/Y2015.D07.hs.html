@@ -1,0 +1,136 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2015.D07
+<span class="lineno">    3 </span>Description: Advent of Code Day 07 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 07 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Y2015.D07
+<span class="lineno">   11 </span>    ( wire
+<span class="lineno">   12 </span>    , circuitParser
+<span class="lineno">   13 </span>    , parseCircuits
+<span class="lineno">   14 </span>    , override
+<span class="lineno">   15 </span>) where
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>import Y2015.Util (regularParse, intParser)
+<span class="lineno">   18 </span>
+<span class="lineno">   19 </span>import           Control.Applicative   ((&lt;|&gt;))
+<span class="lineno">   20 </span>import           Data.Bits             ((.&amp;.), (.|.), shift, complement)
+<span class="lineno">   21 </span>import           Data.Function.Memoize (memoize)
+<span class="lineno">   22 </span>import           Data.Map.Strict       (Map)
+<span class="lineno">   23 </span>import qualified Data.Map.Strict  as   M
+<span class="lineno">   24 </span>import           Data.Word             (Word16)
+<span class="lineno">   25 </span>import           Text.Parsec.Char      (digit, letter, endOfLine)
+<span class="lineno">   26 </span>import           Text.Parsec.String    (Parser)
+<span class="lineno">   27 </span>import           Text.Parsec
+<span class="lineno">   28 </span>    ( ParseError
+<span class="lineno">   29 </span>    , lookAhead
+<span class="lineno">   30 </span>    , many
+<span class="lineno">   31 </span>    , many1
+<span class="lineno">   32 </span>    , optional
+<span class="lineno">   33 </span>    , skipMany
+<span class="lineno">   34 </span>    , skipMany1
+<span class="lineno">   35 </span>    , space
+<span class="lineno">   36 </span>    , string
+<span class="lineno">   37 </span>    , try)
+<span class="lineno">   38 </span>
+<span class="lineno">   39 </span>type Wire = String
+<span class="lineno">   40 </span>
+<span class="lineno">   41 </span>data Atom = Val Word16 | Var String
+<span class="lineno">   42 </span>          deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   43 </span>
+<span class="lineno">   44 </span>data Gate = Singleton Atom
+<span class="lineno">   45 </span>          | And       Atom Atom
+<span class="lineno">   46 </span>          | Or        Atom Atom
+<span class="lineno">   47 </span>          | LShift    Atom Int
+<span class="lineno">   48 </span>          | RShift    Atom Int
+<span class="lineno">   49 </span>          | Not       Atom
+<span class="lineno">   50 </span>          deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   51 </span>
+<span class="lineno">   52 </span>data Instruction = Instruction Gate Wire
+<span class="lineno">   53 </span>                 deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>-- |Parsec parser for list of 'Instruction's
+<span class="lineno">   56 </span>circuitParser :: Parser [Instruction] -- ^ Parser
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">circuitParser = many (pInstruction &lt;* optional endOfLine)</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>pInstruction :: Parser Instruction
+<span class="lineno">   60 </span><span class="decl"><span class="istickedoff">pInstruction = Instruction &lt;$&gt; pGate &lt;*&gt; pWire</span></span>
+<span class="lineno">   61 </span>
+<span class="lineno">   62 </span>pGate :: Parser Gate
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">pGate =  try (Singleton &lt;$&gt; atom &lt;* lookAhead arrow)</span>
+<span class="lineno">   64 </span><span class="spaces">     </span><span class="istickedoff">&lt;|&gt; try (And       &lt;$&gt; atom &lt;* gate &quot;AND&quot;    &lt;*&gt; atom)</span>
+<span class="lineno">   65 </span><span class="spaces">     </span><span class="istickedoff">&lt;|&gt; try (Or        &lt;$&gt; atom &lt;* gate &quot;OR&quot;     &lt;*&gt; atom)</span>
+<span class="lineno">   66 </span><span class="spaces">     </span><span class="istickedoff">&lt;|&gt; try (LShift    &lt;$&gt; atom &lt;* gate &quot;LSHIFT&quot; &lt;*&gt; bits)</span>
+<span class="lineno">   67 </span><span class="spaces">     </span><span class="istickedoff">&lt;|&gt; try (RShift    &lt;$&gt; atom &lt;* gate &quot;RSHIFT&quot; &lt;*&gt; bits)</span>
+<span class="lineno">   68 </span><span class="spaces">     </span><span class="istickedoff">&lt;|&gt; try (Not       &lt;$          gate &quot;NOT&quot;    &lt;*&gt; atom)</span></span>
+<span class="lineno">   69 </span>
+<span class="lineno">   70 </span>pWire :: Parser Wire
+<span class="lineno">   71 </span><span class="decl"><span class="istickedoff">pWire = arrow *&gt; many1 letter</span></span>
+<span class="lineno">   72 </span>
+<span class="lineno">   73 </span>gate :: String -&gt; Parser ()
+<span class="lineno">   74 </span><span class="decl"><span class="istickedoff">gate s = skipMany space *&gt; string s *&gt; skipMany1 space</span></span>
+<span class="lineno">   75 </span>
+<span class="lineno">   76 </span>bits :: Parser Int
+<span class="lineno">   77 </span><span class="decl"><span class="istickedoff">bits = intParser</span></span>
+<span class="lineno">   78 </span>
+<span class="lineno">   79 </span>atom :: Parser Atom
+<span class="lineno">   80 </span><span class="decl"><span class="istickedoff">atom =  try (Var &lt;$&gt; many1 letter)</span>
+<span class="lineno">   81 </span><span class="spaces">    </span><span class="istickedoff">&lt;|&gt; try (Val .read &lt;$&gt; many1 digit)</span></span>
+<span class="lineno">   82 </span>
+<span class="lineno">   83 </span>arrow :: Parser ()
+<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">arrow = skipMany1 space *&gt; string &quot;-&gt;&quot; *&gt; skipMany1 space</span></span>
+<span class="lineno">   85 </span>
+<span class="lineno">   86 </span>voltageOn :: Map String Gate -&gt; String -&gt; Word16
+<span class="lineno">   87 </span><span class="decl"><span class="istickedoff">voltageOn m = resolve</span>
+<span class="lineno">   88 </span><span class="spaces">    </span><span class="istickedoff">where eval :: String -&gt; Word16</span>
+<span class="lineno">   89 </span><span class="spaces">          </span><span class="istickedoff">eval wire' = case M.lookup wire' m of</span>
+<span class="lineno">   90 </span><span class="spaces">                       </span><span class="istickedoff">Just (Singleton x) -&gt; atom' x</span>
+<span class="lineno">   91 </span><span class="spaces">                       </span><span class="istickedoff">Just (And x y)     -&gt; atom' x .&amp;. atom' y</span>
+<span class="lineno">   92 </span><span class="spaces">                       </span><span class="istickedoff">Just (Or x y)      -&gt; atom' x .|. atom' y</span>
+<span class="lineno">   93 </span><span class="spaces">                       </span><span class="istickedoff">Just (LShift x i)  -&gt; shift (atom' x) i</span>
+<span class="lineno">   94 </span><span class="spaces">                       </span><span class="istickedoff">Just (RShift x i)  -&gt; shift (atom' x) (-i)</span>
+<span class="lineno">   95 </span><span class="spaces">                       </span><span class="istickedoff">Just (Not x)       -&gt; complement (atom' x)</span>
+<span class="lineno">   96 </span><span class="spaces">                       </span><span class="istickedoff">Nothing            -&gt; <span class="nottickedoff">0</span></span>
+<span class="lineno">   97 </span><span class="spaces">          </span><span class="istickedoff">resolve = memoize eval</span>
+<span class="lineno">   98 </span><span class="spaces">          </span><span class="istickedoff">atom' (Val i) = i</span>
+<span class="lineno">   99 </span><span class="spaces">          </span><span class="istickedoff">atom' (Var v) = resolve v</span></span>
+<span class="lineno">  100 </span>
+<span class="lineno">  101 </span>-- |Constructs then returns resulting voltage from wiring spec
+<span class="lineno">  102 </span>wire :: String        -- ^ Wire to find voltage on
+<span class="lineno">  103 </span>     -&gt; [Instruction] -- ^ List of instructions
+<span class="lineno">  104 </span>     -&gt; Word16        -- ^ Resulting voltage on indicated wire
+<span class="lineno">  105 </span><span class="decl"><span class="istickedoff">wire s = flip voltageOn s . M.fromList . map toPair</span>
+<span class="lineno">  106 </span><span class="spaces">    </span><span class="istickedoff">where toPair (Instruction g w) = (w, g)</span></span>
+<span class="lineno">  107 </span>
+<span class="lineno">  108 </span>-- |Helper function to parse 'Instruction's
+<span class="lineno">  109 </span>parseCircuits :: String                            -- ^ Input string
+<span class="lineno">  110 </span>              -&gt; Either ParseError [Instruction] -- ^ Either parse error or 'Instruction's
+<span class="lineno">  111 </span><span class="decl"><span class="nottickedoff">parseCircuits = regularParse circuitParser</span></span>
+<span class="lineno">  112 </span>
+<span class="lineno">  113 </span>-- |Inject a manual instruction.
+<span class="lineno">  114 </span>override :: Word16      -- ^ Value to inject into 'Instruction'.
+<span class="lineno">  115 </span>         -&gt; Instruction -- ^ Resulting 'Instruction'.
+<span class="lineno">  116 </span><span class="decl"><span class="nottickedoff">override s = Instruction (Singleton (Val s)) &quot;b&quot;</span></span>
+
+</pre>
+</body>
+</html>
