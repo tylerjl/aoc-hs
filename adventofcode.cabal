@@ -29,6 +29,7 @@ library
   default-extensions:  QuasiQuotes
   ghc-options:         -Wall -Werror
   exposed-modules:     Y2015
+                     , Y2016
                      , Y2015.Util
                      , Y2015.D01
                      , Y2015.D02
@@ -55,6 +56,7 @@ library
                      , Y2015.D23
                      , Y2015.D24
                      , Y2015.D25
+                     , Y2016.D01
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring

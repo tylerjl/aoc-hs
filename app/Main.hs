@@ -8,6 +8,7 @@ import Safe
 import System.Environment (getArgs)
 import Text.Read (readMaybe)
 import Y2015
+import Y2016
 
 usage :: String
 usage = "Usage: <year> <day number> [input file or string]"
@@ -107,6 +108,9 @@ run 2015 24 file = do
 run 2015 25 file = do
   contents <- readFile file
   print (manualCodeFrom contents)
+run 2016 1 file = do
+  contents <- readFile file
+  print (blockDistance contents)
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
