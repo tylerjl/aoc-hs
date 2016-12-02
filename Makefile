@@ -17,7 +17,10 @@ benchmarks:
 .PHONY: coverage
 coverage:
 	rm -rf docs/coverage/*
-	cp -r $$(stack path --local-hpc-root)/ docs/coverage/
+	stack hpc report \
+		$$(stack path --local-install-root)/hpc/adventofcode/adventofcode-test/adventofcode-test.tix \
+		--destdir docs/coverage
+	ln -s hpc_index.html docs/coverage/index.html
 
 .PHONY: docs
 docs:
