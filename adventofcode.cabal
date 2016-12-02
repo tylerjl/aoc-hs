@@ -57,6 +57,7 @@ library
                      , Y2015.D24
                      , Y2015.D25
                      , Y2016.D01
+                     , Y2016.D02
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
@@ -64,6 +65,7 @@ library
                      , containers
                      , cryptohash
                      , lens
+                     , matrix
                      , memoize
                      , parsec
                      , repa

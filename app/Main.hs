@@ -111,6 +111,9 @@ run 2015 25 file = do
 run 2016 1 file = do
   contents <- readFile file
   print (blockDistance contents, visitedTwice contents)
+run 2016 2 file = do
+  contents <- readFile file
+  print (bathroomCode contents)
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
