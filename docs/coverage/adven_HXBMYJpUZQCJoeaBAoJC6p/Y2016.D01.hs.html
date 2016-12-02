@@ -1,0 +1,114 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2016.D01
+<span class="lineno">    3 </span>Description: Advent of Code Day 01 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 01 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2016.D01
+<span class="lineno">   10 </span>  ( blockDistance
+<span class="lineno">   11 </span>  , visitedTwice
+<span class="lineno">   12 </span>  ) where
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>import Data.List (foldl')
+<span class="lineno">   15 </span>import qualified Data.Set as Set
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>-- | Cardinal direction for movement
+<span class="lineno">   18 </span>data Direction
+<span class="lineno">   19 </span>  = North
+<span class="lineno">   20 </span>  | East
+<span class="lineno">   21 </span>  | South
+<span class="lineno">   22 </span>  | West
+<span class="lineno">   23 </span>  deriving (<span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">   24 </span>
+<span class="lineno">   25 </span>-- | (x, y) coordinates
+<span class="lineno">   26 </span>type Coordinates = (Int, Int)
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>-- | Find number of blocks traveled per list of instructions
+<span class="lineno">   29 </span>blockDistance
+<span class="lineno">   30 </span>  :: String -- ^ Input of directions
+<span class="lineno">   31 </span>  -&gt; Int -- ^ Number of blocks traveled
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">blockDistance = blocks . foldl' travel (0, 0) . mapRoute</span></span>
+<span class="lineno">   33 </span>
+<span class="lineno">   34 </span>-- | Find first block that is visited twice
+<span class="lineno">   35 </span>visitedTwice
+<span class="lineno">   36 </span>  :: String -- ^ Input of directions
+<span class="lineno">   37 </span>  -&gt; Maybe Int -- ^ Possible block that is visited twice
+<span class="lineno">   38 </span><span class="decl"><span class="istickedoff">visitedTwice = navigate (0, 0) Set.empty . mapRoute</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   40 </span><span class="spaces">    </span><span class="istickedoff">navigate point set (path:xs)</span>
+<span class="lineno">   41 </span><span class="spaces">      </span><span class="istickedoff">| Set.member point' set = Just $ blocks point'</span>
+<span class="lineno">   42 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = navigate point' (Set.insert point' set) xs</span>
+<span class="lineno">   43 </span><span class="spaces">      </span><span class="istickedoff">where</span>
+<span class="lineno">   44 </span><span class="spaces">        </span><span class="istickedoff">point' = travel point path</span>
+<span class="lineno">   45 </span><span class="spaces">    </span><span class="istickedoff">navigate _ _ _ = <span class="nottickedoff">Nothing</span></span></span>
+<span class="lineno">   46 </span>
+<span class="lineno">   47 </span>-- | Translate an input string into a list of movement `Direction`s
+<span class="lineno">   48 </span>mapRoute
+<span class="lineno">   49 </span>  :: String -- ^ Input string
+<span class="lineno">   50 </span>  -&gt; [Direction] -- ^ List of `Direction`s
+<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">mapRoute = toRoute North . map (toPath . filter (not . (==) ',')) . words</span>
+<span class="lineno">   52 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   53 </span><span class="spaces">    </span><span class="istickedoff">toRoute orientation ((lr, distance):xs) =</span>
+<span class="lineno">   54 </span><span class="spaces">      </span><span class="istickedoff">replicate distance orientation' ++ toRoute orientation' xs</span>
+<span class="lineno">   55 </span><span class="spaces">      </span><span class="istickedoff">where</span>
+<span class="lineno">   56 </span><span class="spaces">        </span><span class="istickedoff">orientation' = turn lr orientation</span>
+<span class="lineno">   57 </span><span class="spaces">    </span><span class="istickedoff">toRoute _ [] = []</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>-- | Calculate the number of blocks from the origin
+<span class="lineno">   60 </span>blocks
+<span class="lineno">   61 </span>  :: Coordinates -- ^ Current `Coordinates`
+<span class="lineno">   62 </span>  -&gt; Int -- ^ Number of blocks that `Coordinate` lies from the origin
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">blocks (x, y) = abs x + abs y</span></span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>-- | Move along a given direction
+<span class="lineno">   66 </span>travel
+<span class="lineno">   67 </span>  :: Coordinates -- ^ Initial `Coordinates`
+<span class="lineno">   68 </span>  -&gt; Direction -- ^ `Direction` to move towards
+<span class="lineno">   69 </span>  -&gt; Coordinates -- ^ New `Coordinates`
+<span class="lineno">   70 </span><span class="decl"><span class="istickedoff">travel (x, y) d =</span>
+<span class="lineno">   71 </span><span class="spaces">  </span><span class="istickedoff">case d of</span>
+<span class="lineno">   72 </span><span class="spaces">    </span><span class="istickedoff">North -&gt; (x, succ y)</span>
+<span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">East -&gt; (succ x, y)</span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="istickedoff">South -&gt; (x, pred y)</span>
+<span class="lineno">   75 </span><span class="spaces">    </span><span class="istickedoff">West -&gt; (pred x, y)</span></span>
+<span class="lineno">   76 </span>
+<span class="lineno">   77 </span>-- | Translate a movement instruction to an intermediate form
+<span class="lineno">   78 </span>toPath
+<span class="lineno">   79 </span>  :: String -- ^ Raw input instruction
+<span class="lineno">   80 </span>  -&gt; (Char, Int) -- ^ `Tuple` consisting of movement direction and
+<span class="lineno">   81 </span>                 -- ^ distance
+<span class="lineno">   82 </span><span class="decl"><span class="istickedoff">toPath (direction:steps) = (direction, read steps)</span>
+<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff">toPath [] = <span class="nottickedoff">(' ', 0)</span></span></span>
+<span class="lineno">   84 </span>
+<span class="lineno">   85 </span>-- | Determine new direction after turning Left or Right
+<span class="lineno">   86 </span>turn
+<span class="lineno">   87 </span>  :: Char -- ^ 'L'eft or 'R'right
+<span class="lineno">   88 </span>  -&gt; Direction -- ^ Initial `Direction`
+<span class="lineno">   89 </span>  -&gt; Direction -- ^ New `Direction`
+<span class="lineno">   90 </span><span class="decl"><span class="istickedoff">turn 'R' West = North</span>
+<span class="lineno">   91 </span><span class="spaces"></span><span class="istickedoff">turn 'L' North = <span class="nottickedoff">West</span></span>
+<span class="lineno">   92 </span><span class="spaces"></span><span class="istickedoff">turn 'R' d = succ d</span>
+<span class="lineno">   93 </span><span class="spaces"></span><span class="istickedoff">turn 'L' d = pred d</span>
+<span class="lineno">   94 </span><span class="spaces"></span><span class="istickedoff">turn _ d = <span class="nottickedoff">d</span></span></span>
+
+</pre>
+</body>
+</html>
