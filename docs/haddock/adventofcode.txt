@@ -9,9 +9,24 @@
 @version 0.1.0.0
 
 
+-- | Solutions to the day 02 set of problems for <a>adventofcode.com</a>.
+module Y2016.D02
+bathroomCode :: Matrix String -> Position -> String -> String
+
+-- | <tt>Matrix</tt> for part 1
+grid1 :: Matrix String
+
+-- | <tt>Matrix</tt> for part 2
+grid2 :: Matrix String
+
+
 -- | Solutions to the day 01 set of problems for <a>adventofcode.com</a>.
 module Y2016.D01
+
+-- | Find number of blocks traveled per list of instructions
 blockDistance :: String -> Int
+
+-- | Find first block that is visited twice
 visitedTwice :: String -> Maybe Int
 instance GHC.Enum.Enum Y2016.D01.Direction
 
