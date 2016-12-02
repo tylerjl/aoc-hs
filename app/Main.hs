@@ -110,7 +110,7 @@ run 2015 25 file = do
   print (manualCodeFrom contents)
 run 2016 1 file = do
   contents <- readFile file
-  print (blockDistance contents)
+  print (blockDistance contents, visitedTwice contents)
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()

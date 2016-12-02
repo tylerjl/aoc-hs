@@ -16,4 +16,4 @@ spec = parallel $ do
                 blockDistance "R5, L5, R5, R3" `shouldBe` 12
         describe "visitedTwice" $ do
             it "finds easter bunny HQ" $
-                visitedTwice "R8, R4, R4, R8" `shouldBe` 4
+                visitedTwice "R8, R4, R4, R8" `shouldBe` Just 4

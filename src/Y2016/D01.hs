@@ -12,41 +12,52 @@ module Y2016.D01
   ) where
 
 import Data.List (foldl')
+import qualified Data.Set as Set
 
 data Direction = North
                | East
                | South
                | West
-               deriving Enum
+               deriving (Enum)
 
 type Coordinates = (Int, Int)
 
 blockDistance :: String -> Int
-blockDistance = (\(x, y) -> abs x + abs y)
-              . snd
-              . foldl' travel (North, (0, 0))
-              . map (toPath . filter  (not . (==) ','))
-              . words
+blockDistance = blocks
+              . foldl' travel (0, 0)
+              . mapRoute
 
-visitedTwice :: String -> Int
-visitedTwice _ = 0
+visitedTwice :: String -> Maybe Int
+visitedTwice = navigate (0,0) Set.empty
+             . mapRoute
+    where navigate point set (path:xs)
+              | Set.member point' set = Just $ blocks point'
+              | otherwise = navigate point' (Set.insert point' set) xs
+              where point' = travel point path
+          navigate _ _ _ = Nothing
 
-travel :: (Direction, Coordinates) -> (Char, Int) -> (Direction, Coordinates)
-travel (dir, c) (lr, steps) =
-    (dir', walk c dir' steps)
-    where dir' = turn lr dir
+mapRoute :: String -> [Direction]
+mapRoute = toRoute North
+         . map (toPath . filter  (not . (==) ','))
+         . words
+         where toRoute orientation ((lr, distance):xs) =
+                   replicate distance orientation' ++ toRoute orientation' xs
+                   where orientation' = turn lr orientation
+               toRoute _ [] = []
+
+blocks :: Coordinates -> Int
+blocks (x, y) = abs x + abs y
+
+travel :: Coordinates -> Direction -> Coordinates
+travel (x, y) d = case d of
+                    North -> (x, succ y)
+                    East -> (succ x, y)
+                    South -> (x, pred y)
+                    West -> (pred x, y)
 
 toPath :: String -> (Char, Int)
 toPath (direction:steps) = (direction, read steps)
 toPath [] = (' ', 0)
-
-walk :: Coordinates -> Direction -> Int -> Coordinates
-walk (x, y) d l =
-    case d of
-      North -> (x, y + l)
-      East -> (x + l, y)
-      South -> (x, y - l)
-      West -> (x - l, y)
 
 turn :: Char -> Direction -> Direction
 turn 'R' West = North
