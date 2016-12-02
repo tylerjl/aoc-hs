@@ -16,9 +16,8 @@ import qualified Data.Map.Strict as M
 import Data.Set  (Set)
 import qualified Data.Set as S
 
-type Mol       = [String]
-type Repls     = Map String (Set String)
-type Compounds = Set Mol
+type Mol   = [String]
+type Repls = Map String (Set String)
 
 -- |Returns the number of steps required to form a specified molecule
 molSteps :: String -- ^ Target molecule composition as a raw string
@@ -40,10 +39,10 @@ distinctMols s = S.size $ compounds mols repls
 compounds :: Mol -> Repls -> Set String
 compounds m r = foldl' S.union S.empty $ map combine molTrips
   where molTrips = zip3 (inits m) m (tail $ tails m)
-        combine t@(_,m,_) = subRepl t $ M.findWithDefault S.empty m r
+        combine t@(_,m',_) = subRepl t $ M.findWithDefault S.empty m' r
 
 subRepl :: (Mol, String, Mol) -> Set String -> Set String
-subRepl (pre,sub,post) = foldl' (flip S.insert) S.empty
+subRepl (pre,_,post) = foldl' (flip S.insert) S.empty
                        . map (concat . construct) . S.toList
   where construct repl = pre ++ [repl] ++ post
 
@@ -52,6 +51,7 @@ toRepls = M.fromListWith S.union . map (molPair S.singleton . words)
 
 molPair :: (a -> b) -> [a] -> (a, b)
 molPair f [from,_,to] = (from, f to)
+molPair f xs = (head xs, f $ last xs)
 
 toMol :: String -> Mol
 toMol []                                = []

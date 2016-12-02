@@ -17,9 +17,6 @@ module Y2015.D22
 where
 
 import           Control.Lens
-import           Data.List    (foldr, minimumBy)
-import           Data.Maybe   (catMaybes)
-import           Data.Ord     (comparing)
 import           Data.Map     (Map, insert, keys, member)
 import qualified Data.Map     as M
 
@@ -125,18 +122,18 @@ newGame hardMode input =
             , _mana = 500
             , _spent = 0
             }
-        , _boss    = boss
+        , _boss    = boss'
         , _effects = M.empty
         , _state   = PlayerTurn
         , _hard    = hardMode
         }
-    where boss = pBoss input
+    where boss' = pBoss input
 
 pBoss :: String -> Boss
-pBoss input = Boss { _hp = hp, _damage = dmg }
+pBoss input = Boss { _hp = hp', _damage = dmg }
     where parse f = read $ last $ words $ f $ lines input
-          hp      = parse head
-          dmg     = parse last
+          hp' = parse head
+          dmg = parse last
 
 -- |Finds the minimum required mana to win a game.
 spellBattle :: Bool   -- ^ Whether to run the game in "hard mode"

@@ -19,19 +19,17 @@ import Y2015.Util (regularParse, intParser)
 import           Control.Applicative   ((<|>))
 import           Data.Bits             ((.&.), (.|.), shift, complement)
 import           Data.Function.Memoize (memoize)
-import           Data.List             (foldl')
-import           Data.Map.Strict       (Map, empty, fromListWith)
+import           Data.Map.Strict       (Map)
 import qualified Data.Map.Strict  as   M
 import           Data.Word             (Word16)
 import           Text.Parsec.Char      (digit, letter, endOfLine)
 import           Text.Parsec.String    (Parser)
 import           Text.Parsec
-    ( ParseError(..)
+    ( ParseError
     , lookAhead
     , many
     , many1
     , optional
-    , sepBy
     , skipMany
     , skipMany1
     , space
@@ -80,7 +78,7 @@ bits = intParser
 
 atom :: Parser Atom
 atom =  try (Var <$> many1 letter)
-    <|> try (Val <$> read <$> many1 digit)
+    <|> try (Val .read <$> many1 digit)
 
 arrow :: Parser ()
 arrow = skipMany1 space *> string "->" *> skipMany1 space
@@ -88,17 +86,17 @@ arrow = skipMany1 space *> string "->" *> skipMany1 space
 voltageOn :: Map String Gate -> String -> Word16
 voltageOn m = resolve
     where eval :: String -> Word16
-          eval wire = case M.lookup wire m of
-                      Just (Singleton x) -> atom x
-                      Just (And x y)     -> atom x .&. atom y
-                      Just (Or x y)      -> atom x .|. atom y
-                      Just (LShift x i)  -> shift (atom x) i
-                      Just (RShift x i)  -> shift (atom x) (-i)
-                      Just (Not x)       -> complement (atom x)
-                      Nothing            -> 0
+          eval wire' = case M.lookup wire' m of
+                       Just (Singleton x) -> atom' x
+                       Just (And x y)     -> atom' x .&. atom' y
+                       Just (Or x y)      -> atom' x .|. atom' y
+                       Just (LShift x i)  -> shift (atom' x) i
+                       Just (RShift x i)  -> shift (atom' x) (-i)
+                       Just (Not x)       -> complement (atom' x)
+                       Nothing            -> 0
           resolve = memoize eval
-          atom (Val i) = i
-          atom (Var v) = resolve v
+          atom' (Val i) = i
+          atom' (Var v) = resolve v
 
 -- |Constructs then returns resulting voltage from wiring spec
 wire :: String        -- ^ Wire to find voltage on

@@ -9,7 +9,7 @@ Solutions to the day 16 set of problems for <adventofcode.com>.
 
 module Y2015.D16 (findAunt, findRealAunt) where
 
-import Data.List (maximumBy, sortBy)
+import Data.List (maximumBy)
 import Data.Map.Strict (Map, differenceWith, differenceWithKey, fromList, size)
 
 type Aunt = Map String Int
@@ -48,6 +48,7 @@ toAunts :: String -> [Aunt]
 toAunts = map (toAunt . words) . lines . filter (/= ',')
 
 toAunt :: [String] -> Aunt
-toAunt (s:n:traits) = fromList $ toPair traits
+toAunt (_:_:traits) = fromList $ toPair traits
     where toPair (x:y:ys) = (init x, read y) : toPair ys
           toPair _        = []
+toAunt _ = fromList []

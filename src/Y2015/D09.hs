@@ -16,16 +16,15 @@ module Y2015.D09
     )
 where
 
-import Y2015.Util (regularParse, intParser)
+import Y2015.Util (intParser)
 
-import           Control.Applicative ((<*>))
-import           Data.List           (concatMap, permutations)
+import           Data.List           (permutations)
 import           Data.Map            ((!), Map, fromListWith, keys, singleton, union)
 import qualified Data.Map as         Map
 import           Data.Maybe          (mapMaybe)
 import           Safe                (maximumMay, minimumMay)
 import           Text.Parsec         (many1, optional, skipMany1, string)
-import           Text.Parsec.Char    (char, digit, endOfLine, letter, space)
+import           Text.Parsec.Char    (endOfLine, letter, space)
 import           Text.Parsec.String  (Parser)
 
 type City     = String
@@ -42,11 +41,6 @@ parseRoute = Route <$> many1 letter <* pSep "to"
                    <*> many1 letter <* pSep "="
                    <*> intParser
     where pSep s = many1 space *> string s *> skipMany1 space
-
-parseRoutes :: String -> Maybe [Route]
-parseRoutes s = case regularParse routeParser s of
-                     Right routes -> Just routes
-                     Left _       -> Nothing
 
 -- Each key represents the start, with possible destination values,
 -- which are keys to the distance to that destination.

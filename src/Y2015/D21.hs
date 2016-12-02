@@ -18,9 +18,7 @@ where
 
 import Control.Monad (replicateM)
 import Data.List     (maximumBy, minimumBy)
-import Data.Maybe    (catMaybes)
 import Data.Ord      (comparing)
-import Safe          (minimumMay)
 
 data Item = Item { cost   :: Int
                  , armor  :: Int
@@ -49,6 +47,11 @@ cheapestVictory :: String -- ^ Raw combatant stats.
                 -> Int    -- ^ Cheapest possible victory as an Int
 cheapestVictory = battleCostBy minimumBy fst
 
+battleCostBy :: Ord a1
+             => (((a2, a1) -> (a2, a1) -> Ordering) -> [(Bool, Int)] -> (a, c))
+             -> ((Bool, Int) -> Bool)
+             -> String
+             -> c
 battleCostBy f g = snd . f (comparing snd) . filter g
                  . flip map loadouts . battle . toBoss
 
@@ -63,10 +66,10 @@ player = Combatant { hp = 100, items = [] }
 -- |Parses a string into a 'Combatant'
 toBoss :: String    -- ^ Raw combatant stats
        -> Combatant -- ^ Resultant combatant record
-toBoss s = Combatant { hp = hp, items = i }
+toBoss s = Combatant { hp = hp', items = i }
   where input = lines s
-        hp    = read $ last $ words $ head input
-        i     = map (toI . words) $ tail input
+        hp'    = read $ last $ words $ head input
+        i      = map (toI . words) $ tail input
         toI ["Damage:",d] = item { damage = read d }
         toI ["Armor:", a] = item { armor  = read a }
         toI _             = item
@@ -102,7 +105,7 @@ rings = [ item {cost = 25,  damage = 1}
         ]
 
 equip :: Combatant -> [Item] -> Combatant
-equip c@(Combatant {items = is}) i = c {items = i ++ is}
+equip c@Combatant {items = is} i = c {items = i ++ is}
 
 attr :: (Item -> Int) -> Combatant -> Int
 attr f = sum . map f . items
@@ -117,5 +120,5 @@ battle b p | (p `hits` b) <= (b `hits` p) = (True,  price)
            where price = attr cost p
 
 hits :: Combatant -> Combatant -> Int
-hits a d = ceiling $ fromIntegral (hp d) / fromIntegral minDmg
+hits a d = ceiling ((fromIntegral (hp d) / fromIntegral minDmg) :: Double)
   where minDmg = max 1 (attr damage a - attr armor d)

@@ -57,3 +57,10 @@ toIngredient [_,_,c,_,d,_,f,_,t,_,ca] =
                , texture    = read t
                , calories   = read ca
                }
+toIngredient _ =
+    Ingredient { capacity   = 0
+               , durability = 0
+               , flavor     = 0
+               , texture    = 0
+               , calories   = 0
+               }

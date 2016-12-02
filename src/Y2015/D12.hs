@@ -11,9 +11,8 @@ Solutions to the day 12 set of problems for <adventofcode.com>.
 
 module Y2015.D12 (jsonSum, jsonSumFixed) where
 
-import           Data.Aeson           (Array(..), Object(..), Value(..), decode)
-import           Data.ByteString.Lazy (ByteString, readFile)
-import qualified Data.ByteString.Lazy as L
+import           Data.Aeson           (Value(..), decode)
+import           Data.ByteString.Lazy (ByteString)
 import qualified Data.HashMap.Strict  as M
 import           Data.Scientific      (floatingOrInteger)
 import qualified Data.Vector          as V
@@ -35,19 +34,19 @@ jsonSumFixed = jSum . decode
 filterV :: Value -> Value
 filterV o@(Object x) | r o    = Null
                      | otherwise  = Object (M.map filterV x)
-                     where r (String x) = x == "red"
-                           r (Object o) = any r $ filter string $ M.elems o
+                     where r (String x') = x' == "red"
+                           r (Object o') = any r $ filter string $ M.elems o'
                            r _          = False
                            string (String _) = True
                            string _          = False
-filterV a@(Array v)               = Array (V.map filterV v)
+filterV (Array v)                 = Array (V.map filterV v)
 filterV s@(String x) | x == "red" = Null
                      | otherwise  = s
 filterV v                         = v
 
 sumValue :: Value -> Int
 sumValue (Object o) = M.foldl' valAcc 0 o
-sumValue (Number n) = case floatingOrInteger n of
+sumValue (Number n) = case (floatingOrInteger n :: Either Double Int) of
                            Left _  -> 0
                            Right i -> i
 sumValue (Array n)  = V.foldl' valAcc 0 n

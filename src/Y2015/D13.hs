@@ -11,8 +11,6 @@ module Y2015.D13 (solveSeating) where
 
 import           Data.List   (nub, permutations)
 import           Data.Map    (Map, findWithDefault, fromList, keys)
-import qualified Data.Map as Map
-import           Data.Tuple  (swap)
 
 type Guest       = String
 type Happiness   = Int
@@ -39,5 +37,6 @@ toSeating = fromList . map (parseSeating . words . init) . lines
 parseSeating :: [String] -> (Edge, Happiness)
 parseSeating [a,_,s,h,_,_,_,_,_,_,b] = ((a, b), hap s)
     where change = read h
-          hap "gain" = change
           hap "lose" = negate change
+          hap _ = change
+parseSeating _ = (("", ""), 0)

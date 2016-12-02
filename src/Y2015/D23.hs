@@ -55,7 +55,9 @@ toOperation ["inc",[r]]          = Increment r
 toOperation ["jmp",offset]       = Jump  $ toInt offset
 toOperation ["jie",r:",",offset] = JIE r $ toInt offset
 toOperation ["jio",r:",",offset] = JIO r $ toInt offset
+toOperation _ = Jump 0
 
 toInt :: String -> Int
 toInt ('-':s) = negate $ read s
 toInt ('+':s) = read s
+toInt s = read s

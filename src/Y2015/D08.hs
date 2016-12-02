@@ -11,7 +11,7 @@ module Y2015.D08 (difference, encoded) where
 
 body :: [a] -> [a]
 body []  = []
-body [x] = []
+body [_] = []
 body xs  = tail $ init xs
 
 hexChars :: String

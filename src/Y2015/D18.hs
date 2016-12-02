@@ -41,7 +41,7 @@ stuck e = R.computeS . R.zipWith (.|.) (stuckLights e)
 stuckLights :: (Num a, Unbox a) => R.DIM2 -> Lights a
 stuckLights sh = R.fromListUnboxed sh [corner x | x <- [1..s]]
     where s      = R.size sh
-          i      = truncate $ sqrt $ fromIntegral s
+          i      = truncate ((sqrt $ fromIntegral s) :: Double)
           corner 1 = 1
           corner n | n == i           = 1
                    | n == s           = 1
@@ -66,7 +66,7 @@ stencil = [stencil2| 1  1  1
 initialGrid :: (Num a, Unbox a) => String -> Lights a
 initialGrid s = R.fromListUnboxed (Z :. size :. size :: R.DIM2) lights
     where scrubbed    = filter (/= '\n') s
-          size        = truncate $ sqrt $ fromIntegral $ length scrubbed
+          size        = truncate ((sqrt $ fromIntegral $ length scrubbed) :: Double)
           lights      = map toLight scrubbed
           toLight '#' = 1
           toLight  _  = 0

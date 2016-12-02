@@ -12,7 +12,7 @@ Original credit for most of this due to aepsilon:
 
 module Y2015.D20 (withMinPresents, withMinPresents2) where
 
-import           Data.List   (group, null)
+import           Data.List   (group)
 import           Data.Set    (Set)
 import qualified Data.Set as Set
 
@@ -34,14 +34,14 @@ factorize :: Int -> [Int]
 factorize 1                = []
 factorize n | null factors = [n]
             | otherwise    = p : factorize q
-  where factors = [ (p,q) | p <- takeWhile (<= intsqrt n) primes
-                          , let (q,r) = quotRem n p
+  where factors = [ (p',q') | p' <- takeWhile (<= intsqrt n) primes
+                          , let (q',r) = quotRem n p'
                           , r == 0 ]
         p = fst $ head factors
         q = snd $ head factors
 
 intsqrt :: Int -> Int
-intsqrt = floor . sqrt . fromIntegral
+intsqrt i = floor ((sqrt $ fromIntegral i) :: Double)
 
 primes :: [Int]
 primes = 2 : 3 : [ p | p <- [5,7..]

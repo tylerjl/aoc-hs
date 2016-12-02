@@ -39,16 +39,16 @@ leadingRace :: String -- ^ Deer stats as raw string input
             -> Int    -- ^ Distance to run race
             -> Int    -- ^ Dat winning deer doe
 leadingRace d t = score $ getWinner $ foldl' raceStep race [0..t]
-    where race = (Race (map toRacer $ toDeer d) 0)
+    where race = Race (map toRacer $ toDeer d) 0
           getWinner (Race racers _) = maximum racers
 
 raceStep :: Race -> Int -> Race
 raceStep (Race racers time) tick = distPoints $ Race (map step racers) (time+1)
-    where step r@(Racer { deer = d, score = s, position = pos })
+    where step r@Racer { deer = d, position = pos }
               | isResting d tick = r
-              | otherwise        = r { position = (pos + velocity d) }
+              | otherwise        = r { position = pos + velocity d }
           distPoints (Race rs n) = Race (map (award $ position $ maximumBy leader rs) rs) n
-          award pos r@(Racer { position = p, score = s })
+          award pos r@Racer { position = p, score = s }
               | pos == p  = r { score = s + 1 }
               | otherwise = r
 
@@ -76,4 +76,10 @@ toDeer = map (parseDeer . words . init) . lines
                        , velocity  = read v
                        , endurance = read e
                        , cooldown  = read cd
+                       }
+          parseDeer _ =
+              Reindeer { name      = "Null"
+                       , velocity  = 0
+                       , endurance = 0
+                       , cooldown  = 0
                        }

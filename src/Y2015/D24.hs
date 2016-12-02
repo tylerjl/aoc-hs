@@ -15,7 +15,6 @@ where
 
 import Data.Function (on)
 import Data.List     (find, groupBy, minimumBy, sortBy, subsequences)
-import Data.Monoid   (mconcat)
 import Data.Ord      (comparing)
 
 -- |Find the ideal entanglement value for a given input of packages.
