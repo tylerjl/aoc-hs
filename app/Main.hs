@@ -9,6 +9,7 @@ import System.Environment (getArgs)
 import Text.Read (readMaybe)
 import Y2015
 import Y2016
+import Y2018
 
 usage :: String
 usage = "Usage: <year> <day number> [input file or string]"
@@ -108,6 +109,7 @@ run 2015 24 file = do
 run 2015 25 file = do
   contents <- readFile file
   print (manualCodeFrom contents)
+
 run 2016 1 file = do
   contents <- readFile file
   print (blockDistance contents, visitedTwice contents)
@@ -116,6 +118,13 @@ run 2016 2 file = do
   print ( bathroomCode grid1 (2,2) contents
         , bathroomCode grid2 (1,3) contents
         )
+
+run 2018 1 file = do
+  contents <- readFile file
+  case frequency contents of
+    Nothing -> putStrLn $ "Could not parse" ++ file
+    Just i -> print i
+
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
