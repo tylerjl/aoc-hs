@@ -8,6 +8,7 @@ Solutions to the day 01 set of problems for <adventofcode.com>.
 -}
 module Y2018.D01
   ( frequency
+  , twiceFrequency
   ) where
 
 import Y2015.Util (regularParse, intParser)
@@ -25,6 +26,7 @@ import Text.Parsec
 
 data Change = Increase Int
             | Decrease Int
+            deriving Eq
 
 parseFrequency :: String
                -> Either ParseError [Change]
@@ -45,3 +47,18 @@ frequency input = case parseFrequency input of
 freqSum :: Int -> Change -> Int
 freqSum n (Increase i) = n + i
 freqSum n (Decrease i) = n - i
+
+twiceFrequency :: String -> Maybe Int
+twiceFrequency input = case parseFrequency input of
+                    Left _ -> Nothing
+                    Right f -> Just $ findRepeatedFrequency (cycle f) [] 0
+
+findRepeatedFrequency :: [Change] -> [Int] -> Int -> Int
+findRepeatedFrequency (change:changes) history current =
+  if current' `elem` history then
+    current'
+  else
+    findRepeatedFrequency changes history' current'
+  where history' = history ++ [current]
+        current' = freqSum current change
+findRepeatedFrequency [] _ current = current

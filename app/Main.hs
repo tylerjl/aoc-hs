@@ -124,6 +124,9 @@ run 2018 1 file = do
   case frequency contents of
     Nothing -> putStrLn $ "Could not parse" ++ file
     Just i -> print i
+  case twiceFrequency contents of
+    Nothing -> putStrLn $ "Could not parse" ++ file
+    Just i -> print i
 
 run _ _ _ = putStrLn "Not implemented yet."
 
