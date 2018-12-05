@@ -131,6 +131,9 @@ run 2018 1 file = do
 run 2018 2 file = do
   contents <- readFile file
   print $ checksum contents
+  case boxID contents of
+    Nothing -> print "Couldn't find matching box."
+    Just s  -> print s
 
 run _ _ _ = putStrLn "Not implemented yet."
 
