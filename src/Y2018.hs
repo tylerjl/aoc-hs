@@ -15,3 +15,4 @@ Each day's module exports are re-exported here for convenience when importing
 module Y2018 (module X) where
 
 import Y2018.D01 as X
+import Y2018.D02 as X

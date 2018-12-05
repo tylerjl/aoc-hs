@@ -128,6 +128,10 @@ run 2018 1 file = do
     Nothing -> putStrLn $ "Could not parse" ++ file
     Just i -> print i
 
+run 2018 2 file = do
+  contents <- readFile file
+  print $ checksum contents
+
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
