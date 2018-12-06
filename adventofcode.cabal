@@ -61,6 +61,7 @@ library
                      , Y2016.D02
                      , Y2018.D01
                      , Y2018.D02
+                     , Y2018.D03
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring

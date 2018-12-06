@@ -135,6 +135,12 @@ run 2018 2 file = do
     Nothing -> print "Couldn't find matching box."
     Just s  -> print s
 
+run 2018 3 file = do
+  contents <- readFile file
+  case overlappedInches contents of
+    Left e -> print e
+    Right s -> print s
+
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
