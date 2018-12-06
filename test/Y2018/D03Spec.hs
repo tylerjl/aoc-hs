@@ -2,6 +2,8 @@ module Y2018.D03Spec (spec) where
 
 import Y2018
 
+import qualified Data.Set as Set
+
 import Test.Hspec
 
 input = unlines
@@ -16,3 +18,6 @@ spec = parallel $ do
         describe "overlappedInches" $ do
             it "solves the example case" $
                 overlappedInches input `shouldBe` Right 4
+        describe "intactInches" $ do
+            it "solves the example case" $
+                intactInches input `shouldBe` Right [3]

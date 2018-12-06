@@ -140,6 +140,7 @@ run 2018 3 file = do
   case overlappedInches contents of
     Left e -> print e
     Right s -> print s
+  print $ intactInches contents
 
 run _ _ _ = putStrLn "Not implemented yet."
 
