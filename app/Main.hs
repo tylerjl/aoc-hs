@@ -142,6 +142,12 @@ run 2018 3 file = do
     Right s -> print s
   print $ intactInches contents
 
+run 2018 4 file = do
+  contents <- readFile file
+  case laziestGuard contents of
+    Left e -> print e
+    Right s -> print s
+
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()

@@ -62,6 +62,7 @@ library
                      , Y2018.D01
                      , Y2018.D02
                      , Y2018.D03
+                     , Y2018.D04
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
@@ -75,6 +76,7 @@ library
                      , repa
                      , safe
                      , scientific
+                     , time
                      , unordered-containers
                      , vector
   default-language:    Haskell2010

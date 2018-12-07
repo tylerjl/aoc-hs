@@ -17,3 +17,4 @@ module Y2018 (module X) where
 import Y2018.D01 as X
 import Y2018.D02 as X
 import Y2018.D03 as X
+import Y2018.D04 as X
