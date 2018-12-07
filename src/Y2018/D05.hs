@@ -12,9 +12,8 @@ module Y2018.D05
   )
 where
 
-import Data.Char (isLower, isUpper, toLower, toUpper)
-import Data.List (groupBy, maximumBy, nub)
-import Data.Ord  (comparing)
+import Data.Char (toLower, toUpper)
+import Data.List (nub)
 
 reactBest :: String -> Int
 reactBest input = minimum $ map react $ map inputWithout candidates
@@ -23,14 +22,8 @@ reactBest input = minimum $ map react $ map inputWithout candidates
         sameLetter x y = (toUpper x) == y || (toLower x) == y
 
 react :: String -> Int
-react input | length (maximumBy (comparing length) (groupBy opposites input)) > 1 =
-              react $ concat $ dropFirstCouple $ groupBy opposites input
-            | otherwise = length input
-
-dropFirstCouple :: [String] -> [String]
-dropFirstCouple (x:xs) | length x > 1 = [(drop 2 x)] ++ xs
-                       | otherwise    = [x] ++ dropFirstCouple xs
-dropFirstCouple [] = []
-
-opposites :: Char -> Char -> Bool
-opposites a b = ((isUpper a && isLower b) || (isLower a && isUpper b)) && (toUpper a == toUpper b)
+react = length . foldr collapse ""
+  where collapse piece l@(x:xs) | reactive piece x = xs
+                                | otherwise = [piece] ++ l
+        collapse piece [] = [piece]
+        reactive a b = a /= b && toUpper a == toUpper b
