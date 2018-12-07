@@ -151,6 +151,10 @@ run 2018 4 file = do
     Left e -> print e
     Right s -> print s
 
+run 2018 5 file = do
+  contents <- readFile file
+  print $ react $ rstrip contents
+
 run _ _ _ = putStrLn "Not implemented yet."
 
 main :: IO ()
