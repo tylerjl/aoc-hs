@@ -154,6 +154,7 @@ run 2018 4 file = do
 run 2018 5 file = do
   contents <- readFile file
   print $ react $ rstrip contents
+  print $ reactBest $ rstrip contents
 
 run _ _ _ = putStrLn "Not implemented yet."
 

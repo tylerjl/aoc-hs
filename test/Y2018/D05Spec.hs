@@ -12,3 +12,6 @@ spec = parallel $ do
         describe "react" $ do
             it "solves the example case" $
                 react input `shouldBe` 10
+        describe "reactBest" $ do
+            it "solves the example case" $
+                reactBest input `shouldBe` 4

@@ -7,12 +7,20 @@ Maintainer:  @tylerjl
 Solutions to the day 05 set of problems for <adventofcode.com>.
 -}
 module Y2018.D05
-  ( react )
+  ( react
+  , reactBest
+  )
 where
 
-import Data.Char (isLower, isUpper, toUpper)
-import Data.List (groupBy, maximumBy)
+import Data.Char (isLower, isUpper, toLower, toUpper)
+import Data.List (groupBy, maximumBy, nub)
 import Data.Ord  (comparing)
+
+reactBest :: String -> Int
+reactBest input = minimum $ map react $ map inputWithout candidates
+  where candidates = nub $ map toUpper input
+        inputWithout c = filter (not . sameLetter c) input
+        sameLetter x y = (toUpper x) == y || (toLower x) == y
 
 react :: String -> Int
 react input | length (maximumBy (comparing length) (groupBy opposites input)) > 1 =
