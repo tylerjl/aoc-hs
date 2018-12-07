@@ -6,7 +6,11 @@ Maintainer:  @tylerjl
 
 Solutions to the day 04 set of problems for <adventofcode.com>.
 -}
-module Y2018.D04 where
+module Y2018.D04
+  ( laziestGuard
+  , laziestMinute
+  )
+where
 
 import Y2015.Util (regularParse, intParser)
 
@@ -31,10 +35,10 @@ data Log = Log
   } deriving (Eq, Ord, Show)
 
 data TimeStamp = TimeStamp
-  { year   :: Int
-  , month  :: Int
-  , day    :: Int
-  , hour   :: Int
+  { _year  :: Int
+  , _month :: Int
+  , _day   :: Int
+  , _hour  :: Int
   , minute :: Int
   } deriving (Eq, Ord, Show)
 
@@ -52,26 +56,39 @@ data Shift = Shift
   , lastChange   :: TimeStamp
   } deriving (Eq, Ord, Show)
 
+laziestMinute :: String -> Either ParseError Int
+laziestMinute input = case parseLog input of
+  Left e -> Left e
+  Right logs -> Right $ logFilter maximum logs
+
 laziestGuard :: String -> Either ParseError Int
 laziestGuard input = case parseLog input of
   Left e -> Left e
-  Right logs ->
-    let sleepiestMinute = fst $ maximumBy (\m c -> compare (snd m) (snd c)) $ Map.toList $ minutesSlept $ snd guard
+  Right logs -> Right $ logFilter (Map.foldl (+) 0) logs
+
+logFilter :: Ord a => (Map.Map Int Int -> a) -> [Log] -> Guard
+logFilter f logs =
+    let sleepiestMinute =
+          fst
+          $ maximumBy (\m c -> compare (snd m) (snd c))
+          $ Map.toList
+          $ minutesSlept
+          $ snd guard
         guardID = fst guard
         guard =
-          maximumBy (comparing (Map.foldl (+) 0 . minutesSlept . snd))
+          maximumBy (comparing (f . minutesSlept . snd))
           $ Map.toList
           $ snd
           $ foldl' recordLog (Nothing, Map.empty)
           $ sort logs
-    in Right $ guardID * sleepiestMinute
+    in guardID * sleepiestMinute
 
 recordLog :: GuardHistory -> Log -> GuardHistory
 recordLog (_current, h) (Log { timeStamp = ts, entry = (StartShift g) }) =
   (Just g, Map.insertWith shiftChange g toShift h)
   where toShift =
           Shift
-            { minutesSlept = Map.empty
+            { minutesSlept = Map.fromList $ zip [0 .. 59] $ repeat 0
             , lastChange   = ts
             }
         shiftChange _newShift oldShift =

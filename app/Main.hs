@@ -147,6 +147,9 @@ run 2018 4 file = do
   case laziestGuard contents of
     Left e -> print e
     Right s -> print s
+  case laziestMinute contents of
+    Left e -> print e
+    Right s -> print s
 
 run _ _ _ = putStrLn "Not implemented yet."
 

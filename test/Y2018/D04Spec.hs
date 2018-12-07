@@ -30,3 +30,6 @@ spec = parallel $ do
         describe "laziestGuard" $ do
             it "solves the example case" $
                 laziestGuard input `shouldBe` Right 240
+        describe "laziestMinute" $ do
+            it "solves the example case" $
+                laziestMinute input `shouldBe` Right 4455
