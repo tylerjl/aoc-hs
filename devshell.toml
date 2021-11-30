@@ -1,0 +1,8 @@
+[devshell]
+packages = [
+  "stack"
+]
+
+[[commands]]
+package = "devshell.cli"
+help = "Per project developer environments"
