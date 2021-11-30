@@ -1,10 +1,31 @@
-# adventofcode [![Build Status](https://travis-ci.org/tylerjl/adventofcode.svg?branch=master)](https://travis-ci.org/tylerjl/adventofcode)
+# aoc-hs [![Build Status](https://travis-ci.org/tylerjl/adventofcode.svg?branch=master)](https://travis-ci.org/tylerjl/adventofcode)
 
-Solutions to advent of code exercises.
+Solutions to Advent of Code exercises.
+
+## Setup
+
+I'm using [nix flakes][flakes] to handle dependencies now, so install the requisite software to make sure that `nix flake` works for you.
+Optionally, I recommend [direnv][] as well to make the process even easier.
+
+Clone this repository, enter the directory, and
+
+```console
+$ direnv allow
+```
+
+Or, if you like living as a caveman:
+
+```console
+$ nix shell
+```
+
+You'll have a bit of setup happen.
+Once that's done, the dev environment should be functional with all dependencies present.
+
+[direnv]: https://github.com/direnv/direnv
+[flakes]: https://nixos.wiki/wiki/Flakes#Flake_schema
 
 ## Usage
-
-First, install [stack](http://docs.haskellstack.org/en/stable/README.html).
 
 Run the test suite to confirm the code conforms to the problem set examples:
 
@@ -15,7 +36,6 @@ If everything looks good, go ahead and either install the solver binary and run 
     stack install
     adventofcode 2015 1 dist/resources/2015/day1
 
-Alternatively, you can build the source and run `Main.sh` standalone against problem set input:
+Alternatively, you can run standalone against problem set input:
 
-    stack build
-    stack runhaskell app/Main.sh 2015 1 dist/resources/2015/day1
+    stack exec adventofcode 2015 1 dist/resources/2015/day1
