@@ -14,12 +14,12 @@ average :: (Fractional a, Real b) => [b] -> a
 average xs = realToFrac (sum xs) / genericLength xs
 
 expected :: Fractional a => a
-expected = 90
+expected = 50
 
 main :: IO ()
 main = do
     text <- fold
-        (fmap (\(Left o) -> o) (inprocWithErr "stack" ["haddock"] ""))
+        (fmap (\(Left o) -> o) (inprocWithErr "stack" ["hpc", "report", "adventofcode"] ""))
         Fold.list
     let output = map (unpack . lineToText) text
         avg = average $ match output
