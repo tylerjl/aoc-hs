@@ -2,7 +2,7 @@ name:                adventofcode
 version:             0.1.0.0
 synopsis:            Haskell solutions to adventofcode
 description:         Please see README.md
-homepage:            https://github.com/tylerjl/adventofcode
+homepage:            https://github.com/tylerjl/aoc-hs
 license:             MIT
 license-file:        LICENSE
 author:              Tyler Langlois
@@ -122,4 +122,4 @@ test-suite haddock
 
 source-repository head
   type:     git
-  location: https://github.com/tylerjl/adventofcode
+  location: https://github.com/tylerjl/aoc-hs
