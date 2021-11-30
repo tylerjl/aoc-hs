@@ -1,16 +1,14 @@
-jobs = 2
-
 .PHONY: build
 build:
-	stack build --coverage --jobs $(jobs)
+	stack build --coverage
 
 .PHONY: test
 test:
-	stack test --coverage --jobs $(jobs)
+	stack test --coverage
 
 .PHONY: benchmarks
 benchmarks:
-	stack bench --jobs $(jobs) \
+	stack bench \
 		--benchmark-arguments '--output docs/benchmarks/index.html' \
 		&& open docs/benchmarks/index.html
 
