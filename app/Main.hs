@@ -1,37 +1,41 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-|
+Module:      Main
+Description: Advent of Code solution driver.
+License:     MIT
+Maintainer:  @tylerjl
 
+Entrypoint for the CLI interface to AoC solutions in Haskell.
+-}
 module Main where
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as L
 import Data.String.Utils (rstrip)
-import Options.Generic
+import Data.Text         (Text)
+import Options.Generic   (unwrapRecord)
+
+import qualified Data.ByteString      as B
+import qualified Data.ByteString.Lazy as L
+
+import Options
 import Y2015
 import Y2016
 import Y2018
 
-type ArgYear = Int
-type ArgDay  = Int
-type ArgPath = String
-data Options w =
-  Options (w ::: ArgYear <?> "Year")
-          (w ::: ArgDay <?> "Day")
-          (w ::: ArgPath <?> "Input file path")
-  deriving Generic
-instance ParseRecord (Options Wrapped)
-
+-- |CLI boilerplate
 usage :: Text
 usage = "Advent of Code solutions in Haskell"
 
+{-|For use of the solutions here outside of a repl if you'd rather build and
+ invoke the solution functions.
+-}
 main :: IO ()
 main = do
-  (Options year day path) <- unwrapRecord usage
+  (Options (ArgYear year) (ArgDay day) (ArgPath path)) <- unwrapRecord usage
   run year day path
 
+{-|Is there a nicer way to "dynamically" invoke these module functions based on
+ year/day input? Maybe. But a big fat pattern match works, too. The small bit of
+ glue between the outside world Main call and the solver functions.
+-}
 run :: Int -> Int -> String -> IO ()
 run 2015 1 file = do
   contents <- readFile file

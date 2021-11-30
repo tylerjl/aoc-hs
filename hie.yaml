@@ -1,6 +1,6 @@
 cradle:
   stack:
-    - path: "./app/Main.hs"
+    - path: "./app"
       component: "adventofcode:exe:adventofcode"
 
     - path: "./src"
