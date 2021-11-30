@@ -14,6 +14,9 @@ span.spaces    { background: white }
 </head>
 <body>
 <pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
 <span class="lineno">    1 </span>{-|
 <span class="lineno">    2 </span>Module:      Y2015.D14
 <span class="lineno">    3 </span>Description: Advent of Code Day 14 Solutions.
@@ -32,14 +35,14 @@ span.spaces    { background: white }
 <span class="lineno">   16 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">velocity</span></span></span>  :: Int
 <span class="lineno">   17 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">endurance</span></span></span> :: Int
 <span class="lineno">   18 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">cooldown</span></span></span>  :: Int
-<span class="lineno">   19 </span>              } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   19 </span>              } deriving (<span class="decl"><span class="nottickedoff">Show</span></span>, <span class="decl"><span class="nottickedoff">Eq</span></span>)
 <span class="lineno">   20 </span>data Racer    = Racer
 <span class="lineno">   21 </span>              { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">deer</span></span></span>     :: Reindeer
 <span class="lineno">   22 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">score</span></span></span>    :: Int
 <span class="lineno">   23 </span>              , <span class="istickedoff"><span class="decl"><span class="istickedoff">position</span></span></span> :: Int
-<span class="lineno">   24 </span>              } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   24 </span>              } deriving (<span class="decl"><span class="nottickedoff">Show</span></span>, <span class="decl"><span class="nottickedoff">Eq</span></span>)
 <span class="lineno">   25 </span>data Race     = Race [Racer] Int
-<span class="lineno">   26 </span>              deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   26 </span>              deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   27 </span>
 <span class="lineno">   28 </span>instance Ord Racer where
 <span class="lineno">   29 </span>    <span class="decl"><span class="istickedoff">Racer { score = a } `compare` Racer { score = b } = a `compare` b</span></span>

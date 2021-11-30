@@ -14,6 +14,9 @@ span.spaces    { background: white }
 </head>
 <body>
 <pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
 <span class="lineno">    1 </span>{-|
 <span class="lineno">    2 </span>Module:      Y2015.D07
 <span class="lineno">    3 </span>Description: Advent of Code Day 07 Solutions.
@@ -55,7 +58,7 @@ span.spaces    { background: white }
 <span class="lineno">   39 </span>type Wire = String
 <span class="lineno">   40 </span>
 <span class="lineno">   41 </span>data Atom = Val Word16 | Var String
-<span class="lineno">   42 </span>          deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   42 </span>          deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   43 </span>
 <span class="lineno">   44 </span>data Gate = Singleton Atom
 <span class="lineno">   45 </span>          | And       Atom Atom
@@ -63,10 +66,10 @@ span.spaces    { background: white }
 <span class="lineno">   47 </span>          | LShift    Atom Int
 <span class="lineno">   48 </span>          | RShift    Atom Int
 <span class="lineno">   49 </span>          | Not       Atom
-<span class="lineno">   50 </span>          deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   50 </span>          deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   51 </span>
 <span class="lineno">   52 </span>data Instruction = Instruction Gate Wire
-<span class="lineno">   53 </span>                 deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   53 </span>                 deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   54 </span>
 <span class="lineno">   55 </span>-- |Parsec parser for list of 'Instruction's
 <span class="lineno">   56 </span>circuitParser :: Parser [Instruction] -- ^ Parser

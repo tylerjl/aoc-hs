@@ -14,6 +14,9 @@ span.spaces    { background: white }
 </head>
 <body>
 <pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
 <span class="lineno">    1 </span>{-|
 <span class="lineno">    2 </span>Module:      Y2015.D02
 <span class="lineno">    3 </span>Description: Advent of Code Day 02 Solutions.
@@ -41,7 +44,7 @@ span.spaces    { background: white }
 <span class="lineno">   25 </span>  Present Int
 <span class="lineno">   26 </span>          Int
 <span class="lineno">   27 </span>          Int
-<span class="lineno">   28 </span>  deriving (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   28 </span>  deriving (<span class="decl"><span class="istickedoff">Eq</span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   29 </span>
 <span class="lineno">   30 </span>presentsParser :: Parser [Present]
 <span class="lineno">   31 </span><span class="decl"><span class="istickedoff">presentsParser = P.many1 (presentParser &lt;* P.optional endOfLine)</span></span>

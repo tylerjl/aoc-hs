@@ -14,6 +14,9 @@ span.spaces    { background: white }
 </head>
 <body>
 <pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
 <span class="lineno">    1 </span>{-# LANGUAGE TemplateHaskell #-}
 <span class="lineno">    2 </span>
 <span class="lineno">    3 </span>{-|
@@ -39,18 +42,18 @@ span.spaces    { background: white }
 <span class="lineno">   23 </span>data Boss = Boss
 <span class="lineno">   24 </span>    { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_damage</span></span></span> :: Int
 <span class="lineno">   25 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_hp</span></span></span>     :: Int
-<span class="lineno">   26 </span>    } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   26 </span>    } deriving (<span class="decl"><span class="nottickedoff">Eq</span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   27 </span>
 <span class="lineno">   28 </span>data Player = Player
 <span class="lineno">   29 </span>    { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_armor</span></span></span> :: Int
 <span class="lineno">   30 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_life</span></span></span>  :: Int
 <span class="lineno">   31 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_mana</span></span></span>  :: Int
 <span class="lineno">   32 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_spent</span></span></span> :: Int
-<span class="lineno">   33 </span>    } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   33 </span>    } deriving (<span class="decl"><span class="nottickedoff">Eq</span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   34 </span>
 <span class="lineno">   35 </span>data State = PlayerTurn
 <span class="lineno">   36 </span>           | BossTurn
-<span class="lineno">   37 </span>           deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   37 </span>           deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   38 </span>
 <span class="lineno">   39 </span>data Game = Game
 <span class="lineno">   40 </span>    { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_boss</span></span></span>    :: Boss
@@ -58,19 +61,19 @@ span.spaces    { background: white }
 <span class="lineno">   42 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_hard</span></span></span>    :: Bool
 <span class="lineno">   43 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_player</span></span></span>  :: Player
 <span class="lineno">   44 </span>    , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">_state</span></span></span>   :: State
-<span class="lineno">   45 </span>    } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   45 </span>    } deriving (<span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   46 </span>
 <span class="lineno">   47 </span>data Spell = MagicMissile
 <span class="lineno">   48 </span>           | Drain
 <span class="lineno">   49 </span>           | Shield
 <span class="lineno">   50 </span>           | Poison
 <span class="lineno">   51 </span>           | Recharge
-<span class="lineno">   52 </span>           deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   52 </span>           deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">Eq</span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   53 </span>
 <span class="lineno">   54 </span>-- |Represents the final result of a sequence of player moves.
 <span class="lineno">   55 </span>data Result = Won Int -- ^ Indicates a player win with the total mana spent.
 <span class="lineno">   56 </span>            | Lost    -- ^ Player loss.
-<span class="lineno">   57 </span>            deriving (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span>)
+<span class="lineno">   57 </span>            deriving (<span class="decl"><span class="istickedoff">Eq</span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
 <span class="lineno">   58 </span>
 <span class="lineno">   59 </span><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="nottickedoff"><span class="istickedoff"><span class="decl"><span class="istickedoff">makeLenses ''Boss</span></span></span></span></span></span></span>
 <span class="lineno">   60 </span><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="nottickedoff"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="nottickedoff"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="nottickedoff"><span class="istickedoff"><span class="decl"><span class="istickedoff">makeLenses ''Game</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
