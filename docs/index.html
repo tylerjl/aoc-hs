@@ -38,27 +38,30 @@
         Advent of Haskell
       </h1>
       <h2 class="subtitle">
-        A Journey Through The Toolchain
+        An Illustrative Project
       </h2>
     </header>
     <hr />
     <div class="row">
       <section class="one-half column">
-        <h5>
+        <h4>
           Introduction
-        </h5>
+        </h4>
         <p>
-          Last year, <a href="https://github.com/topaz">@topaz</a> ran a coding challenge called <a href="http://adventofcode.com/">Advent of Code</a> over the holidays.
+          <a href="http://adventofcode.com/">Advent of Code</a> by <a href="https://github.com/topaz">@topaz</a> is sort of an institution at this point.
+          I've done it a few times over the years, and usually use the event as an excuse to learn a new language.
         </p>
         <p>
-          It's a <em>lot</em> of fun!
+          It's a lot of fun!
         </p>
         <p>
           The problem sets vary widely, which present an opportunity to get a good look at many aspects of a new or unfamiliar programming language.
           I did so with Haskell, the results of which I've cobbled together here to present in unified form.
+          The dates here range back to 2015 - back then I was sort of green at Haskell, I've since done much more Haskell programming and may solve additional AoC challenges in the future using Haskell.
         </p>
         <p>
-          I took advantage of a small project with only myself at the helm to really dig into diferent parts of the ecosystem: <a href="https://www.haskellstack.org/">stack</a> (the new Haskell build tool), various testing and benchmarking libraries, and some libraries like <a href="https://hackage.haskell.org/package/repa">Repa</a> to understand what high-performing Haskell code looks like.
+          I took advantage of a small project with only myself at the helm to really dig into diferent parts of the ecosystem: <a href="https://www.haskellstack.org/">stack</a> (a Haskell build tool), various testing and benchmarking libraries, and some libraries like <a href="https://hackage.haskell.org/package/repa">Repa</a> to understand what high-performing Haskell code looks like.
+          Recent changes include relying on <code>nix flake</code> for a dev environment/dependency management.
           Some of what you'll see is very much overkill, but the purpose here is to see examples for the variety of tools and methods Haskell provides.
         </p>
         <p>
@@ -67,13 +70,13 @@
       </section>
       <section class="one-half column">
         <h3>
-          <a href="https://github.com/tylerjl/adventofcode">
+          <a href="https://github.com/tylerjl/aoc-hs">
             Source
           </a>
         </h3>
         <p>
           All of the source code is hosted on GitHub.
-          The <code>README.md</code> is pretty straightforward if you want to build it yourself: <code>stack</code> makes the process eminently reproducible.
+          The <code>README.md</code> is pretty straightforward if you want to build it yourself: <code>nix</code> and <code>stack</code> makes the process eminently reproducible.
         </p>
         <h3>
           <a href="haddock">
@@ -110,7 +113,7 @@
         Crafted with the <a href="http://getskeleton.com/">Skeleton</a> framework
       </span>
       <span class="u-pull-right">
-        Copyright &copy; 2016 Tyler Langlois
+        Copyright &copy; 2016-2021 Tyler Langlois
       </span>
     </footer>
   </div>
