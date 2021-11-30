@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Y2015.D19
+Description: Advent of Code Day 19 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 19 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2015.D19</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.D19.html#distinctMols"><span class="hs-identifier">distinctMols</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D19.html#molSteps"><span class="hs-identifier">molSteps</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">isLower</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">isUpper</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">foldl'</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">inits</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">tails</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">type</span><span> </span><span id="Mol"><span class="annot"><a href="Y2015.D19.html#Mol"><span class="hs-identifier hs-var">Mol</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">type</span><span> </span><span id="Repls"><span class="annot"><a href="Y2015.D19.html#Repls"><span class="hs-identifier hs-var">Repls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- |Returns the number of steps required to form a specified molecule</span><span>
+</span><span id="line-23"></span><span class="annot"><a href="Y2015.D19.html#molSteps"><span class="hs-identifier hs-type">molSteps</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Target molecule composition as a raw string</span><span>
+</span><span id="line-24"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ Number of steps required to create indicated molecule</span><span>
+</span><span id="line-25"></span><span id="molSteps"><span class="annot"><span class="annottext">molSteps :: String -&gt; Int
+</span><a href="Y2015.D19.html#molSteps"><span class="hs-identifier hs-var hs-var">molSteps</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; (String -&gt; Int) -&gt; String -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; (String -&gt; [Int]) -&gt; String -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int) -&gt; [String] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall p. Num p =&gt; String -&gt; p
+</span><a href="#local-6989586621679224836"><span class="hs-identifier hs-var">replCount</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [Int]) -&gt; (String -&gt; [String]) -&gt; String -&gt; [Int]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; (String -&gt; String) -&gt; String -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; (String -&gt; [String]) -&gt; String -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224836"><span class="annot"><span class="annottext">replCount :: String -&gt; p
+</span><a href="#local-6989586621679224836"><span class="hs-identifier hs-var hs-var">replCount</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Rn&quot;</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-27"></span><span>        </span><span class="annot"><a href="#local-6989586621679224836"><span class="hs-identifier hs-var">replCount</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Ar&quot;</span></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-28"></span><span>        </span><span class="annot"><a href="#local-6989586621679224836"><span class="hs-identifier hs-var">replCount</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Y&quot;</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">-</span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-29"></span><span>        </span><span class="annot"><a href="#local-6989586621679224836"><span class="hs-identifier hs-var">replCount</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span>    </span><span class="hs-glyph">=</span><span>  </span><span class="annot"><span class="annottext">p
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- |Finds the number of possible distinct molecules</span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Y2015.D19.html#distinctMols"><span class="hs-identifier hs-type">distinctMols</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ List of starting molecules as a raw string</span><span>
+</span><span id="line-33"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ Number of distinct modules that can be formed</span><span>
+</span><span id="line-34"></span><span id="distinctMols"><span class="annot"><span class="annottext">distinctMols :: String -&gt; Int
+</span><a href="Y2015.D19.html#distinctMols"><span class="hs-identifier hs-var hs-var">distinctMols</span></a></span></span><span> </span><span id="local-6989586621679224832"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224832"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set String -&gt; Int
+forall a. Set a -&gt; Int
+</span><span class="hs-identifier hs-var">S.size</span></span><span> </span><span class="annot"><span class="annottext">(Set String -&gt; Int) -&gt; Set String -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Repls -&gt; Set String
+</span><a href="Y2015.D19.html#compounds"><span class="hs-identifier hs-var">compounds</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224829"><span class="hs-identifier hs-var">mols</span></a></span><span> </span><span class="annot"><span class="annottext">Repls
+</span><a href="#local-6989586621679224828"><span class="hs-identifier hs-var">repls</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224827"><span class="annot"><span class="annottext">input :: [String]
+</span><a href="#local-6989586621679224827"><span class="hs-identifier hs-var hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224832"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-36"></span><span>        </span><span id="local-6989586621679224829"><span class="annot"><span class="annottext">mols :: [String]
+</span><a href="#local-6989586621679224829"><span class="hs-identifier hs-var hs-var">mols</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; String -&gt; [String]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224827"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-37"></span><span>        </span><span id="local-6989586621679224828"><span class="annot"><span class="annottext">repls :: Repls
+</span><a href="#local-6989586621679224828"><span class="hs-identifier hs-var hs-var">repls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Repls
+</span><a href="Y2015.D19.html#toRepls"><span class="hs-identifier hs-var">toRepls</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Repls) -&gt; [String] -&gt; Repls
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String]
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224827"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Y2015.D19.html#compounds"><span class="hs-identifier hs-type">compounds</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D19.html#Mol"><span class="hs-identifier hs-type">Mol</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D19.html#Repls"><span class="hs-identifier hs-type">Repls</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-40"></span><span id="compounds"><span class="annot"><span class="annottext">compounds :: [String] -&gt; Repls -&gt; Set String
+</span><a href="Y2015.D19.html#compounds"><span class="hs-identifier hs-var hs-var">compounds</span></a></span></span><span> </span><span id="local-6989586621679224824"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224824"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679224823"><span class="annot"><span class="annottext">Repls
+</span><a href="#local-6989586621679224823"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set String -&gt; Set String -&gt; Set String)
+-&gt; Set String -&gt; [Set String] -&gt; Set String
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Set String -&gt; Set String -&gt; Set String
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.union</span></span><span> </span><span class="annot"><span class="annottext">Set String
+forall a. Set a
+</span><span class="hs-identifier hs-var">S.empty</span></span><span> </span><span class="annot"><span class="annottext">([Set String] -&gt; Set String) -&gt; [Set String] -&gt; Set String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(([String], String, [String]) -&gt; Set String)
+-&gt; [([String], String, [String])] -&gt; [Set String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">([String], String, [String]) -&gt; Set String
+</span><a href="#local-6989586621679224820"><span class="hs-identifier hs-var">combine</span></a></span><span> </span><span class="annot"><span class="annottext">[([String], String, [String])]
+</span><a href="#local-6989586621679224819"><span class="hs-identifier hs-var">molTrips</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224819"><span class="annot"><span class="annottext">molTrips :: [([String], String, [String])]
+</span><a href="#local-6989586621679224819"><span class="hs-identifier hs-var hs-var">molTrips</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[String]]
+-&gt; [String] -&gt; [[String]] -&gt; [([String], String, [String])]
+forall a b c. [a] -&gt; [b] -&gt; [c] -&gt; [(a, b, c)]
+</span><span class="hs-identifier hs-var">zip3</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; [[String]]
+forall a. [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">inits</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224824"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224824"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[[String]] -&gt; [[String]]
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">tail</span></span><span> </span><span class="annot"><span class="annottext">([[String]] -&gt; [[String]]) -&gt; [[String]] -&gt; [[String]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [[String]]
+forall a. [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">tails</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224824"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>        </span><span id="local-6989586621679224820"><span class="annot"><span class="annottext">combine :: ([String], String, [String]) -&gt; Set String
+</span><a href="#local-6989586621679224820"><span class="hs-identifier hs-var hs-var">combine</span></a></span></span><span> </span><span id="local-6989586621679224816"><span class="annot"><span class="annottext">t :: ([String], String, [String])
+</span><a href="#local-6989586621679224816"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679224815"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224815"><span class="hs-identifier hs-var">m'</span></a></span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([String], String, [String]) -&gt; Set String -&gt; Set String
+</span><a href="Y2015.D19.html#subRepl"><span class="hs-identifier hs-var">subRepl</span></a></span><span> </span><span class="annot"><span class="annottext">([String], String, [String])
+</span><a href="#local-6989586621679224816"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">(Set String -&gt; Set String) -&gt; Set String -&gt; Set String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set String -&gt; String -&gt; Repls -&gt; Set String
+forall k a. Ord k =&gt; a -&gt; k -&gt; Map k a -&gt; a
+</span><span class="hs-identifier hs-var">M.findWithDefault</span></span><span> </span><span class="annot"><span class="annottext">Set String
+forall a. Set a
+</span><span class="hs-identifier hs-var">S.empty</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224815"><span class="hs-identifier hs-var">m'</span></a></span><span> </span><span class="annot"><span class="annottext">Repls
+</span><a href="#local-6989586621679224823"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Y2015.D19.html#subRepl"><span class="hs-identifier hs-type">subRepl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.D19.html#Mol"><span class="hs-identifier hs-type">Mol</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D19.html#Mol"><span class="hs-identifier hs-type">Mol</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-45"></span><span id="subRepl"><span class="annot"><span class="annottext">subRepl :: ([String], String, [String]) -&gt; Set String -&gt; Set String
+</span><a href="Y2015.D19.html#subRepl"><span class="hs-identifier hs-var hs-var">subRepl</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679224812"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224812"><span class="hs-identifier hs-var">pre</span></a></span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679224811"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224811"><span class="hs-identifier hs-var">post</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set String -&gt; String -&gt; Set String)
+-&gt; Set String -&gt; [String] -&gt; Set String
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(String -&gt; Set String -&gt; Set String)
+-&gt; Set String -&gt; String -&gt; Set String
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Set String -&gt; Set String
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.insert</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set String
+forall a. Set a
+</span><span class="hs-identifier hs-var">S.empty</span></span><span>
+</span><span id="line-46"></span><span>                       </span><span class="annot"><span class="annottext">([String] -&gt; Set String)
+-&gt; (Set String -&gt; [String]) -&gt; Set String -&gt; Set String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; [String] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; String
+forall (t :: * -&gt; *) a. Foldable t =&gt; t [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">concat</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; (String -&gt; [String]) -&gt; String -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="#local-6989586621679224807"><span class="hs-identifier hs-var">construct</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [String])
+-&gt; (Set String -&gt; [String]) -&gt; Set String -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set String -&gt; [String]
+forall a. Set a -&gt; [a]
+</span><span class="hs-identifier hs-var">S.toList</span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224807"><span class="annot"><span class="annottext">construct :: String -&gt; [String]
+</span><a href="#local-6989586621679224807"><span class="hs-identifier hs-var hs-var">construct</span></a></span></span><span> </span><span id="local-6989586621679224805"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224805"><span class="hs-identifier hs-var">repl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224812"><span class="hs-identifier hs-var">pre</span></a></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224805"><span class="hs-identifier hs-var">repl</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224811"><span class="hs-identifier hs-var">post</span></a></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="annot"><a href="Y2015.D19.html#toRepls"><span class="hs-identifier hs-type">toRepls</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D19.html#Repls"><span class="hs-identifier hs-type">Repls</span></a></span><span>
+</span><span id="line-50"></span><span id="toRepls"><span class="annot"><span class="annottext">toRepls :: [String] -&gt; Repls
+</span><a href="Y2015.D19.html#toRepls"><span class="hs-identifier hs-var hs-var">toRepls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set String -&gt; Set String -&gt; Set String)
+-&gt; [(String, Set String)] -&gt; Repls
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.fromListWith</span></span><span> </span><span class="annot"><span class="annottext">Set String -&gt; Set String -&gt; Set String
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.union</span></span><span> </span><span class="annot"><span class="annottext">([(String, Set String)] -&gt; Repls)
+-&gt; ([String] -&gt; [(String, Set String)]) -&gt; [String] -&gt; Repls
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; (String, Set String))
+-&gt; [String] -&gt; [(String, Set String)]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(String -&gt; Set String) -&gt; [String] -&gt; (String, Set String)
+forall a b. (a -&gt; b) -&gt; [a] -&gt; (a, b)
+</span><a href="Y2015.D19.html#molPair"><span class="hs-identifier hs-var">molPair</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; Set String
+forall a. a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.singleton</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; (String, Set String))
+-&gt; (String -&gt; [String]) -&gt; String -&gt; (String, Set String)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span id="local-6989586621679224853"><span id="local-6989586621679224854"><span class="annot"><a href="Y2015.D19.html#molPair"><span class="hs-identifier hs-type">molPair</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679224854"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679224853"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679224854"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679224854"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679224853"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-53"></span><span id="molPair"><span class="annot"><span class="annottext">molPair :: (a -&gt; b) -&gt; [a] -&gt; (a, b)
+</span><a href="Y2015.D19.html#molPair"><span class="hs-identifier hs-var hs-var">molPair</span></a></span></span><span> </span><span id="local-6989586621679224800"><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679224800"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-special">[</span><span id="local-6989586621679224799"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224799"><span class="hs-identifier hs-var">from</span></a></span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679224798"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224798"><span class="hs-identifier hs-var">to</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224799"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679224800"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224798"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span class="annot"><a href="Y2015.D19.html#molPair"><span class="hs-identifier hs-var">molPair</span></a></span><span> </span><span id="local-6989586621679224797"><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679224797"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679224796"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679224796"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; a
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679224796"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; b
+</span><a href="#local-6989586621679224797"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; b) -&gt; a -&gt; b
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679224796"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="annot"><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-type">toMol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D19.html#Mol"><span class="hs-identifier hs-type">Mol</span></a></span><span>
+</span><span id="line-57"></span><span id="toMol"><span class="annot"><span class="annottext">toMol :: String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var hs-var">toMol</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>                                </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-58"></span><span class="annot"><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679224794"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224794"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224793"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224793"><span class="hs-identifier hs-var">y</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224792"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224792"><span class="hs-identifier hs-var">ys</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isUpper</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224794"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isLower</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224793"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224794"><span class="hs-identifier hs-var">x</span></a></span><span class="annot"><span class="annottext">Char -&gt; String -&gt; String
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224793"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; [String]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224792"><span class="hs-identifier hs-var">ys</span></a></span><span>
+</span><span id="line-59"></span><span class="annot"><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679224790"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224790"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224789"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224789"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><span class="hs-identifier hs-var">isUpper</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224790"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224790"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'e'</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679224790"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">]</span><span>     </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; [String]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224789"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-60"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span>              </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><a href="Y2015.D19.html#toMol"><span class="hs-identifier hs-var">toMol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224789"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-61"></span></pre></body></html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Y2018.D03
+Description: Advent of Code Day 03 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 01 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2018.D03</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2018.D03.html#intactInches"><span class="hs-identifier">intactInches</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2018.D03.html#overlappedInches"><span class="hs-identifier">overlappedInches</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Y2015.Util.html"><span class="hs-identifier">Y2015.Util</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.Util.html#regularParse"><span class="hs-identifier">regularParse</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.Util.html#intParser"><span class="hs-identifier">intParser</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">foldl'</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec.String</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Parser</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec.Char</span></span><span>   </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">endOfLine</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec</span></span><span>
+</span><span id="line-20"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier">ParseError</span></span><span>
+</span><span id="line-21"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">many</span></span><span>
+</span><span id="line-22"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">optional</span></span><span>
+</span><span id="line-23"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">space</span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">string</span></span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">data</span><span> </span><span id="Claim"><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-var">Claim</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Claim"><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-var">Claim</span></a></span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="iD"><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#iD"><span class="hs-identifier hs-var hs-var">iD</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="leftEdge"><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#leftEdge"><span class="hs-identifier hs-var hs-var">leftEdge</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="topEdge"><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#topEdge"><span class="hs-identifier hs-var hs-var">topEdge</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="width"><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#width"><span class="hs-identifier hs-var hs-var">width</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="height"><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#height"><span class="hs-identifier hs-var hs-var">height</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226714"><span id="local-6989586621679226716"><span class="annot"><span class="annottext">Claim -&gt; Claim -&gt; Bool
+(Claim -&gt; Claim -&gt; Bool) -&gt; (Claim -&gt; Claim -&gt; Bool) -&gt; Eq Claim
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Claim -&gt; Claim -&gt; Bool
+$c/= :: Claim -&gt; Claim -&gt; Bool
+== :: Claim -&gt; Claim -&gt; Bool
+$c== :: Claim -&gt; Claim -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226707"><span id="local-6989586621679226709"><span id="local-6989586621679226711"><span class="annot"><span class="annottext">Int -&gt; Claim -&gt; ShowS
+[Claim] -&gt; ShowS
+Claim -&gt; String
+(Int -&gt; Claim -&gt; ShowS)
+-&gt; (Claim -&gt; String) -&gt; ([Claim] -&gt; ShowS) -&gt; Show Claim
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Claim] -&gt; ShowS
+$cshowList :: [Claim] -&gt; ShowS
+show :: Claim -&gt; String
+$cshow :: Claim -&gt; String
+showsPrec :: Int -&gt; Claim -&gt; ShowS
+$cshowsPrec :: Int -&gt; Claim -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">type</span><span> </span><span id="Point"><span class="annot"><a href="Y2018.D03.html#Point"><span class="hs-identifier hs-var">Point</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Y2018.D03.html#intactInches"><span class="hs-identifier hs-type">intactInches</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-41"></span><span id="intactInches"><span class="annot"><span class="annottext">intactInches :: String -&gt; Either ParseError [Int]
+</span><a href="Y2018.D03.html#intactInches"><span class="hs-identifier hs-var hs-var">intactInches</span></a></span></span><span> </span><span id="local-6989586621679226705"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226705"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either ParseError [Claim]
+</span><a href="Y2018.D03.html#parseClaims"><span class="hs-identifier hs-var">parseClaims</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226705"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679226703"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226703"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; Either ParseError [Int]
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226703"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679226702"><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226702"><span class="hs-identifier hs-var">claims</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-45"></span><span>      </span><span class="annot"><span class="annottext">[Int] -&gt; Either ParseError [Int]
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Either ParseError [Int])
+-&gt; [Int] -&gt; Either ParseError [Int]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Claim -&gt; Int) -&gt; [Claim] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#iD"><span class="hs-identifier hs-var hs-var">iD</span></a></span><span> </span><span class="annot"><span class="annottext">([Claim] -&gt; [Int]) -&gt; [Claim] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Claim] -&gt; Map Point (Set Int) -&gt; [Claim]
+</span><a href="Y2018.D03.html#singleClaims"><span class="hs-identifier hs-var">singleClaims</span></a></span><span> </span><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226702"><span class="hs-identifier hs-var">claims</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; [Claim]) -&gt; Map Point (Set Int) -&gt; [Claim]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Claim] -&gt; Map Point (Set Int)
+</span><a href="Y2018.D03.html#toClothMap"><span class="hs-identifier hs-var">toClothMap</span></a></span><span> </span><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226702"><span class="hs-identifier hs-var">claims</span></a></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Y2018.D03.html#singleClaims"><span class="hs-identifier hs-type">singleClaims</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set.Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span id="singleClaims"><span class="annot"><span class="annottext">singleClaims :: [Claim] -&gt; Map Point (Set Int) -&gt; [Claim]
+</span><a href="Y2018.D03.html#singleClaims"><span class="hs-identifier hs-var hs-var">singleClaims</span></a></span></span><span> </span><span id="local-6989586621679226699"><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226699"><span class="hs-identifier hs-var">claims</span></a></span></span><span> </span><span id="local-6989586621679226698"><span class="annot"><span class="annottext">Map Point (Set Int)
+</span><a href="#local-6989586621679226698"><span class="hs-identifier hs-var">cloth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Claim -&gt; Bool) -&gt; [Claim] -&gt; [Claim]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="annot"><span class="annottext">Claim -&gt; Bool
+</span><a href="#local-6989586621679226697"><span class="hs-identifier hs-var">noOtherClaims</span></a></span><span> </span><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226699"><span class="hs-identifier hs-var">claims</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226697"><span class="annot"><span class="annottext">noOtherClaims :: Claim -&gt; Bool
+</span><a href="#local-6989586621679226697"><span class="hs-identifier hs-var hs-var">noOtherClaims</span></a></span></span><span> </span><span id="local-6989586621679226696"><span class="annot"><span class="annottext">Claim
+</span><a href="#local-6989586621679226696"><span class="hs-identifier hs-var">claim</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-50"></span><span>          </span><span class="annot"><span class="annottext">Map Point (Set Int) -&gt; Bool
+forall k a. Map k a -&gt; Bool
+</span><span class="hs-identifier hs-var">Map.null</span></span><span>
+</span><span id="line-51"></span><span>          </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; Bool) -&gt; Map Point (Set Int) -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set Int -&gt; Bool) -&gt; Map Point (Set Int) -&gt; Map Point (Set Int)
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; (Set Int -&gt; Bool) -&gt; Set Int -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Set Int -&gt; Int) -&gt; Set Int -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set Int -&gt; Int
+forall a. Set a -&gt; Int
+</span><span class="hs-identifier hs-var">Set.size</span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>          </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; Map Point (Set Int))
+-&gt; Map Point (Set Int) -&gt; Map Point (Set Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set Int -&gt; Bool) -&gt; Map Point (Set Int) -&gt; Map Point (Set Int)
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Set Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
+</span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Claim -&gt; Int
+</span><a href="Y2018.D03.html#iD"><span class="hs-identifier hs-var hs-var">iD</span></a></span><span> </span><span class="annot"><span class="annottext">Claim
+</span><a href="#local-6989586621679226696"><span class="hs-identifier hs-var">claim</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map Point (Set Int)
+</span><a href="#local-6989586621679226698"><span class="hs-identifier hs-var">cloth</span></a></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="annot"><a href="Y2018.D03.html#overlappedInches"><span class="hs-identifier hs-type">overlappedInches</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-55"></span><span id="overlappedInches"><span class="annot"><span class="annottext">overlappedInches :: String -&gt; Either ParseError Int
+</span><a href="Y2018.D03.html#overlappedInches"><span class="hs-identifier hs-var hs-var">overlappedInches</span></a></span></span><span> </span><span id="local-6989586621679226689"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226689"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either ParseError [Claim]
+</span><a href="Y2018.D03.html#parseClaims"><span class="hs-identifier hs-var">parseClaims</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226689"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-57"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679226688"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226688"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; Either ParseError Int
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226688"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-58"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679226687"><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226687"><span class="hs-identifier hs-var">claims</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-59"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Either ParseError Int
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span>
+</span><span id="line-60"></span><span>        </span><span class="annot"><span class="annottext">(Int -&gt; Either ParseError Int) -&gt; Int -&gt; Either ParseError Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Point (Set Int) -&gt; Int
+forall k a. Map k a -&gt; Int
+</span><span class="hs-identifier hs-var">Map.size</span></span><span>
+</span><span id="line-61"></span><span>        </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; Int) -&gt; Map Point (Set Int) -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set Int -&gt; Bool) -&gt; Map Point (Set Int) -&gt; Map Point (Set Int)
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="annot"><span class="annottext">Set Int -&gt; Bool
+forall a. Set a -&gt; Bool
+</span><a href="#local-6989586621679226685"><span class="hs-identifier hs-var">multipleClaims</span></a></span><span>
+</span><span id="line-62"></span><span>        </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; Map Point (Set Int))
+-&gt; Map Point (Set Int) -&gt; Map Point (Set Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Claim] -&gt; Map Point (Set Int)
+</span><a href="Y2018.D03.html#toClothMap"><span class="hs-identifier hs-var">toClothMap</span></a></span><span> </span><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226687"><span class="hs-identifier hs-var">claims</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226685"><span class="annot"><span class="annottext">multipleClaims :: Set a -&gt; Bool
+</span><a href="#local-6989586621679226685"><span class="hs-identifier hs-var hs-var">multipleClaims</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Bool) -&gt; Int -&gt; Int -&gt; Bool
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(&gt;)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Set a -&gt; Int) -&gt; Set a -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Int
+forall a. Set a -&gt; Int
+</span><span class="hs-identifier hs-var">Set.size</span></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="annot"><a href="Y2018.D03.html#toClothMap"><span class="hs-identifier hs-type">toClothMap</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set.Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span id="toClothMap"><span class="annot"><span class="annottext">toClothMap :: [Claim] -&gt; Map Point (Set Int)
+</span><a href="Y2018.D03.html#toClothMap"><span class="hs-identifier hs-var hs-var">toClothMap</span></a></span></span><span> </span><span id="local-6989586621679226682"><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226682"><span class="hs-identifier hs-var">claims</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="annottext">(Map Point (Set Int) -&gt; Map Point (Set Int) -&gt; Map Point (Set Int))
+-&gt; Map Point (Set Int)
+-&gt; [Map Point (Set Int)]
+-&gt; Map Point (Set Int)
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Set Int -&gt; Set Int -&gt; Set Int)
+-&gt; Map Point (Set Int)
+-&gt; Map Point (Set Int)
+-&gt; Map Point (Set Int)
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.unionWith</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Int -&gt; Set Int -&gt; Set Int
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">Set.union</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Point (Set Int)
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set.Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><span class="annottext">([Map Point (Set Int)] -&gt; Map Point (Set Int))
+-&gt; [Map Point (Set Int)] -&gt; Map Point (Set Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((Int, Set Point) -&gt; Map Point (Set Int))
+-&gt; [(Int, Set Point)] -&gt; [Map Point (Set Int)]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679226678"><span class="annot"><span class="annottext">(Int, Set Point)
+</span><a href="#local-6989586621679226678"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Point -&gt; Set Int) -&gt; Set Point -&gt; Map Point (Set Int)
+forall k a. (k -&gt; a) -&gt; Set k -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromSet</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><span class="annottext">Point
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Set Int
+forall a. a -&gt; Set a
+</span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Set Int) -&gt; Int -&gt; Set Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Int, Set Point) -&gt; Int
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(Int, Set Point)
+</span><a href="#local-6989586621679226678"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Set Point -&gt; Map Point (Set Int))
+-&gt; Set Point -&gt; Map Point (Set Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Int, Set Point) -&gt; Set Point
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">(Int, Set Point)
+</span><a href="#local-6989586621679226678"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="annottext">([(Int, Set Point)] -&gt; [Map Point (Set Int)])
+-&gt; [(Int, Set Point)] -&gt; [Map Point (Set Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Claim -&gt; (Int, Set Point)) -&gt; [Claim] -&gt; [(Int, Set Point)]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Claim -&gt; (Int, Set Point)
+</span><a href="Y2018.D03.html#toPoints"><span class="hs-identifier hs-var">toPoints</span></a></span><span> </span><span class="annot"><span class="annottext">[Claim]
+</span><a href="#local-6989586621679226682"><span class="hs-identifier hs-var">claims</span></a></span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="annot"><a href="Y2018.D03.html#toPoints"><span class="hs-identifier hs-type">toPoints</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set.Set</span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span id="toPoints"><span class="annot"><span class="annottext">toPoints :: Claim -&gt; (Int, Set Point)
+</span><a href="Y2018.D03.html#toPoints"><span class="hs-identifier hs-var hs-var">toPoints</span></a></span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">iD :: Claim -&gt; Int
+</span><a href="Y2018.D03.html#iD"><span class="hs-identifier hs-var">iD</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226674"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226674"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">leftEdge :: Claim -&gt; Int
+</span><a href="Y2018.D03.html#leftEdge"><span class="hs-identifier hs-var">leftEdge</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226673"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226673"><span class="hs-identifier hs-var">l</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">topEdge :: Claim -&gt; Int
+</span><a href="Y2018.D03.html#topEdge"><span class="hs-identifier hs-var">topEdge</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226672"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226672"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">width :: Claim -&gt; Int
+</span><a href="Y2018.D03.html#width"><span class="hs-identifier hs-var">width</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226671"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226671"><span class="hs-identifier hs-var">w</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">height :: Claim -&gt; Int
+</span><a href="Y2018.D03.html#height"><span class="hs-identifier hs-var">height</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226670"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226670"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226674"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Point] -&gt; Set Point
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><span class="hs-identifier hs-var">Set.fromList</span></span><span> </span><span class="annot"><span class="annottext">([Point] -&gt; Set Point) -&gt; [Point] -&gt; Set Point
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; [Point]) -&gt; [Int] -&gt; [Point]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679226667"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226667"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Point) -&gt; [Int] -&gt; [Point]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679226666"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226666"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226667"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226666"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226672"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226672"><span class="hs-identifier hs-var">t</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226670"><span class="hs-identifier hs-var">h</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226673"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226673"><span class="hs-identifier hs-var">l</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226671"><span class="hs-identifier hs-var">w</span></a></span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="hs-comment">-- Parsing utilities</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="annot"><a href="Y2018.D03.html#parseClaims"><span class="hs-identifier hs-type">parseClaims</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-78"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-79"></span><span id="parseClaims"><span class="annot"><span class="annottext">parseClaims :: String -&gt; Either ParseError [Claim]
+</span><a href="Y2018.D03.html#parseClaims"><span class="hs-identifier hs-var hs-var">parseClaims</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser [Claim] -&gt; String -&gt; Either ParseError [Claim]
+forall a. Parser a -&gt; String -&gt; Either ParseError a
+</span><a href="Y2015.Util.html#regularParse"><span class="hs-identifier hs-var">regularParse</span></a></span><span> </span><span class="annot"><span class="annottext">Parser [Claim]
+</span><a href="Y2018.D03.html#claimParser"><span class="hs-identifier hs-var">claimParser</span></a></span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="annot"><a href="Y2018.D03.html#claimParser"><span class="hs-identifier hs-type">claimParser</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-82"></span><span id="claimParser"><span class="annot"><span class="annottext">claimParser :: Parser [Claim]
+</span><a href="Y2018.D03.html#claimParser"><span class="hs-identifier hs-var hs-var">claimParser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Claim -&gt; Parser [Claim]
+forall s u (m :: * -&gt; *) a. ParsecT s u m a -&gt; ParsecT s u m [a]
+</span><span class="hs-identifier hs-var">many</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT String () Identity Claim
+</span><a href="Y2018.D03.html#parseClaim"><span class="hs-identifier hs-var">parseClaim</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Claim
+-&gt; ParsecT String () Identity ()
+-&gt; ParsecT String () Identity Claim
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char -&gt; ParsecT String () Identity ()
+forall s (m :: * -&gt; *) t u a.
+Stream s m t =&gt;
+ParsecT s u m a -&gt; ParsecT s u m ()
+</span><span class="hs-identifier hs-var">optional</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">endOfLine</span></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="Y2018.D03.html#parseClaim"><span class="hs-identifier hs-type">parseClaim</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="annot"><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-type">Claim</span></a></span><span>
+</span><span id="line-85"></span><span id="parseClaim"><span class="annot"><span class="annottext">parseClaim :: ParsecT String () Identity Claim
+</span><a href="Y2018.D03.html#parseClaim"><span class="hs-identifier hs-var hs-var">parseClaim</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim
+</span><a href="Y2018.D03.html#Claim"><span class="hs-identifier hs-var">Claim</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT
+     String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;#&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT
+  String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Char
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">space</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;@&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Char
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">space</span></span><span>
+</span><span id="line-86"></span><span>                                 </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;,&quot;</span></span><span>
+</span><span id="line-87"></span><span>                                 </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;:&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Char
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">space</span></span><span>
+</span><span id="line-88"></span><span>                                 </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Claim)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Claim)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Claim)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;x&quot;</span></span><span>
+</span><span id="line-89"></span><span>                                 </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Claim)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity Claim
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span>
+</span><span id="line-90"></span></pre></body></html>

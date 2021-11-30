@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Y2015.D25
+Description: Advent of Code Day 25 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 25 set of problems for &lt;adventofcode.com&gt;.
+
+Implements a simple function to return the machine code at a position
+indicated by plaintext input for a row and column.
+-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2015.D25</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.D25.html#manualCodeFrom"><span class="hs-identifier">manualCodeFrom</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">type</span><span> </span><span id="Point"><span class="annot"><a href="Y2015.D25.html#Point"><span class="hs-identifier hs-var">Point</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- |Return the manual code found at the indicated row and column</span><span>
+</span><span id="line-18"></span><span class="hs-comment">-- |from human-readable input.</span><span>
+</span><span id="line-19"></span><span class="annot"><a href="Y2015.D25.html#manualCodeFrom"><span class="hs-identifier hs-type">manualCodeFrom</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>  </span><span class="hs-comment">-- ^ Plaintext instruction input.</span><span>
+</span><span id="line-20"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span> </span><span class="hs-comment">-- ^ Numerical code found at the indicated position.</span><span>
+</span><span id="line-21"></span><span id="manualCodeFrom"><span class="annot"><span class="annottext">manualCodeFrom :: String -&gt; Integer
+</span><a href="Y2015.D25.html#manualCodeFrom"><span class="hs-identifier hs-var hs-var">manualCodeFrom</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Integer] -&gt; Int -&gt; Integer
+forall a. [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">(!!)</span></span><span> </span><span class="annot"><span class="annottext">[Integer]
+</span><a href="Y2015.D25.html#manualSeq"><span class="hs-identifier hs-var">manualSeq</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Integer) -&gt; (String -&gt; Int) -&gt; String -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Int
+forall a. Integral a =&gt; (a, a) -&gt; a
+</span><a href="#local-6989586621679225561"><span class="hs-identifier hs-var">toPos</span></a></span><span> </span><span class="annot"><span class="annottext">((Int, Int) -&gt; Int) -&gt; (String -&gt; (Int, Int)) -&gt; String -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; (Int, Int)
+</span><a href="Y2015.D25.html#toPoint"><span class="hs-identifier hs-var">toPoint</span></a></span><span>
+</span><span id="line-22"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225561"><span class="annot"><span class="annottext">toPos :: (a, a) -&gt; a
+</span><a href="#local-6989586621679225561"><span class="hs-identifier hs-var hs-var">toPos</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225559"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225559"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225558"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225558"><span class="hs-identifier hs-var">y</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225557"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225557"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225557"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225559"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-23"></span><span>                       </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225557"><span class="annot"><span class="annottext">i :: a
+</span><a href="#local-6989586621679225557"><span class="hs-identifier hs-var hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225559"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679225558"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="Y2015.D25.html#toPoint"><span class="hs-identifier hs-type">toPoint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D25.html#Point"><span class="hs-identifier hs-type">Point</span></a></span><span>
+</span><span id="line-26"></span><span id="toPoint"><span class="annot"><span class="annottext">toPoint :: String -&gt; (Int, Int)
+</span><a href="Y2015.D25.html#toPoint"><span class="hs-identifier hs-var hs-var">toPoint</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; (Int, Int)
+forall b. Read b =&gt; [String] -&gt; (b, b)
+</span><a href="#local-6989586621679225553"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; (Int, Int))
+-&gt; (String -&gt; [String]) -&gt; String -&gt; (Int, Int)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225553"><span class="annot"><span class="annottext">go :: [String] -&gt; (b, b)
+</span><a href="#local-6989586621679225553"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679225551"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679225551"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; b
+</span><a href="#local-6989586621679225550"><span class="hs-identifier hs-var">grab</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">15</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; b
+</span><a href="#local-6989586621679225550"><span class="hs-identifier hs-var">grab</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">17</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>                 </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225550"><span class="annot"><span class="annottext">grab :: Int -&gt; b
+</span><a href="#local-6989586621679225550"><span class="hs-identifier hs-var hs-var">grab</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; b
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; b) -&gt; (Int -&gt; String) -&gt; Int -&gt; b
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; (Int -&gt; String) -&gt; Int -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Int -&gt; String
+forall a. [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">(!!)</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679225551"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Y2015.D25.html#manualSeq"><span class="hs-identifier hs-type">manualSeq</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">]</span><span>
+</span><span id="line-31"></span><span id="manualSeq"><span class="annot"><span class="annottext">manualSeq :: [Integer]
+</span><a href="Y2015.D25.html#manualSeq"><span class="hs-identifier hs-var hs-var">manualSeq</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Integer) -&gt; Integer -&gt; [Integer]
+forall a. (a -&gt; a) -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">iterate</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer
+</span><a href="#local-6989586621679225546"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">20151125</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>    </span><span id="local-6989586621679225546"><span class="annot"><span class="annottext">f :: Integer -&gt; Integer
+</span><a href="#local-6989586621679225546"><span class="hs-identifier hs-var hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Integer -&gt; Integer) -&gt; Integer -&gt; Integer -&gt; Integer
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">mod</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">33554393</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Integer) -&gt; (Integer -&gt; Integer) -&gt; Integer -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(*)</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">252533</span></span><span>
+</span><span id="line-33"></span></pre></body></html>

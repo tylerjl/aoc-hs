@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE RankNTypes #-}</span><span>
+</span><span id="line-2"></span><span class="hs-comment">{-|
+Module:      Y2018.D02
+Description: Advent of Code Day 01 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 02 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2018.D02</span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2018.D02.html#boxID"><span class="hs-identifier">boxID</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2018.D02.html#checksum"><span class="hs-identifier">checksum</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">group</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">sort</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="annot"><a href="Y2018.D02.html#boxID"><span class="hs-identifier hs-type">boxID</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-18"></span><span id="boxID"><span class="annot"><span class="annottext">boxID :: String -&gt; Maybe String
+</span><a href="Y2018.D02.html#boxID"><span class="hs-identifier hs-var hs-var">boxID</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Maybe String
+forall b. Eq b =&gt; [[b]] -&gt; Maybe [b]
+</span><a href="Y2018.D02.html#findBox"><span class="hs-identifier hs-var">findBox</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Maybe String)
+-&gt; (String -&gt; [String]) -&gt; String -&gt; Maybe String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- boxID = findBox . filter (\s -&gt; has 2 s || has 3 s) . lines</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="annot"><a href="Y2018.D02.html#findBox"><span class="hs-identifier hs-type">findBox</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679226659"><span class="annot"><a href="#local-6989586621679226659"><span class="hs-identifier hs-type">b</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679226659"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679226659"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679226659"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-22"></span><span id="findBox"><span class="annot"><span class="annottext">findBox :: [[b]] -&gt; Maybe [b]
+</span><a href="Y2018.D02.html#findBox"><span class="hs-identifier hs-var hs-var">findBox</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226621"><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679226621"><span class="hs-identifier hs-var">box</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679226620"><span class="annot"><span class="annottext">[[b]]
+</span><a href="#local-6989586621679226620"><span class="hs-identifier hs-var">boxes</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[b] -&gt; [[b]] -&gt; [[(b, b)]]
+forall a. Eq a =&gt; [a] -&gt; [[a]] -&gt; [[(a, a)]]
+</span><a href="Y2018.D02.html#matchingBoxes"><span class="hs-identifier hs-var">matchingBoxes</span></a></span><span> </span><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679226621"><span class="hs-identifier hs-var">box</span></a></span><span> </span><span class="annot"><span class="annottext">[[b]]
+</span><a href="#local-6989586621679226620"><span class="hs-identifier hs-var">boxes</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-23"></span><span>                        </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[[b]] -&gt; Maybe [b]
+forall b. Eq b =&gt; [[b]] -&gt; Maybe [b]
+</span><a href="Y2018.D02.html#findBox"><span class="hs-identifier hs-var">findBox</span></a></span><span> </span><span class="annot"><span class="annottext">[[b]]
+</span><a href="#local-6989586621679226620"><span class="hs-identifier hs-var">boxes</span></a></span><span>
+</span><span id="line-24"></span><span>                        </span><span class="hs-special">(</span><span id="local-6989586621679226618"><span class="annot"><span class="annottext">[(b, b)]
+</span><a href="#local-6989586621679226618"><span class="hs-identifier hs-var">match</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><span class="annottext">[[(b, b)]]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[b] -&gt; Maybe [b]
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">([b] -&gt; Maybe [b]) -&gt; [b] -&gt; Maybe [b]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([b], [b]) -&gt; [b]
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(([b], [b]) -&gt; [b]) -&gt; ([b], [b]) -&gt; [b]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[(b, b)] -&gt; ([b], [b])
+forall a b. [(a, b)] -&gt; ([a], [b])
+</span><span class="hs-identifier hs-var">unzip</span></span><span> </span><span class="annot"><span class="annottext">[(b, b)]
+</span><a href="#local-6989586621679226618"><span class="hs-identifier hs-var">match</span></a></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="Y2018.D02.html#findBox"><span class="hs-identifier hs-var">findBox</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe [b]
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="annot"><a href="Y2018.D02.html#matchingBoxes"><span class="hs-identifier hs-type">matchingBoxes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679226654"><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span></span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679226654"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-28"></span><span id="matchingBoxes"><span class="annot"><span class="annottext">matchingBoxes :: [a] -&gt; [[a]] -&gt; [[(a, a)]]
+</span><a href="Y2018.D02.html#matchingBoxes"><span class="hs-identifier hs-var hs-var">matchingBoxes</span></a></span></span><span> </span><span id="local-6989586621679226616"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679226616"><span class="hs-identifier hs-var">box</span></a></span></span><span> </span><span id="local-6989586621679226615"><span class="annot"><span class="annottext">[[a]]
+</span><a href="#local-6989586621679226615"><span class="hs-identifier hs-var">boxes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([(a, a)] -&gt; [(a, a)]) -&gt; [[(a, a)]] -&gt; [[(a, a)]]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((a, a) -&gt; Bool) -&gt; [(a, a)] -&gt; [(a, a)]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="annot"><span class="annottext">(a, a) -&gt; Bool
+forall a. Eq a =&gt; (a, a) -&gt; Bool
+</span><a href="#local-6989586621679226614"><span class="hs-identifier hs-var">pair</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[(a, a)]] -&gt; [[(a, a)]]) -&gt; [[(a, a)]] -&gt; [[(a, a)]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([(a, a)] -&gt; Bool) -&gt; [[(a, a)]] -&gt; [[(a, a)]]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; ([(a, a)] -&gt; Int) -&gt; [(a, a)] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[(a, a)] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">([(a, a)] -&gt; Int) -&gt; ([(a, a)] -&gt; [(a, a)]) -&gt; [(a, a)] -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[(a, a)] -&gt; [(a, a)]
+</span><a href="#local-6989586621679226612"><span class="hs-identifier hs-var">unmatched</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[(a, a)]] -&gt; [[(a, a)]]) -&gt; [[(a, a)]] -&gt; [[(a, a)]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [(a, a)]) -&gt; [[a]] -&gt; [[(a, a)]]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; [a] -&gt; [(a, a)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679226616"><span class="hs-identifier hs-var">box</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[[a]]
+</span><a href="#local-6989586621679226615"><span class="hs-identifier hs-var">boxes</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226612"><span class="annot"><span class="annottext">unmatched :: [(a, a)] -&gt; [(a, a)]
+</span><a href="#local-6989586621679226612"><span class="hs-identifier hs-var hs-var">unmatched</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((a, a) -&gt; Bool) -&gt; [(a, a)] -&gt; [(a, a)]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; ((a, a) -&gt; Bool) -&gt; (a, a) -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, a) -&gt; Bool
+forall a. Eq a =&gt; (a, a) -&gt; Bool
+</span><a href="#local-6989586621679226614"><span class="hs-identifier hs-var">pair</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>        </span><span id="local-6989586621679226614"><span class="annot"><span class="annottext">pair :: (a, a) -&gt; Bool
+</span><a href="#local-6989586621679226614"><span class="hs-identifier hs-var hs-var">pair</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226610"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679226610"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226609"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679226609"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679226610"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679226609"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Y2018.D02.html#checksum"><span class="hs-identifier hs-type">checksum</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-33"></span><span id="checksum"><span class="annot"><span class="annottext">checksum :: String -&gt; Int
+</span><a href="Y2018.D02.html#checksum"><span class="hs-identifier hs-var hs-var">checksum</span></a></span></span><span> </span><span id="local-6989586621679226608"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226608"><span class="hs-identifier hs-var">boxes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">product</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [Int] -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Int) -&gt; [[String]] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; [String]
+</span><a href="Y2018.D02.html#doubles"><span class="hs-identifier hs-var">doubles</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679226605"><span class="hs-identifier hs-var">boxes'</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; [String]
+</span><a href="Y2018.D02.html#triples"><span class="hs-identifier hs-var">triples</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679226605"><span class="hs-identifier hs-var">boxes'</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226605"><span class="annot"><span class="annottext">boxes' :: [String]
+</span><a href="#local-6989586621679226605"><span class="hs-identifier hs-var hs-var">boxes'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226608"><span class="hs-identifier hs-var">boxes</span></a></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="annot"><a href="Y2018.D02.html#doubles"><span class="hs-identifier hs-type">doubles</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
+</span><span id="line-37"></span><span id="doubles"><span class="annot"><span class="annottext">doubles :: [String] -&gt; [String]
+</span><a href="Y2018.D02.html#doubles"><span class="hs-identifier hs-var hs-var">doubles</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bool) -&gt; [String] -&gt; [String]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Bool
+forall a. Ord a =&gt; Int -&gt; [a] -&gt; Bool
+</span><a href="Y2018.D02.html#has"><span class="hs-identifier hs-var">has</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Y2018.D02.html#triples"><span class="hs-identifier hs-type">triples</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
+</span><span id="line-40"></span><span id="triples"><span class="annot"><span class="annottext">triples :: [String] -&gt; [String]
+</span><a href="Y2018.D02.html#triples"><span class="hs-identifier hs-var hs-var">triples</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bool) -&gt; [String] -&gt; [String]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; String -&gt; Bool
+forall a. Ord a =&gt; Int -&gt; [a] -&gt; Bool
+</span><a href="Y2018.D02.html#has"><span class="hs-identifier hs-var">has</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span id="local-6989586621679226634"><span class="annot"><a href="Y2018.D02.html#has"><span class="hs-identifier hs-type">has</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679226634"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679226634"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span></span><span>
+</span><span id="line-43"></span><span id="has"><span class="annot"><span class="annottext">has :: Int -&gt; [a] -&gt; Bool
+</span><a href="Y2018.D02.html#has"><span class="hs-identifier hs-var hs-var">has</span></a></span></span><span> </span><span id="local-6989586621679226602"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226602"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Bool) -&gt; [[a]] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226602"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; ([a] -&gt; Int) -&gt; [a] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[a]] -&gt; Bool) -&gt; ([a] -&gt; [[a]]) -&gt; [a] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [[a]]
+forall a. Eq a =&gt; [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">group</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [[a]]) -&gt; ([a] -&gt; [a]) -&gt; [a] -&gt; [[a]]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; [a]
+forall a. Ord a =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sort</span></span><span>
+</span><span id="line-44"></span></pre></body></html>

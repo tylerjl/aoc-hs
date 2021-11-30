@@ -1,0 +1,791 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_7TzIupc5NGm0STGpoNeXQz"></span><span class="hs-comment">{-|
+Module:      Y2018.D04
+Description: Advent of Code Day 03 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 04 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2018.D04</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2018.D04.html#laziestGuard"><span class="hs-identifier">laziestGuard</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2018.D04.html#laziestMinute"><span class="hs-identifier">laziestMinute</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Y2015.Util.html"><span class="hs-identifier">Y2015.Util</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.Util.html#regularParse"><span class="hs-identifier">regularParse</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.Util.html#intParser"><span class="hs-identifier">intParser</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;|&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>           </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">foldl'</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">maximumBy</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">sort</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ord</span></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">comparing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec.String</span></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Parser</span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec.Char</span></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">endOfLine</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Parsec</span></span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="hs-identifier">ParseError</span></span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">many</span></span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">optional</span></span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">space</span></span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">string</span></span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">data</span><span> </span><span id="Log"><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-var">Log</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Log"><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-var">Log</span></a></span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="timeStamp"><span class="annot"><span class="annottext">Log -&gt; TimeStamp
+</span><a href="Y2018.D04.html#timeStamp"><span class="hs-identifier hs-var hs-var">timeStamp</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-type">TimeStamp</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="entry"><span class="annot"><span class="annottext">Log -&gt; Entry
+</span><a href="Y2018.D04.html#entry"><span class="hs-identifier hs-var hs-var">entry</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2018.D04.html#Entry"><span class="hs-identifier hs-type">Entry</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226986"><span id="local-6989586621679226988"><span class="annot"><span class="annottext">Log -&gt; Log -&gt; Bool
+(Log -&gt; Log -&gt; Bool) -&gt; (Log -&gt; Log -&gt; Bool) -&gt; Eq Log
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Log -&gt; Log -&gt; Bool
+$c/= :: Log -&gt; Log -&gt; Bool
+== :: Log -&gt; Log -&gt; Bool
+$c== :: Log -&gt; Log -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226970"><span id="local-6989586621679226972"><span id="local-6989586621679226974"><span id="local-6989586621679226976"><span id="local-6989586621679226978"><span id="local-6989586621679226980"><span id="local-6989586621679226982"><span class="annot"><span class="annottext">Eq Log
+Eq Log
+-&gt; (Log -&gt; Log -&gt; Ordering)
+-&gt; (Log -&gt; Log -&gt; Bool)
+-&gt; (Log -&gt; Log -&gt; Bool)
+-&gt; (Log -&gt; Log -&gt; Bool)
+-&gt; (Log -&gt; Log -&gt; Bool)
+-&gt; (Log -&gt; Log -&gt; Log)
+-&gt; (Log -&gt; Log -&gt; Log)
+-&gt; Ord Log
+Log -&gt; Log -&gt; Bool
+Log -&gt; Log -&gt; Ordering
+Log -&gt; Log -&gt; Log
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Log -&gt; Log -&gt; Log
+$cmin :: Log -&gt; Log -&gt; Log
+max :: Log -&gt; Log -&gt; Log
+$cmax :: Log -&gt; Log -&gt; Log
+&gt;= :: Log -&gt; Log -&gt; Bool
+$c&gt;= :: Log -&gt; Log -&gt; Bool
+&gt; :: Log -&gt; Log -&gt; Bool
+$c&gt; :: Log -&gt; Log -&gt; Bool
+&lt;= :: Log -&gt; Log -&gt; Bool
+$c&lt;= :: Log -&gt; Log -&gt; Bool
+&lt; :: Log -&gt; Log -&gt; Bool
+$c&lt; :: Log -&gt; Log -&gt; Bool
+compare :: Log -&gt; Log -&gt; Ordering
+$ccompare :: Log -&gt; Log -&gt; Ordering
+$cp1Ord :: Eq Log
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226963"><span id="local-6989586621679226965"><span id="local-6989586621679226967"><span class="annot"><span class="annottext">Int -&gt; Log -&gt; ShowS
+[Log] -&gt; ShowS
+Log -&gt; String
+(Int -&gt; Log -&gt; ShowS)
+-&gt; (Log -&gt; String) -&gt; ([Log] -&gt; ShowS) -&gt; Show Log
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Log] -&gt; ShowS
+$cshowList :: [Log] -&gt; ShowS
+show :: Log -&gt; String
+$cshow :: Log -&gt; String
+showsPrec :: Int -&gt; Log -&gt; ShowS
+$cshowsPrec :: Int -&gt; Log -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">data</span><span> </span><span id="TimeStamp"><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-var">TimeStamp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TimeStamp"><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-var">TimeStamp</span></a></span></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="_year"><span class="annot"><span class="annottext">TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#_year"><span class="hs-identifier hs-var hs-var">_year</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="_month"><span class="annot"><span class="annottext">TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#_month"><span class="hs-identifier hs-var hs-var">_month</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="_day"><span class="annot"><span class="annottext">TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#_day"><span class="hs-identifier hs-var hs-var">_day</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="_hour"><span class="annot"><span class="annottext">TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#_hour"><span class="hs-identifier hs-var hs-var">_hour</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="minute"><span class="annot"><span class="annottext">TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#minute"><span class="hs-identifier hs-var hs-var">minute</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226952"><span id="local-6989586621679226954"><span class="annot"><span class="annottext">TimeStamp -&gt; TimeStamp -&gt; Bool
+(TimeStamp -&gt; TimeStamp -&gt; Bool)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Bool) -&gt; Eq TimeStamp
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c/= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+== :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c== :: TimeStamp -&gt; TimeStamp -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226937"><span id="local-6989586621679226939"><span id="local-6989586621679226941"><span id="local-6989586621679226943"><span id="local-6989586621679226945"><span id="local-6989586621679226947"><span id="local-6989586621679226949"><span class="annot"><span class="annottext">Eq TimeStamp
+Eq TimeStamp
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Ordering)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Bool)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Bool)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Bool)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; Bool)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; TimeStamp)
+-&gt; (TimeStamp -&gt; TimeStamp -&gt; TimeStamp)
+-&gt; Ord TimeStamp
+TimeStamp -&gt; TimeStamp -&gt; Bool
+TimeStamp -&gt; TimeStamp -&gt; Ordering
+TimeStamp -&gt; TimeStamp -&gt; TimeStamp
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: TimeStamp -&gt; TimeStamp -&gt; TimeStamp
+$cmin :: TimeStamp -&gt; TimeStamp -&gt; TimeStamp
+max :: TimeStamp -&gt; TimeStamp -&gt; TimeStamp
+$cmax :: TimeStamp -&gt; TimeStamp -&gt; TimeStamp
+&gt;= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c&gt;= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+&gt; :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c&gt; :: TimeStamp -&gt; TimeStamp -&gt; Bool
+&lt;= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c&lt;= :: TimeStamp -&gt; TimeStamp -&gt; Bool
+&lt; :: TimeStamp -&gt; TimeStamp -&gt; Bool
+$c&lt; :: TimeStamp -&gt; TimeStamp -&gt; Bool
+compare :: TimeStamp -&gt; TimeStamp -&gt; Ordering
+$ccompare :: TimeStamp -&gt; TimeStamp -&gt; Ordering
+$cp1Ord :: Eq TimeStamp
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226931"><span id="local-6989586621679226933"><span id="local-6989586621679226935"><span class="annot"><span class="annottext">Int -&gt; TimeStamp -&gt; ShowS
+[TimeStamp] -&gt; ShowS
+TimeStamp -&gt; String
+(Int -&gt; TimeStamp -&gt; ShowS)
+-&gt; (TimeStamp -&gt; String)
+-&gt; ([TimeStamp] -&gt; ShowS)
+-&gt; Show TimeStamp
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [TimeStamp] -&gt; ShowS
+$cshowList :: [TimeStamp] -&gt; ShowS
+show :: TimeStamp -&gt; String
+$cshow :: TimeStamp -&gt; String
+showsPrec :: Int -&gt; TimeStamp -&gt; ShowS
+$cshowsPrec :: Int -&gt; TimeStamp -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="Entry"><span class="annot"><a href="Y2018.D04.html#Entry"><span class="hs-identifier hs-var">Entry</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="StartShift"><span class="annot"><a href="Y2018.D04.html#StartShift"><span class="hs-identifier hs-var">StartShift</span></a></span></span><span> </span><span class="annot"><a href="Y2018.D04.html#Guard"><span class="hs-identifier hs-type">Guard</span></a></span><span>
+</span><span id="line-46"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Sleep"><span class="annot"><a href="Y2018.D04.html#Sleep"><span class="hs-identifier hs-var">Sleep</span></a></span></span><span>
+</span><span id="line-47"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Wake"><span class="annot"><a href="Y2018.D04.html#Wake"><span class="hs-identifier hs-var">Wake</span></a></span></span><span>
+</span><span id="line-48"></span><span>           </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226923"><span id="local-6989586621679226925"><span class="annot"><span class="annottext">Entry -&gt; Entry -&gt; Bool
+(Entry -&gt; Entry -&gt; Bool) -&gt; (Entry -&gt; Entry -&gt; Bool) -&gt; Eq Entry
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Entry -&gt; Entry -&gt; Bool
+$c/= :: Entry -&gt; Entry -&gt; Bool
+== :: Entry -&gt; Entry -&gt; Bool
+$c== :: Entry -&gt; Entry -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226908"><span id="local-6989586621679226910"><span id="local-6989586621679226912"><span id="local-6989586621679226914"><span id="local-6989586621679226916"><span id="local-6989586621679226918"><span id="local-6989586621679226920"><span class="annot"><span class="annottext">Eq Entry
+Eq Entry
+-&gt; (Entry -&gt; Entry -&gt; Ordering)
+-&gt; (Entry -&gt; Entry -&gt; Bool)
+-&gt; (Entry -&gt; Entry -&gt; Bool)
+-&gt; (Entry -&gt; Entry -&gt; Bool)
+-&gt; (Entry -&gt; Entry -&gt; Bool)
+-&gt; (Entry -&gt; Entry -&gt; Entry)
+-&gt; (Entry -&gt; Entry -&gt; Entry)
+-&gt; Ord Entry
+Entry -&gt; Entry -&gt; Bool
+Entry -&gt; Entry -&gt; Ordering
+Entry -&gt; Entry -&gt; Entry
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Entry -&gt; Entry -&gt; Entry
+$cmin :: Entry -&gt; Entry -&gt; Entry
+max :: Entry -&gt; Entry -&gt; Entry
+$cmax :: Entry -&gt; Entry -&gt; Entry
+&gt;= :: Entry -&gt; Entry -&gt; Bool
+$c&gt;= :: Entry -&gt; Entry -&gt; Bool
+&gt; :: Entry -&gt; Entry -&gt; Bool
+$c&gt; :: Entry -&gt; Entry -&gt; Bool
+&lt;= :: Entry -&gt; Entry -&gt; Bool
+$c&lt;= :: Entry -&gt; Entry -&gt; Bool
+&lt; :: Entry -&gt; Entry -&gt; Bool
+$c&lt; :: Entry -&gt; Entry -&gt; Bool
+compare :: Entry -&gt; Entry -&gt; Ordering
+$ccompare :: Entry -&gt; Entry -&gt; Ordering
+$cp1Ord :: Eq Entry
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226902"><span id="local-6989586621679226904"><span id="local-6989586621679226906"><span class="annot"><span class="annottext">Int -&gt; Entry -&gt; ShowS
+[Entry] -&gt; ShowS
+Entry -&gt; String
+(Int -&gt; Entry -&gt; ShowS)
+-&gt; (Entry -&gt; String) -&gt; ([Entry] -&gt; ShowS) -&gt; Show Entry
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Entry] -&gt; ShowS
+$cshowList :: [Entry] -&gt; ShowS
+show :: Entry -&gt; String
+$cshow :: Entry -&gt; String
+showsPrec :: Int -&gt; Entry -&gt; ShowS
+$cshowsPrec :: Int -&gt; Entry -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">type</span><span> </span><span id="Guard"><span class="annot"><a href="Y2018.D04.html#Guard"><span class="hs-identifier hs-var">Guard</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">type</span><span> </span><span id="GuardHistory"><span class="annot"><a href="Y2018.D04.html#GuardHistory"><span class="hs-identifier hs-var">GuardHistory</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Y2018.D04.html#Guard"><span class="hs-identifier hs-type">Guard</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><a href="Y2018.D04.html#Guard"><span class="hs-identifier hs-type">Guard</span></a></span><span> </span><span class="annot"><a href="Y2018.D04.html#Shift"><span class="hs-identifier hs-type">Shift</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">data</span><span> </span><span id="Shift"><span class="annot"><a href="Y2018.D04.html#Shift"><span class="hs-identifier hs-var">Shift</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Shift"><span class="annot"><a href="Y2018.D04.html#Shift"><span class="hs-identifier hs-var">Shift</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="minutesSlept"><span class="annot"><span class="annottext">Shift -&gt; Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var hs-var">minutesSlept</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="lastChange"><span class="annot"><span class="annottext">Shift -&gt; TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var hs-var">lastChange</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-type">TimeStamp</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226894"><span id="local-6989586621679226896"><span class="annot"><span class="annottext">Shift -&gt; Shift -&gt; Bool
+(Shift -&gt; Shift -&gt; Bool) -&gt; (Shift -&gt; Shift -&gt; Bool) -&gt; Eq Shift
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Shift -&gt; Shift -&gt; Bool
+$c/= :: Shift -&gt; Shift -&gt; Bool
+== :: Shift -&gt; Shift -&gt; Bool
+$c== :: Shift -&gt; Shift -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226879"><span id="local-6989586621679226881"><span id="local-6989586621679226883"><span id="local-6989586621679226885"><span id="local-6989586621679226887"><span id="local-6989586621679226889"><span id="local-6989586621679226891"><span class="annot"><span class="annottext">Eq Shift
+Eq Shift
+-&gt; (Shift -&gt; Shift -&gt; Ordering)
+-&gt; (Shift -&gt; Shift -&gt; Bool)
+-&gt; (Shift -&gt; Shift -&gt; Bool)
+-&gt; (Shift -&gt; Shift -&gt; Bool)
+-&gt; (Shift -&gt; Shift -&gt; Bool)
+-&gt; (Shift -&gt; Shift -&gt; Shift)
+-&gt; (Shift -&gt; Shift -&gt; Shift)
+-&gt; Ord Shift
+Shift -&gt; Shift -&gt; Bool
+Shift -&gt; Shift -&gt; Ordering
+Shift -&gt; Shift -&gt; Shift
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Shift -&gt; Shift -&gt; Shift
+$cmin :: Shift -&gt; Shift -&gt; Shift
+max :: Shift -&gt; Shift -&gt; Shift
+$cmax :: Shift -&gt; Shift -&gt; Shift
+&gt;= :: Shift -&gt; Shift -&gt; Bool
+$c&gt;= :: Shift -&gt; Shift -&gt; Bool
+&gt; :: Shift -&gt; Shift -&gt; Bool
+$c&gt; :: Shift -&gt; Shift -&gt; Bool
+&lt;= :: Shift -&gt; Shift -&gt; Bool
+$c&lt;= :: Shift -&gt; Shift -&gt; Bool
+&lt; :: Shift -&gt; Shift -&gt; Bool
+$c&lt; :: Shift -&gt; Shift -&gt; Bool
+compare :: Shift -&gt; Shift -&gt; Ordering
+$ccompare :: Shift -&gt; Shift -&gt; Ordering
+$cp1Ord :: Eq Shift
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226873"><span id="local-6989586621679226875"><span id="local-6989586621679226877"><span class="annot"><span class="annottext">Int -&gt; Shift -&gt; ShowS
+[Shift] -&gt; ShowS
+Shift -&gt; String
+(Int -&gt; Shift -&gt; ShowS)
+-&gt; (Shift -&gt; String) -&gt; ([Shift] -&gt; ShowS) -&gt; Show Shift
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Shift] -&gt; ShowS
+$cshowList :: [Shift] -&gt; ShowS
+show :: Shift -&gt; String
+$cshow :: Shift -&gt; String
+showsPrec :: Int -&gt; Shift -&gt; ShowS
+$cshowsPrec :: Int -&gt; Shift -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="annot"><a href="Y2018.D04.html#laziestMinute"><span class="hs-identifier hs-type">laziestMinute</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-60"></span><span id="laziestMinute"><span class="annot"><span class="annottext">laziestMinute :: String -&gt; Either ParseError Int
+</span><a href="Y2018.D04.html#laziestMinute"><span class="hs-identifier hs-var hs-var">laziestMinute</span></a></span></span><span> </span><span id="local-6989586621679226872"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226872"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either ParseError [Log]
+</span><a href="Y2018.D04.html#parseLog"><span class="hs-identifier hs-var">parseLog</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226872"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679226870"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226870"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; Either ParseError Int
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226870"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679226869"><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226869"><span class="hs-identifier hs-var">logs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Either ParseError Int
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Either ParseError Int) -&gt; Int -&gt; Either ParseError Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Map Int Int -&gt; Int) -&gt; [Log] -&gt; Int
+forall a. Ord a =&gt; (Map Int Int -&gt; a) -&gt; [Log] -&gt; Int
+</span><a href="Y2018.D04.html#logFilter"><span class="hs-identifier hs-var">logFilter</span></a></span><span> </span><span class="annot"><span class="annottext">Map Int Int -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Ord a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">maximum</span></span><span> </span><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226869"><span class="hs-identifier hs-var">logs</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Y2018.D04.html#laziestGuard"><span class="hs-identifier hs-type">laziestGuard</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-65"></span><span id="laziestGuard"><span class="annot"><span class="annottext">laziestGuard :: String -&gt; Either ParseError Int
+</span><a href="Y2018.D04.html#laziestGuard"><span class="hs-identifier hs-var hs-var">laziestGuard</span></a></span></span><span> </span><span id="local-6989586621679226866"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226866"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either ParseError [Log]
+</span><a href="Y2018.D04.html#parseLog"><span class="hs-identifier hs-var">parseLog</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226866"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679226865"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226865"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; Either ParseError Int
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679226865"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679226864"><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226864"><span class="hs-identifier hs-var">logs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Either ParseError Int
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Either ParseError Int) -&gt; Int -&gt; Either ParseError Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Map Int Int -&gt; Int) -&gt; [Log] -&gt; Int
+forall a. Ord a =&gt; (Map Int Int -&gt; a) -&gt; [Log] -&gt; Int
+</span><a href="Y2018.D04.html#logFilter"><span class="hs-identifier hs-var">logFilter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; Int -&gt; Map Int Int -&gt; Int
+forall a b k. (a -&gt; b -&gt; a) -&gt; a -&gt; Map k b -&gt; a
+</span><span class="hs-identifier hs-var">Map.foldl</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226864"><span class="hs-identifier hs-var">logs</span></a></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span id="local-6989586621679227080"><span class="annot"><a href="Y2018.D04.html#logFilter"><span class="hs-identifier hs-type">logFilter</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679227080"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map.Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679227080"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2018.D04.html#Guard"><span class="hs-identifier hs-type">Guard</span></a></span></span><span>
+</span><span id="line-70"></span><span id="logFilter"><span class="annot"><span class="annottext">logFilter :: (Map Int Int -&gt; a) -&gt; [Log] -&gt; Int
+</span><a href="Y2018.D04.html#logFilter"><span class="hs-identifier hs-var hs-var">logFilter</span></a></span></span><span> </span><span id="local-6989586621679226861"><span class="annot"><span class="annottext">Map Int Int -&gt; a
+</span><a href="#local-6989586621679226861"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679226860"><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226860"><span class="hs-identifier hs-var">logs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679226859"><span class="annot"><span class="annottext">sleepiestMinute :: Int
+</span><a href="#local-6989586621679226859"><span class="hs-identifier hs-var hs-var">sleepiestMinute</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-72"></span><span>          </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Int
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span>
+</span><span id="line-73"></span><span>          </span><span class="annot"><span class="annottext">((Int, Int) -&gt; Int) -&gt; (Int, Int) -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((Int, Int) -&gt; (Int, Int) -&gt; Ordering)
+-&gt; [(Int, Int)] -&gt; (Int, Int)
+forall (t :: * -&gt; *) a.
+Foldable t =&gt;
+(a -&gt; a -&gt; Ordering) -&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">maximumBy</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679226858"><span class="annot"><span class="annottext">(Int, Int)
+</span><a href="#local-6989586621679226858"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679226857"><span class="annot"><span class="annottext">(Int, Int)
+</span><a href="#local-6989586621679226857"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int, Int) -&gt; Int
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">(Int, Int)
+</span><a href="#local-6989586621679226858"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int, Int) -&gt; Int
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">(Int, Int)
+</span><a href="#local-6989586621679226857"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>          </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; (Int, Int)) -&gt; [(Int, Int)] -&gt; (Int, Int)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Int Int -&gt; [(Int, Int)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">Map.toList</span></span><span>
+</span><span id="line-75"></span><span>          </span><span class="annot"><span class="annottext">(Map Int Int -&gt; [(Int, Int)]) -&gt; Map Int Int -&gt; [(Int, Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Shift -&gt; Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var hs-var">minutesSlept</span></a></span><span>
+</span><span id="line-76"></span><span>          </span><span class="annot"><span class="annottext">(Shift -&gt; Map Int Int) -&gt; Shift -&gt; Map Int Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Int, Shift) -&gt; Shift
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">(Int, Shift)
+</span><a href="#local-6989586621679226854"><span class="hs-identifier hs-var">guard</span></a></span><span>
+</span><span id="line-77"></span><span>        </span><span id="local-6989586621679226853"><span class="annot"><span class="annottext">guardID :: Int
+</span><a href="#local-6989586621679226853"><span class="hs-identifier hs-var hs-var">guardID</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int, Shift) -&gt; Int
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(Int, Shift)
+</span><a href="#local-6989586621679226854"><span class="hs-identifier hs-var">guard</span></a></span><span>
+</span><span id="line-78"></span><span>        </span><span id="local-6989586621679226854"><span class="annot"><span class="annottext">guard :: (Int, Shift)
+</span><a href="#local-6989586621679226854"><span class="hs-identifier hs-var hs-var">guard</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-79"></span><span>          </span><span class="annot"><span class="annottext">((Int, Shift) -&gt; (Int, Shift) -&gt; Ordering)
+-&gt; [(Int, Shift)] -&gt; (Int, Shift)
+forall (t :: * -&gt; *) a.
+Foldable t =&gt;
+(a -&gt; a -&gt; Ordering) -&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">maximumBy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Int, Shift) -&gt; a) -&gt; (Int, Shift) -&gt; (Int, Shift) -&gt; Ordering
+forall a b. Ord a =&gt; (b -&gt; a) -&gt; b -&gt; b -&gt; Ordering
+</span><span class="hs-identifier hs-var">comparing</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Int Int -&gt; a
+</span><a href="#local-6989586621679226861"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Int Int -&gt; a)
+-&gt; ((Int, Shift) -&gt; Map Int Int) -&gt; (Int, Shift) -&gt; a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Shift -&gt; Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var hs-var">minutesSlept</span></a></span><span> </span><span class="annot"><span class="annottext">(Shift -&gt; Map Int Int)
+-&gt; ((Int, Shift) -&gt; Shift) -&gt; (Int, Shift) -&gt; Map Int Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Int, Shift) -&gt; Shift
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>          </span><span class="annot"><span class="annottext">([(Int, Shift)] -&gt; (Int, Shift)) -&gt; [(Int, Shift)] -&gt; (Int, Shift)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Int Shift -&gt; [(Int, Shift)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">Map.toList</span></span><span>
+</span><span id="line-81"></span><span>          </span><span class="annot"><span class="annottext">(Map Int Shift -&gt; [(Int, Shift)])
+-&gt; Map Int Shift -&gt; [(Int, Shift)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Maybe Int, Map Int Shift) -&gt; Map Int Shift
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span>
+</span><span id="line-82"></span><span>          </span><span class="annot"><span class="annottext">((Maybe Int, Map Int Shift) -&gt; Map Int Shift)
+-&gt; (Maybe Int, Map Int Shift) -&gt; Map Int Shift
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((Maybe Int, Map Int Shift) -&gt; Log -&gt; (Maybe Int, Map Int Shift))
+-&gt; (Maybe Int, Map Int Shift)
+-&gt; [Log]
+-&gt; (Maybe Int, Map Int Shift)
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">(Maybe Int, Map Int Shift) -&gt; Log -&gt; (Maybe Int, Map Int Shift)
+</span><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-var">recordLog</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Map Int Shift
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span>          </span><span class="annot"><span class="annottext">([Log] -&gt; (Maybe Int, Map Int Shift))
+-&gt; [Log] -&gt; (Maybe Int, Map Int Shift)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Log] -&gt; [Log]
+forall a. Ord a =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sort</span></span><span> </span><span class="annot"><span class="annottext">[Log]
+</span><a href="#local-6989586621679226860"><span class="hs-identifier hs-var">logs</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226853"><span class="hs-identifier hs-var">guardID</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226859"><span class="hs-identifier hs-var">sleepiestMinute</span></a></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-type">recordLog</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2018.D04.html#GuardHistory"><span class="hs-identifier hs-type">GuardHistory</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2018.D04.html#GuardHistory"><span class="hs-identifier hs-type">GuardHistory</span></a></span><span>
+</span><span id="line-87"></span><span id="recordLog"><span class="annot"><span class="annottext">recordLog :: (Maybe Int, Map Int Shift) -&gt; Log -&gt; (Maybe Int, Map Int Shift)
+</span><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-var hs-var">recordLog</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226848"><span class="annot"><span class="annottext">Maybe Int
+</span><a href="#local-6989586621679226848"><span class="hs-identifier hs-var">_current</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226847"><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226847"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">timeStamp :: Log -&gt; TimeStamp
+</span><a href="Y2018.D04.html#timeStamp"><span class="hs-identifier hs-var">timeStamp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226846"><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226846"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">entry :: Log -&gt; Entry
+</span><a href="Y2018.D04.html#entry"><span class="hs-identifier hs-var">entry</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#StartShift"><span class="hs-identifier hs-type">StartShift</span></a></span><span> </span><span id="local-6989586621679226845"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226845"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226845"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Shift -&gt; Shift -&gt; Shift)
+-&gt; Int -&gt; Shift -&gt; Map Int Shift -&gt; Map Int Shift
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insertWith</span></span><span> </span><span class="annot"><span class="annottext">Shift -&gt; Shift -&gt; Shift
+forall p. p -&gt; Shift -&gt; Shift
+</span><a href="#local-6989586621679226843"><span class="hs-identifier hs-var">shiftChange</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226845"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226842"><span class="hs-identifier hs-var">toShift</span></a></span><span> </span><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226847"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226842"><span class="annot"><span class="annottext">toShift :: Shift
+</span><a href="#local-6989586621679226842"><span class="hs-identifier hs-var hs-var">toShift</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-90"></span><span>          </span><span class="annot"><span class="annottext">Shift :: Map Int Int -&gt; TimeStamp -&gt; Shift
+</span><a href="Y2018.D04.html#Shift"><span class="hs-identifier hs-type">Shift</span></a></span><span>
+</span><span id="line-91"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">minutesSlept :: Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var">minutesSlept</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Map Int Int
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; Map Int Int) -&gt; [(Int, Int)] -&gt; Map Int Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; [(Int, Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">59</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [(Int, Int)]) -&gt; [Int] -&gt; [(Int, Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int]
+forall a. a -&gt; [a]
+</span><span class="hs-identifier hs-var">repeat</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-92"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">lastChange :: TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var">lastChange</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226846"><span class="hs-identifier hs-var">ts</span></a></span><span>
+</span><span id="line-93"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-94"></span><span>        </span><span id="local-6989586621679226843"><span class="annot"><span class="annottext">shiftChange :: p -&gt; Shift -&gt; Shift
+</span><a href="#local-6989586621679226843"><span class="hs-identifier hs-var hs-var">shiftChange</span></a></span></span><span> </span><span id="local-6989586621679226839"><span class="annot"><span class="annottext">p
+</span><a href="#local-6989586621679226839"><span class="hs-identifier hs-var">_newShift</span></a></span></span><span> </span><span id="local-6989586621679226838"><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226838"><span class="hs-identifier hs-var">oldShift</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-95"></span><span>          </span><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226838"><span class="hs-identifier hs-var">oldShift</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">lastChange :: TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var">lastChange</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226846"><span class="hs-identifier hs-var">ts</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-96"></span><span class="annot"><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-var">recordLog</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679226837"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226837"><span class="hs-identifier hs-var">current</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226836"><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226836"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">timeStamp :: Log -&gt; TimeStamp
+</span><a href="Y2018.D04.html#timeStamp"><span class="hs-identifier hs-var">timeStamp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226835"><span class="annot"><span class="annottext">ts :: TimeStamp
+</span><a href="#local-6989586621679226835"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-type">TimeStamp</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">minute :: TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#minute"><span class="hs-identifier hs-var">minute</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226834"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226834"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">entry :: Log -&gt; Entry
+</span><a href="Y2018.D04.html#entry"><span class="hs-identifier hs-var">entry</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Entry
+</span><a href="Y2018.D04.html#Wake"><span class="hs-identifier hs-var">Wake</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226837"><span class="hs-identifier hs-var">current</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Shift -&gt; Shift) -&gt; Int -&gt; Map Int Shift -&gt; Map Int Shift
+forall k a. Ord k =&gt; (a -&gt; a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.adjust</span></span><span> </span><span class="annot"><span class="annottext">Shift -&gt; Shift
+</span><a href="#local-6989586621679226832"><span class="hs-identifier hs-var">transition</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226837"><span class="hs-identifier hs-var">current</span></a></span><span> </span><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226836"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226832"><span class="annot"><span class="annottext">transition :: Shift -&gt; Shift
+</span><a href="#local-6989586621679226832"><span class="hs-identifier hs-var hs-var">transition</span></a></span></span><span> </span><span id="local-6989586621679226831"><span class="annot"><span class="annottext">oldShift :: Shift
+</span><a href="#local-6989586621679226831"><span class="hs-identifier hs-var">oldShift</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#Shift"><span class="hs-identifier hs-type">Shift</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">lastChange :: Shift -&gt; TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var">lastChange</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-type">TimeStamp</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">minute :: TimeStamp -&gt; Int
+</span><a href="Y2018.D04.html#minute"><span class="hs-identifier hs-var">minute</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226830"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226830"><span class="hs-identifier hs-var">m'</span></a></span></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">minutesSlept :: Shift -&gt; Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var">minutesSlept</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226829"><span class="annot"><span class="annottext">Map Int Int
+</span><a href="#local-6989586621679226829"><span class="hs-identifier hs-var">minutes</span></a></span></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-99"></span><span>          </span><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226831"><span class="hs-identifier hs-var">oldShift</span></a></span><span>
+</span><span id="line-100"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">lastChange :: TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var">lastChange</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226835"><span class="hs-identifier hs-var">ts</span></a></span><span>
+</span><span id="line-101"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">minutesSlept :: Map Int Int
+</span><a href="Y2018.D04.html#minutesSlept"><span class="hs-identifier hs-var">minutesSlept</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int) -&gt; Map Int Int -&gt; Map Int Int -&gt; Map Int Int
+forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.unionWith</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="annot"><span class="annottext">Map Int Int
+</span><a href="#local-6989586621679226829"><span class="hs-identifier hs-var">minutes</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Int Int -&gt; Map Int Int) -&gt; Map Int Int -&gt; Map Int Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; Map Int Int
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; Map Int Int) -&gt; [(Int, Int)] -&gt; Map Int Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; [(Int, Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226830"><span class="hs-identifier hs-var">m'</span></a></span><span> </span><span class="hs-glyph">..</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226834"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [(Int, Int)]) -&gt; [Int] -&gt; [(Int, Int)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int]
+forall a. a -&gt; [a]
+</span><span class="hs-identifier hs-var">repeat</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-102"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-103"></span><span class="annot"><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-var">recordLog</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679226827"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226827"><span class="hs-identifier hs-var">current</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226826"><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226826"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">timeStamp :: Log -&gt; TimeStamp
+</span><a href="Y2018.D04.html#timeStamp"><span class="hs-identifier hs-var">timeStamp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679226825"><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226825"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">entry :: Log -&gt; Entry
+</span><a href="Y2018.D04.html#entry"><span class="hs-identifier hs-var">entry</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Entry
+</span><a href="Y2018.D04.html#Sleep"><span class="hs-identifier hs-var">Sleep</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226827"><span class="hs-identifier hs-var">current</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Shift -&gt; Shift) -&gt; Int -&gt; Map Int Shift -&gt; Map Int Shift
+forall k a. Ord k =&gt; (a -&gt; a) -&gt; k -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.adjust</span></span><span> </span><span class="annot"><span class="annottext">Shift -&gt; Shift
+</span><a href="#local-6989586621679226824"><span class="hs-identifier hs-var">transition</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226827"><span class="hs-identifier hs-var">current</span></a></span><span> </span><span class="annot"><span class="annottext">Map Int Shift
+</span><a href="#local-6989586621679226826"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679226824"><span class="annot"><span class="annottext">transition :: Shift -&gt; Shift
+</span><a href="#local-6989586621679226824"><span class="hs-identifier hs-var hs-var">transition</span></a></span></span><span> </span><span id="local-6989586621679226823"><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226823"><span class="hs-identifier hs-var">oldShift</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Shift
+</span><a href="#local-6989586621679226823"><span class="hs-identifier hs-var">oldShift</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">lastChange :: TimeStamp
+</span><a href="Y2018.D04.html#lastChange"><span class="hs-identifier hs-var">lastChange</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TimeStamp
+</span><a href="#local-6989586621679226825"><span class="hs-identifier hs-var">ts</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-106"></span><span class="annot"><a href="Y2018.D04.html#recordLog"><span class="hs-identifier hs-var">recordLog</span></a></span><span> </span><span id="local-6989586621679226822"><span class="annot"><span class="annottext">gh :: (Maybe Int, Map Int Shift)
+</span><a href="#local-6989586621679226822"><span class="hs-identifier hs-var">gh</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Int
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Map Int Shift
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Log
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Maybe Int, Map Int Shift)
+</span><a href="#local-6989586621679226822"><span class="hs-identifier hs-var">gh</span></a></span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- Parsing</span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="annot"><a href="Y2018.D04.html#parseLog"><span class="hs-identifier hs-type">parseLog</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-111"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">ParseError</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-112"></span><span id="parseLog"><span class="annot"><span class="annottext">parseLog :: String -&gt; Either ParseError [Log]
+</span><a href="Y2018.D04.html#parseLog"><span class="hs-identifier hs-var hs-var">parseLog</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser [Log] -&gt; String -&gt; Either ParseError [Log]
+forall a. Parser a -&gt; String -&gt; Either ParseError a
+</span><a href="Y2015.Util.html#regularParse"><span class="hs-identifier hs-var">regularParse</span></a></span><span> </span><span class="annot"><span class="annottext">Parser [Log]
+</span><a href="Y2018.D04.html#logParser"><span class="hs-identifier hs-var">logParser</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="annot"><a href="Y2018.D04.html#logParser"><span class="hs-identifier hs-type">logParser</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-115"></span><span id="logParser"><span class="annot"><span class="annottext">logParser :: Parser [Log]
+</span><a href="Y2018.D04.html#logParser"><span class="hs-identifier hs-var hs-var">logParser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Log -&gt; Parser [Log]
+forall s u (m :: * -&gt; *) a. ParsecT s u m a -&gt; ParsecT s u m [a]
+</span><span class="hs-identifier hs-var">many</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT String () Identity Log
+</span><a href="Y2018.D04.html#parseRawLog"><span class="hs-identifier hs-var">parseRawLog</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Log
+-&gt; ParsecT String () Identity () -&gt; ParsecT String () Identity Log
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char -&gt; ParsecT String () Identity ()
+forall s (m :: * -&gt; *) t u a.
+Stream s m t =&gt;
+ParsecT s u m a -&gt; ParsecT s u m ()
+</span><span class="hs-identifier hs-var">optional</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">endOfLine</span></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="annot"><a href="Y2018.D04.html#parseRawLog"><span class="hs-identifier hs-type">parseRawLog</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="annot"><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-type">Log</span></a></span><span>
+</span><span id="line-118"></span><span id="parseRawLog"><span class="annot"><span class="annottext">parseRawLog :: ParsecT String () Identity Log
+</span><a href="Y2018.D04.html#parseRawLog"><span class="hs-identifier hs-var hs-var">parseRawLog</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TimeStamp -&gt; Entry -&gt; Log
+</span><a href="Y2018.D04.html#Log"><span class="hs-identifier hs-var">Log</span></a></span><span> </span><span class="annot"><span class="annottext">(TimeStamp -&gt; Entry -&gt; Log)
+-&gt; ParsecT String () Identity TimeStamp
+-&gt; ParsecT String () Identity (Entry -&gt; Log)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT String () Identity TimeStamp
+</span><a href="Y2018.D04.html#parseTimeStamp"><span class="hs-identifier hs-var">parseTimeStamp</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity TimeStamp
+-&gt; ParsecT String () Identity Char
+-&gt; ParsecT String () Identity TimeStamp
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">space</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Entry -&gt; Log)
+-&gt; ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity Log
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Entry
+</span><a href="Y2018.D04.html#parseEntry"><span class="hs-identifier hs-var">parseEntry</span></a></span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Y2018.D04.html#parseTimeStamp"><span class="hs-identifier hs-type">parseTimeStamp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="annot"><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-type">TimeStamp</span></a></span><span>
+</span><span id="line-121"></span><span id="parseTimeStamp"><span class="annot"><span class="annottext">parseTimeStamp :: ParsecT String () Identity TimeStamp
+</span><a href="Y2018.D04.html#parseTimeStamp"><span class="hs-identifier hs-var hs-var">parseTimeStamp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp
+</span><a href="Y2018.D04.html#TimeStamp"><span class="hs-identifier hs-var">TimeStamp</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT
+     String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;[&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT
+  String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT
+     String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT
+     String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;-&quot;</span></span><span>
+</span><span id="line-122"></span><span>                          </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span>  </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span>  </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;-&quot;</span></span><span>
+</span><span id="line-123"></span><span>                          </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span>  </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Char
+-&gt; ParsecT String () Identity (Int -&gt; Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span>  </span><span class="annot"><span class="annottext">ParsecT String () Identity Char
+forall s (m :: * -&gt; *) u. Stream s m Char =&gt; ParsecT s u m Char
+</span><span class="hs-identifier hs-var">space</span></span><span>
+</span><span id="line-124"></span><span>                          </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity (Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span>  </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; TimeStamp)
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span>  </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;:&quot;</span></span><span>
+</span><span id="line-125"></span><span>                          </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; TimeStamp)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity TimeStamp
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span>  </span><span class="annot"><span class="annottext">ParsecT String () Identity TimeStamp
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity TimeStamp
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span>  </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;]&quot;</span></span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="annot"><a href="Y2018.D04.html#parseEntry"><span class="hs-identifier hs-type">parseEntry</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="annot"><a href="Y2018.D04.html#Entry"><span class="hs-identifier hs-type">Entry</span></a></span><span>
+</span><span id="line-128"></span><span id="parseEntry"><span class="annot"><span class="annottext">parseEntry :: ParsecT String () Identity Entry
+</span><a href="Y2018.D04.html#parseEntry"><span class="hs-identifier hs-var hs-var">parseEntry</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Entry
+</span><a href="Y2018.D04.html#StartShift"><span class="hs-identifier hs-var">StartShift</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Entry)
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity (Int -&gt; Entry)
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Guard #&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity (Int -&gt; Entry)
+-&gt; ParsecT String () Identity Int
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Int
+</span><a href="Y2015.Util.html#intParser"><span class="hs-identifier hs-var">intParser</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; begins shift&quot;</span></span><span>
+</span><span id="line-129"></span><span>         </span><span class="annot"><span class="annottext">ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Entry
+</span><a href="Y2018.D04.html#Sleep"><span class="hs-identifier hs-var">Sleep</span></a></span><span>      </span><span class="annot"><span class="annottext">Entry
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;falls asleep&quot;</span></span><span>
+</span><span id="line-130"></span><span>         </span><span class="annot"><span class="annottext">ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity Entry
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Entry
+</span><a href="Y2018.D04.html#Wake"><span class="hs-identifier hs-var">Wake</span></a></span><span>       </span><span class="annot"><span class="annottext">Entry
+-&gt; ParsecT String () Identity String
+-&gt; ParsecT String () Identity Entry
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT String () Identity String
+forall s (m :: * -&gt; *) u.
+Stream s m Char =&gt;
+String -&gt; ParsecT s u m String
+</span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;wakes up&quot;</span></span><span>
+</span><span id="line-131"></span></pre></body></html>

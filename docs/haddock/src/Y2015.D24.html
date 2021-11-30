@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Y2015.D24
+Description: Advent of Code Day 24 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 24 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2015.D24</span><span>
+</span><span id="line-11"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2015.D24.html#idealEntanglement"><span class="hs-identifier">idealEntanglement</span></a></span><span>
+</span><span id="line-12"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D24.html#idealEntanglementOptimized"><span class="hs-identifier">idealEntanglementOptimized</span></a></span><span>
+</span><span id="line-13"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Function</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">on</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">find</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">groupBy</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">minimumBy</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">sortBy</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">subsequences</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ord</span></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">comparing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- |Find the ideal entanglement value for a given input of packages.</span><span>
+</span><span id="line-21"></span><span class="annot"><a href="Y2015.D24.html#idealEntanglement"><span class="hs-identifier hs-type">idealEntanglement</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ How many compartments to divide amongst.</span><span>
+</span><span id="line-22"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">{-^
+                                Input as a string containing newlined-separated
+                                list of package weights.
+                            -}</span><span>
+</span><span id="line-26"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">{-^
+                                Ideal entanglement value for the resulting
+                                package distribution.
+                            -}</span><span>
+</span><span id="line-30"></span><span id="idealEntanglement"><span class="annot"><span class="annottext">idealEntanglement :: Int -&gt; String -&gt; Int
+</span><a href="Y2015.D24.html#idealEntanglement"><span class="hs-identifier hs-var hs-var">idealEntanglement</span></a></span></span><span> </span><span id="local-6989586621679225500"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225500"><span class="hs-identifier hs-var">compartments</span></a></span></span><span> </span><span id="local-6989586621679225499"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225499"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">product</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [Int] -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int] -&gt; Ordering) -&gt; [[Int]] -&gt; [Int]
+forall (t :: * -&gt; *) a.
+Foldable t =&gt;
+(a -&gt; a -&gt; Ordering) -&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">minimumBy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[[Int] -&gt; [Int] -&gt; Ordering] -&gt; [Int] -&gt; [Int] -&gt; Ordering
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="annot"><span class="annottext">[[Int] -&gt; [Int] -&gt; Ordering]
+</span><a href="#local-6989586621679225497"><span class="hs-identifier hs-var">santasPredicates</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[[Int]]
+</span><a href="#local-6989586621679225496"><span class="hs-identifier hs-var">seqs</span></a></span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225495"><span class="annot"><span class="annottext">weights :: [Int]
+</span><a href="#local-6989586621679225495"><span class="hs-identifier hs-var hs-var">weights</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int) -&gt; [String] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [Int]) -&gt; [String] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225499"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-33"></span><span>          </span><span id="local-6989586621679225492"><span class="annot"><span class="annottext">balanced :: Int
+</span><a href="#local-6989586621679225492"><span class="hs-identifier hs-var hs-var">balanced</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679225495"><span class="hs-identifier hs-var">weights</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`quot`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225500"><span class="hs-identifier hs-var">compartments</span></a></span><span>
+</span><span id="line-34"></span><span>          </span><span id="local-6989586621679225489"><span class="annot"><span class="annottext">isBalanced :: [Int] -&gt; Bool
+</span><a href="#local-6989586621679225489"><span class="hs-identifier hs-var hs-var">isBalanced</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225492"><span class="hs-identifier hs-var">balanced</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; ([Int] -&gt; Int) -&gt; [Int] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span>
+</span><span id="line-35"></span><span>          </span><span id="local-6989586621679225496"><span class="annot"><span class="annottext">seqs :: [[Int]]
+</span><a href="#local-6989586621679225496"><span class="hs-identifier hs-var hs-var">seqs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Bool) -&gt; [[Int]] -&gt; [[Int]]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Bool
+</span><a href="#local-6989586621679225489"><span class="hs-identifier hs-var">isBalanced</span></a></span><span> </span><span class="annot"><span class="annottext">([[Int]] -&gt; [[Int]]) -&gt; [[Int]] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [[Int]]
+forall a. [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">subsequences</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679225495"><span class="hs-identifier hs-var">weights</span></a></span><span>
+</span><span id="line-36"></span><span>          </span><span id="local-6989586621679225497"><span class="annot"><span class="annottext">santasPredicates :: [[Int] -&gt; [Int] -&gt; Ordering]
+</span><a href="#local-6989586621679225497"><span class="hs-identifier hs-var hs-var">santasPredicates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [Int] -&gt; [Int] -&gt; Ordering
+forall a b. Ord a =&gt; (b -&gt; a) -&gt; b -&gt; b -&gt; Ordering
+</span><span class="hs-identifier hs-var">comparing</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [Int] -&gt; [Int] -&gt; Ordering
+forall a b. Ord a =&gt; (b -&gt; a) -&gt; b -&gt; b -&gt; Ordering
+</span><span class="hs-identifier hs-var">comparing</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">product</span></span><span class="hs-special">]</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- |Find the ideal entanglement value for a given input of packages.</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Y2015.D24.html#idealEntanglementOptimized"><span class="hs-identifier hs-type">idealEntanglementOptimized</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ How many compartments to divide amongst.</span><span>
+</span><span id="line-40"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>    </span><span class="hs-comment">{-^
+                                   Input as a string containing newlined-separated
+                                   list of package weights.
+                               -}</span><span>
+</span><span id="line-44"></span><span>                  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-comment">{-^
+                                   Ideal entanglement value for the resulting
+                                   package distribution if one can be found.
+                               -}</span><span>
+</span><span id="line-48"></span><span id="idealEntanglementOptimized"><span class="annot"><span class="annottext">idealEntanglementOptimized :: Int -&gt; String -&gt; Maybe Int
+</span><a href="Y2015.D24.html#idealEntanglementOptimized"><span class="hs-identifier hs-var hs-var">idealEntanglementOptimized</span></a></span></span><span> </span><span id="local-6989586621679225486"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225486"><span class="hs-identifier hs-var">compartments</span></a></span></span><span> </span><span id="local-6989586621679225485"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225485"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe [[Int]]
+</span><a href="#local-6989586621679225484"><span class="hs-identifier hs-var">seqs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-50"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679225483"><span class="annot"><span class="annottext">[[Int]]
+</span><a href="#local-6989586621679225483"><span class="hs-identifier hs-var">groups</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Int) -&gt; Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Ord a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">minimum</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [Int] -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; Int) -&gt; [[Int]] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">product</span></span><span> </span><span class="annot"><span class="annottext">[[Int]]
+</span><a href="#local-6989586621679225483"><span class="hs-identifier hs-var">groups</span></a></span><span>
+</span><span id="line-51"></span><span>        </span><span class="annot"><span class="annottext">Maybe [[Int]]
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225481"><span class="annot"><span class="annottext">weights :: [Int]
+</span><a href="#local-6989586621679225481"><span class="hs-identifier hs-var hs-var">weights</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int) -&gt; [String] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [Int]) -&gt; [String] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225485"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-53"></span><span>          </span><span id="local-6989586621679225480"><span class="annot"><span class="annottext">balanced :: Int
+</span><a href="#local-6989586621679225480"><span class="hs-identifier hs-var hs-var">balanced</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679225481"><span class="hs-identifier hs-var">weights</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`quot`</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225486"><span class="hs-identifier hs-var">compartments</span></a></span><span>
+</span><span id="line-54"></span><span>          </span><span id="local-6989586621679225479"><span class="annot"><span class="annottext">isBalanced :: [Int] -&gt; Bool
+</span><a href="#local-6989586621679225479"><span class="hs-identifier hs-var hs-var">isBalanced</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225480"><span class="hs-identifier hs-var">balanced</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; ([Int] -&gt; Int) -&gt; [Int] -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span>
+</span><span id="line-55"></span><span>          </span><span id="local-6989586621679225484"><span class="annot"><span class="annottext">seqs :: Maybe [[Int]]
+</span><a href="#local-6989586621679225484"><span class="hs-identifier hs-var hs-var">seqs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([[Int]] -&gt; Bool) -&gt; [[[Int]]] -&gt; Maybe [[Int]]
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">find</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">([Int] -&gt; Bool) -&gt; [[Int]] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Bool
+</span><a href="#local-6989586621679225479"><span class="hs-identifier hs-var">isBalanced</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[[Int]]] -&gt; Maybe [[Int]]) -&gt; [[[Int]]] -&gt; Maybe [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-56"></span><span>              </span><span class="annot"><span class="annottext">([Int] -&gt; [Int] -&gt; Bool) -&gt; [[Int]] -&gt; [[[Int]]]
+forall a. (a -&gt; a -&gt; Bool) -&gt; [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">groupBy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Bool) -&gt; ([Int] -&gt; Int) -&gt; [Int] -&gt; [Int] -&gt; Bool
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">`on`</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[Int]] -&gt; [[[Int]]]) -&gt; [[Int]] -&gt; [[[Int]]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-57"></span><span>              </span><span class="annot"><span class="annottext">([Int] -&gt; [Int] -&gt; Ordering) -&gt; [[Int]] -&gt; [[Int]]
+forall a. (a -&gt; a -&gt; Ordering) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sortBy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Ordering)
+-&gt; ([Int] -&gt; Int) -&gt; [Int] -&gt; [Int] -&gt; Ordering
+forall b c a. (b -&gt; b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">`on`</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[Int]] -&gt; [[Int]]) -&gt; [[Int]] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-58"></span><span>              </span><span class="annot"><span class="annottext">[Int] -&gt; [[Int]]
+forall a. [a] -&gt; [[a]]
+</span><span class="hs-identifier hs-var">subsequences</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679225481"><span class="hs-identifier hs-var">weights</span></a></span><span>
+</span><span id="line-59"></span></pre></body></html>

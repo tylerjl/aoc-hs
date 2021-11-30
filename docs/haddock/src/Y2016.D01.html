@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24maxtag_FsBhmUuubj8AYtAicyvYfp"><span id="%24tag2con_FsBhmUuubj8AYtAicyvYfp"><span id="%24con2tag_FsBhmUuubj8AYtAicyvYfp"></span></span></span><span class="hs-comment">{-|
+Module:      Y2016.D01
+Description: Advent of Code Day 01 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 01 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2016.D01</span><span>
+</span><span id="line-10"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2016.D01.html#blockDistance"><span class="hs-identifier">blockDistance</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2016.D01.html#visitedTwice"><span class="hs-identifier">visitedTwice</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">foldl'</span></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- | Cardinal direction for movement</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">data</span><span> </span><span id="Direction"><span class="annot"><a href="Y2016.D01.html#Direction"><span class="hs-identifier hs-var">Direction</span></a></span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="North"><span class="annot"><a href="Y2016.D01.html#North"><span class="hs-identifier hs-var">North</span></a></span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="East"><span class="annot"><a href="Y2016.D01.html#East"><span class="hs-identifier hs-var">East</span></a></span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="South"><span class="annot"><a href="Y2016.D01.html#South"><span class="hs-identifier hs-var">South</span></a></span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="West"><span class="annot"><a href="Y2016.D01.html#West"><span class="hs-identifier hs-var">West</span></a></span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226390"><span id="local-6989586621679226392"><span id="local-6989586621679226394"><span id="local-6989586621679226396"><span id="local-6989586621679226398"><span id="local-6989586621679226400"><span id="local-6989586621679226402"><span id="local-6989586621679226404"><span class="annot"><span class="annottext">Int -&gt; Direction
+Direction -&gt; Int
+Direction -&gt; [Direction]
+Direction -&gt; Direction
+Direction -&gt; Direction -&gt; [Direction]
+Direction -&gt; Direction -&gt; Direction -&gt; [Direction]
+(Direction -&gt; Direction)
+-&gt; (Direction -&gt; Direction)
+-&gt; (Int -&gt; Direction)
+-&gt; (Direction -&gt; Int)
+-&gt; (Direction -&gt; [Direction])
+-&gt; (Direction -&gt; Direction -&gt; [Direction])
+-&gt; (Direction -&gt; Direction -&gt; [Direction])
+-&gt; (Direction -&gt; Direction -&gt; Direction -&gt; [Direction])
+-&gt; Enum Direction
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: Direction -&gt; Direction -&gt; Direction -&gt; [Direction]
+$cenumFromThenTo :: Direction -&gt; Direction -&gt; Direction -&gt; [Direction]
+enumFromTo :: Direction -&gt; Direction -&gt; [Direction]
+$cenumFromTo :: Direction -&gt; Direction -&gt; [Direction]
+enumFromThen :: Direction -&gt; Direction -&gt; [Direction]
+$cenumFromThen :: Direction -&gt; Direction -&gt; [Direction]
+enumFrom :: Direction -&gt; [Direction]
+$cenumFrom :: Direction -&gt; [Direction]
+fromEnum :: Direction -&gt; Int
+$cfromEnum :: Direction -&gt; Int
+toEnum :: Int -&gt; Direction
+$ctoEnum :: Int -&gt; Direction
+pred :: Direction -&gt; Direction
+$cpred :: Direction -&gt; Direction
+succ :: Direction -&gt; Direction
+$csucc :: Direction -&gt; Direction
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- | (x, y) coordinates</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">type</span><span> </span><span id="Coordinates"><span class="annot"><a href="Y2016.D01.html#Coordinates"><span class="hs-identifier hs-var">Coordinates</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- | Find number of blocks traveled per list of instructions</span><span>
+</span><span id="line-29"></span><span class="annot"><a href="Y2016.D01.html#blockDistance"><span class="hs-identifier hs-type">blockDistance</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Input of directions</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-comment">-- ^ Number of blocks traveled</span><span>
+</span><span id="line-32"></span><span id="blockDistance"><span class="annot"><span class="annottext">blockDistance :: String -&gt; Int
+</span><a href="Y2016.D01.html#blockDistance"><span class="hs-identifier hs-var hs-var">blockDistance</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Int
+</span><a href="Y2016.D01.html#blocks"><span class="hs-identifier hs-var">blocks</span></a></span><span> </span><span class="annot"><span class="annottext">(Coordinates -&gt; Int) -&gt; (String -&gt; Coordinates) -&gt; String -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Coordinates -&gt; Direction -&gt; Coordinates)
+-&gt; Coordinates -&gt; [Direction] -&gt; Coordinates
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Direction -&gt; Coordinates
+</span><a href="Y2016.D01.html#travel"><span class="hs-identifier hs-var">travel</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Direction] -&gt; Coordinates)
+-&gt; (String -&gt; [Direction]) -&gt; String -&gt; Coordinates
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [Direction]
+</span><a href="Y2016.D01.html#mapRoute"><span class="hs-identifier hs-var">mapRoute</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- | Find first block that is visited twice</span><span>
+</span><span id="line-35"></span><span class="annot"><a href="Y2016.D01.html#visitedTwice"><span class="hs-identifier hs-type">visitedTwice</span></a></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Input of directions</span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-comment">-- ^ Possible block that is visited twice</span><span>
+</span><span id="line-38"></span><span id="visitedTwice"><span class="annot"><span class="annottext">visitedTwice :: String -&gt; Maybe Int
+</span><a href="Y2016.D01.html#visitedTwice"><span class="hs-identifier hs-var hs-var">visitedTwice</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Set Coordinates -&gt; [Direction] -&gt; Maybe Int
+</span><a href="#local-6989586621679226384"><span class="hs-identifier hs-var">navigate</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set Coordinates
+forall a. Set a
+</span><span class="hs-identifier hs-var">Set.empty</span></span><span> </span><span class="annot"><span class="annottext">([Direction] -&gt; Maybe Int)
+-&gt; (String -&gt; [Direction]) -&gt; String -&gt; Maybe Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [Direction]
+</span><a href="Y2016.D01.html#mapRoute"><span class="hs-identifier hs-var">mapRoute</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679226384"><span class="annot"><span class="annottext">navigate :: Coordinates -&gt; Set Coordinates -&gt; [Direction] -&gt; Maybe Int
+</span><a href="#local-6989586621679226384"><span class="hs-identifier hs-var hs-var">navigate</span></a></span></span><span> </span><span id="local-6989586621679226382"><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226382"><span class="hs-identifier hs-var">point</span></a></span></span><span> </span><span id="local-6989586621679226381"><span class="annot"><span class="annottext">Set Coordinates
+</span><a href="#local-6989586621679226381"><span class="hs-identifier hs-var">set</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226380"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226380"><span class="hs-identifier hs-var">path</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679226379"><span class="annot"><span class="annottext">[Direction]
+</span><a href="#local-6989586621679226379"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Set Coordinates -&gt; Bool
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
+</span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226377"><span class="hs-identifier hs-var">point'</span></a></span><span> </span><span class="annot"><span class="annottext">Set Coordinates
+</span><a href="#local-6989586621679226381"><span class="hs-identifier hs-var">set</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Int) -&gt; Int -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Int
+</span><a href="Y2016.D01.html#blocks"><span class="hs-identifier hs-var">blocks</span></a></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226377"><span class="hs-identifier hs-var">point'</span></a></span><span>
+</span><span id="line-42"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Set Coordinates -&gt; [Direction] -&gt; Maybe Int
+</span><a href="#local-6989586621679226384"><span class="hs-identifier hs-var">navigate</span></a></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226377"><span class="hs-identifier hs-var">point'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Coordinates -&gt; Set Coordinates -&gt; Set Coordinates
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">Set.insert</span></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226377"><span class="hs-identifier hs-var">point'</span></a></span><span> </span><span class="annot"><span class="annottext">Set Coordinates
+</span><a href="#local-6989586621679226381"><span class="hs-identifier hs-var">set</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Direction]
+</span><a href="#local-6989586621679226379"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-43"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-44"></span><span>        </span><span id="local-6989586621679226377"><span class="annot"><span class="annottext">point' :: Coordinates
+</span><a href="#local-6989586621679226377"><span class="hs-identifier hs-var hs-var">point'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Coordinates -&gt; Direction -&gt; Coordinates
+</span><a href="Y2016.D01.html#travel"><span class="hs-identifier hs-var">travel</span></a></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><a href="#local-6989586621679226382"><span class="hs-identifier hs-var">point</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226380"><span class="hs-identifier hs-var">path</span></a></span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><a href="#local-6989586621679226384"><span class="hs-identifier hs-var">navigate</span></a></span><span> </span><span class="annot"><span class="annottext">Coordinates
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Set Coordinates
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[Direction]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- | Translate an input string into a list of movement `Direction`s</span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Y2016.D01.html#mapRoute"><span class="hs-identifier hs-type">mapRoute</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Input string</span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2016.D01.html#Direction"><span class="hs-identifier hs-type">Direction</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ List of `Direction`s</span><span>
+</span><span id="line-51"></span><span id="mapRoute"><span class="annot"><span class="annottext">mapRoute :: String -&gt; [Direction]
+</span><a href="Y2016.D01.html#mapRoute"><span class="hs-identifier hs-var hs-var">mapRoute</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction -&gt; [(Char, Int)] -&gt; [Direction]
+</span><a href="#local-6989586621679226375"><span class="hs-identifier hs-var">toRoute</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#North"><span class="hs-identifier hs-var">North</span></a></span><span> </span><span class="annot"><span class="annottext">([(Char, Int)] -&gt; [Direction])
+-&gt; (String -&gt; [(Char, Int)]) -&gt; String -&gt; [Direction]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; (Char, Int)) -&gt; [String] -&gt; [(Char, Int)]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; (Char, Int)
+</span><a href="Y2016.D01.html#toPath"><span class="hs-identifier hs-var">toPath</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; (Char, Int))
+-&gt; (String -&gt; String) -&gt; String -&gt; (Char, Int)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; String
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; (Char -&gt; Bool) -&gt; Char -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">','</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [(Char, Int)])
+-&gt; (String -&gt; [String]) -&gt; String -&gt; [(Char, Int)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-53"></span><span>    </span><span id="local-6989586621679226375"><span class="annot"><span class="annottext">toRoute :: Direction -&gt; [(Char, Int)] -&gt; [Direction]
+</span><a href="#local-6989586621679226375"><span class="hs-identifier hs-var hs-var">toRoute</span></a></span></span><span> </span><span id="local-6989586621679226371"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226371"><span class="hs-identifier hs-var">orientation</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679226370"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679226370"><span class="hs-identifier hs-var">lr</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226369"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226369"><span class="hs-identifier hs-var">distance</span></a></span></span><span class="hs-special">)</span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679226368"><span class="annot"><span class="annottext">[(Char, Int)]
+</span><a href="#local-6989586621679226368"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-54"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; Direction -&gt; [Direction]
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226369"><span class="hs-identifier hs-var">distance</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226366"><span class="hs-identifier hs-var">orientation'</span></a></span><span> </span><span class="annot"><span class="annottext">[Direction] -&gt; [Direction] -&gt; [Direction]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Direction -&gt; [(Char, Int)] -&gt; [Direction]
+</span><a href="#local-6989586621679226375"><span class="hs-identifier hs-var">toRoute</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226366"><span class="hs-identifier hs-var">orientation'</span></a></span><span> </span><span class="annot"><span class="annottext">[(Char, Int)]
+</span><a href="#local-6989586621679226368"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-55"></span><span>      </span><span class="hs-keyword">where</span><span>
+</span><span id="line-56"></span><span>        </span><span id="local-6989586621679226366"><span class="annot"><span class="annottext">orientation' :: Direction
+</span><a href="#local-6989586621679226366"><span class="hs-identifier hs-var hs-var">orientation'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Direction -&gt; Direction
+</span><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var">turn</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679226370"><span class="hs-identifier hs-var">lr</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226371"><span class="hs-identifier hs-var">orientation</span></a></span><span>
+</span><span id="line-57"></span><span>    </span><span class="annot"><a href="#local-6989586621679226375"><span class="hs-identifier hs-var">toRoute</span></a></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- | Calculate the number of blocks from the origin</span><span>
+</span><span id="line-60"></span><span class="annot"><a href="Y2016.D01.html#blocks"><span class="hs-identifier hs-type">blocks</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2016.D01.html#Coordinates"><span class="hs-identifier hs-type">Coordinates</span></a></span><span> </span><span class="hs-comment">-- ^ Current `Coordinates`</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-comment">-- ^ Number of blocks that `Coordinate` lies from the origin</span><span>
+</span><span id="line-63"></span><span id="blocks"><span class="annot"><span class="annottext">blocks :: Coordinates -&gt; Int
+</span><a href="Y2016.D01.html#blocks"><span class="hs-identifier hs-var hs-var">blocks</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226364"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226364"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226363"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226363"><span class="hs-identifier hs-var">y</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">abs</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226364"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">abs</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226363"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- | Move along a given direction</span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Y2016.D01.html#travel"><span class="hs-identifier hs-type">travel</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2016.D01.html#Coordinates"><span class="hs-identifier hs-type">Coordinates</span></a></span><span> </span><span class="hs-comment">-- ^ Initial `Coordinates`</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2016.D01.html#Direction"><span class="hs-identifier hs-type">Direction</span></a></span><span> </span><span class="hs-comment">-- ^ `Direction` to move towards</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2016.D01.html#Coordinates"><span class="hs-identifier hs-type">Coordinates</span></a></span><span> </span><span class="hs-comment">-- ^ New `Coordinates`</span><span>
+</span><span id="line-70"></span><span id="travel"><span class="annot"><span class="annottext">travel :: Coordinates -&gt; Direction -&gt; Coordinates
+</span><a href="Y2016.D01.html#travel"><span class="hs-identifier hs-var hs-var">travel</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226360"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226360"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679226359"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226359"><span class="hs-identifier hs-var">y</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679226358"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226358"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226358"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-72"></span><span>    </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#North"><span class="hs-identifier hs-var">North</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226360"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">succ</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226359"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>    </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#East"><span class="hs-identifier hs-var">East</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">succ</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226360"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226359"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>    </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#South"><span class="hs-identifier hs-var">South</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226360"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226359"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#West"><span class="hs-identifier hs-var">West</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226360"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679226359"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-comment">-- | Translate a movement instruction to an intermediate form</span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Y2016.D01.html#toPath"><span class="hs-identifier hs-type">toPath</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Raw input instruction</span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ `Tuple` consisting of movement direction and</span><span>
+</span><span id="line-81"></span><span>                 </span><span class="hs-comment">-- ^ distance</span><span>
+</span><span id="line-82"></span><span id="toPath"><span class="annot"><span class="annottext">toPath :: String -&gt; (Char, Int)
+</span><a href="Y2016.D01.html#toPath"><span class="hs-identifier hs-var hs-var">toPath</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679226355"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679226355"><span class="hs-identifier hs-var">direction</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679226354"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226354"><span class="hs-identifier hs-var">steps</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679226355"><span class="hs-identifier hs-var">direction</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679226354"><span class="hs-identifier hs-var">steps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span class="annot"><a href="Y2016.D01.html#toPath"><span class="hs-identifier hs-var">toPath</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">' '</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- | Determine new direction after turning Left or Right</span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-type">turn</span></a></span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-comment">-- ^ 'L'eft or 'R'right</span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2016.D01.html#Direction"><span class="hs-identifier hs-type">Direction</span></a></span><span> </span><span class="hs-comment">-- ^ Initial `Direction`</span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2016.D01.html#Direction"><span class="hs-identifier hs-type">Direction</span></a></span><span> </span><span class="hs-comment">-- ^ New `Direction`</span><span>
+</span><span id="line-90"></span><span id="turn"><span class="annot"><span class="annottext">turn :: Char -&gt; Direction -&gt; Direction
+</span><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var hs-var">turn</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'R'</span></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#West"><span class="hs-identifier hs-var">West</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#North"><span class="hs-identifier hs-var">North</span></a></span><span>
+</span><span id="line-91"></span><span class="annot"><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var">turn</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'L'</span></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#North"><span class="hs-identifier hs-var">North</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="Y2016.D01.html#West"><span class="hs-identifier hs-var">West</span></a></span><span>
+</span><span id="line-92"></span><span class="annot"><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var">turn</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'R'</span></span><span> </span><span id="local-6989586621679226352"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226352"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction -&gt; Direction
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">succ</span></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226352"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var">turn</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'L'</span></span><span> </span><span id="local-6989586621679226351"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226351"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction -&gt; Direction
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226351"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-94"></span><span class="annot"><a href="Y2016.D01.html#turn"><span class="hs-identifier hs-var">turn</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679226350"><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226350"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Direction
+</span><a href="#local-6989586621679226350"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-95"></span></pre></body></html>

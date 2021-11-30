@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module:      Y2015.D16
+Description: Advent of Code Day 16 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 16 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2015.D16</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.D16.html#findAunt"><span class="hs-identifier">findAunt</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D16.html#findRealAunt"><span class="hs-identifier">findRealAunt</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">maximumBy</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">differenceWith</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">differenceWithKey</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromList</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">size</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">type</span><span> </span><span id="Aunt"><span class="annot"><a href="Y2015.D16.html#Aunt"><span class="hs-identifier hs-var">Aunt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- |Finds the real Aunt given altered targeting criteria</span><span>
+</span><span id="line-18"></span><span class="annot"><a href="Y2015.D16.html#findRealAunt"><span class="hs-identifier hs-type">findRealAunt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Raw input of list of Aunts</span><span>
+</span><span id="line-19"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ Id of the gifting Aunt</span><span>
+</span><span id="line-20"></span><span id="findRealAunt"><span class="annot"><span class="annottext">findRealAunt :: String -&gt; Int
+</span><a href="Y2015.D16.html#findRealAunt"><span class="hs-identifier hs-var hs-var">findRealAunt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Aunt -&gt; Int) -&gt; String -&gt; Int
+</span><a href="Y2015.D16.html#findGifter"><span class="hs-identifier hs-var">findGifter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Aunt -&gt; Int
+forall k a. Map k a -&gt; Int
+</span><span class="hs-identifier hs-var">size</span></span><span> </span><span class="annot"><span class="annottext">(Aunt -&gt; Int) -&gt; (Aunt -&gt; Aunt) -&gt; Aunt -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Int -&gt; Int -&gt; Maybe Int) -&gt; Aunt -&gt; Aunt -&gt; Aunt
+forall k a b.
+Ord k =&gt;
+(k -&gt; a -&gt; b -&gt; Maybe a) -&gt; Map k a -&gt; Map k b -&gt; Map k a
+</span><span class="hs-identifier hs-var">differenceWithKey</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Int -&gt; Int -&gt; Maybe Int
+forall a. Ord a =&gt; String -&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224567"><span class="hs-identifier hs-var">match</span></a></span><span> </span><span class="annot"><span class="annottext">Aunt
+</span><a href="Y2015.D16.html#gifter"><span class="hs-identifier hs-var">gifter</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224567"><span class="annot"><span class="annottext">match :: String -&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224567"><span class="hs-identifier hs-var hs-var">match</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;cats&quot;</span></span><span>        </span><span id="local-6989586621679224565"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224565"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span id="local-6989586621679224564"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224564"><span class="hs-identifier hs-var">candidate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224564"><span class="hs-identifier hs-var">candidate</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Maybe a
+forall a. Ord a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224563"><span class="hs-operator hs-var">`gtNothing`</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224565"><span class="hs-identifier hs-var">target</span></a></span><span>
+</span><span id="line-22"></span><span>          </span><span class="annot"><a href="#local-6989586621679224567"><span class="hs-identifier hs-var">match</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;trees&quot;</span></span><span>       </span><span id="local-6989586621679224562"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224562"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span id="local-6989586621679224561"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224561"><span class="hs-identifier hs-var">candidate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224561"><span class="hs-identifier hs-var">candidate</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Maybe a
+forall a. Ord a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224563"><span class="hs-operator hs-var">`gtNothing`</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224562"><span class="hs-identifier hs-var">target</span></a></span><span>
+</span><span id="line-23"></span><span>          </span><span class="annot"><a href="#local-6989586621679224567"><span class="hs-identifier hs-var">match</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;pomeranians&quot;</span></span><span> </span><span id="local-6989586621679224560"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224560"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span id="local-6989586621679224559"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224559"><span class="hs-identifier hs-var">candidate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224560"><span class="hs-identifier hs-var">target</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Maybe a
+forall a. Ord a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224563"><span class="hs-operator hs-var">`gtNothing`</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224559"><span class="hs-identifier hs-var">candidate</span></a></span><span>
+</span><span id="line-24"></span><span>          </span><span class="annot"><a href="#local-6989586621679224567"><span class="hs-identifier hs-var">match</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;goldfish&quot;</span></span><span>    </span><span id="local-6989586621679224558"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224558"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span id="local-6989586621679224557"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224557"><span class="hs-identifier hs-var">candidate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224558"><span class="hs-identifier hs-var">target</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Maybe a
+forall a. Ord a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224563"><span class="hs-operator hs-var">`gtNothing`</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224557"><span class="hs-identifier hs-var">candidate</span></a></span><span>
+</span><span id="line-25"></span><span>          </span><span class="annot"><a href="#local-6989586621679224567"><span class="hs-identifier hs-var">match</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span>             </span><span id="local-6989586621679224556"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224556"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span id="local-6989586621679224555"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224555"><span class="hs-identifier hs-var">candidate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224555"><span class="hs-identifier hs-var">candidate</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Maybe a
+forall a. Eq a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="Y2015.D16.html#sameNothing"><span class="hs-operator hs-var">`sameNothing`</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224556"><span class="hs-identifier hs-var">target</span></a></span><span>
+</span><span id="line-26"></span><span>          </span><span id="local-6989586621679224563"><span class="annot"><span class="annottext">gtNothing :: a -&gt; a -&gt; Maybe a
+</span><a href="#local-6989586621679224563"><span class="hs-identifier hs-var hs-var">gtNothing</span></a></span></span><span> </span><span id="local-6989586621679224553"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224553"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679224552"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224552"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224553"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224552"><span class="hs-identifier hs-var">b</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe a
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-27"></span><span>                        </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224553"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- |Given a list of Aunts, find the Id of the gifting Aunt.</span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Y2015.D16.html#findAunt"><span class="hs-identifier hs-type">findAunt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Raw input of list of Aunts</span><span>
+</span><span id="line-31"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>    </span><span class="hs-comment">-- ^ Id of the gifting Aunt</span><span>
+</span><span id="line-32"></span><span id="findAunt"><span class="annot"><span class="annottext">findAunt :: String -&gt; Int
+</span><a href="Y2015.D16.html#findAunt"><span class="hs-identifier hs-var hs-var">findAunt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Aunt -&gt; Int) -&gt; String -&gt; Int
+</span><a href="Y2015.D16.html#findGifter"><span class="hs-identifier hs-var">findGifter</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Aunt -&gt; Int
+forall k a. Map k a -&gt; Int
+</span><span class="hs-identifier hs-var">size</span></span><span> </span><span class="annot"><span class="annottext">(Aunt -&gt; Int) -&gt; (Aunt -&gt; Aunt) -&gt; Aunt -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int -&gt; Maybe Int) -&gt; Aunt -&gt; Aunt -&gt; Aunt
+forall k a b.
+Ord k =&gt;
+(a -&gt; b -&gt; Maybe a) -&gt; Map k a -&gt; Map k b -&gt; Map k a
+</span><span class="hs-identifier hs-var">differenceWith</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Maybe Int
+forall a. Eq a =&gt; a -&gt; a -&gt; Maybe a
+</span><a href="Y2015.D16.html#sameNothing"><span class="hs-identifier hs-var">sameNothing</span></a></span><span> </span><span class="annot"><span class="annottext">Aunt
+</span><a href="Y2015.D16.html#gifter"><span class="hs-identifier hs-var">gifter</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span id="local-6989586621679224605"><span class="annot"><a href="Y2015.D16.html#sameNothing"><span class="hs-identifier hs-type">sameNothing</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="#local-6989586621679224605"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679224605"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679224605"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679224605"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-35"></span><span id="sameNothing"><span class="annot"><span class="annottext">sameNothing :: a -&gt; a -&gt; Maybe a
+</span><a href="Y2015.D16.html#sameNothing"><span class="hs-identifier hs-var hs-var">sameNothing</span></a></span></span><span> </span><span id="local-6989586621679224550"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224550"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679224549"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224549"><span class="hs-identifier hs-var">b</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224550"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224549"><span class="hs-identifier hs-var">b</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe a
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-36"></span><span>                </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Maybe a
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679224550"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="annot"><a href="Y2015.D16.html#findGifter"><span class="hs-identifier hs-type">findGifter</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Y2015.D16.html#Aunt"><span class="hs-identifier hs-type">Aunt</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-39"></span><span id="findGifter"><span class="annot"><span class="annottext">findGifter :: (Aunt -&gt; Int) -&gt; String -&gt; Int
+</span><a href="Y2015.D16.html#findGifter"><span class="hs-identifier hs-var hs-var">findGifter</span></a></span></span><span> </span><span id="local-6989586621679224548"><span class="annot"><span class="annottext">Aunt -&gt; Int
+</span><a href="#local-6989586621679224548"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679224547"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224547"><span class="hs-identifier hs-var">aunts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; Int
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">((Int, Int) -&gt; Int)
+-&gt; ([(Int, Int)] -&gt; (Int, Int)) -&gt; [(Int, Int)] -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((Int, Int) -&gt; (Int, Int) -&gt; Ordering)
+-&gt; [(Int, Int)] -&gt; (Int, Int)
+forall (t :: * -&gt; *) a.
+Foldable t =&gt;
+(a -&gt; a -&gt; Ordering) -&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">maximumBy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Int, Int) -&gt; (Int, Int) -&gt; Ordering)
+-&gt; (Int, Int) -&gt; (Int, Int) -&gt; Ordering
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">(Int, Int) -&gt; (Int, Int) -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>                   </span><span class="annot"><span class="annottext">([(Int, Int)] -&gt; Int) -&gt; [(Int, Int)] -&gt; Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int] -&gt; [(Int, Int)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Aunt -&gt; Int) -&gt; [Aunt] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Aunt -&gt; Int
+</span><a href="#local-6989586621679224548"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [Aunt]
+</span><a href="Y2015.D16.html#toAunts"><span class="hs-identifier hs-var">toAunts</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224547"><span class="hs-identifier hs-var">aunts</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="Y2015.D16.html#gifter"><span class="hs-identifier hs-type">gifter</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D16.html#Aunt"><span class="hs-identifier hs-type">Aunt</span></a></span><span>
+</span><span id="line-43"></span><span id="gifter"><span class="annot"><span class="annottext">gifter :: Aunt
+</span><a href="Y2015.D16.html#gifter"><span class="hs-identifier hs-var hs-var">gifter</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Aunt
+</span><a href="Y2015.D16.html#toAunt"><span class="hs-identifier hs-var">toAunt</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Aunt) -&gt; [String] -&gt; Aunt
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Sue 0: children: 3 cats: 7 samoyeds: 2 &quot;</span></span><span>
+</span><span id="line-44"></span><span>                         </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;pomeranians: 3 akitas: 0 vizslas: 0 &quot;</span></span><span>
+</span><span id="line-45"></span><span>                         </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;goldfish: 5 trees: 3 cars: 2 perfumes: 1&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Y2015.D16.html#toAunts"><span class="hs-identifier hs-type">toAunts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2015.D16.html#Aunt"><span class="hs-identifier hs-type">Aunt</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-48"></span><span id="toAunts"><span class="annot"><span class="annottext">toAunts :: String -&gt; [Aunt]
+</span><a href="Y2015.D16.html#toAunts"><span class="hs-identifier hs-var hs-var">toAunts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; Aunt) -&gt; [String] -&gt; [Aunt]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; Aunt
+</span><a href="Y2015.D16.html#toAunt"><span class="hs-identifier hs-var">toAunt</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; Aunt) -&gt; (String -&gt; [String]) -&gt; String -&gt; Aunt
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; [Aunt]) -&gt; (String -&gt; [String]) -&gt; String -&gt; [Aunt]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; (String -&gt; String) -&gt; String -&gt; [String]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; String -&gt; String
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">','</span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Y2015.D16.html#toAunt"><span class="hs-identifier hs-type">toAunt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D16.html#Aunt"><span class="hs-identifier hs-type">Aunt</span></a></span><span>
+</span><span id="line-51"></span><span id="toAunt"><span class="annot"><span class="annottext">toAunt :: [String] -&gt; Aunt
+</span><a href="Y2015.D16.html#toAunt"><span class="hs-identifier hs-var hs-var">toAunt</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224539"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224539"><span class="hs-identifier hs-var">traits</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(String, Int)] -&gt; Aunt
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="annot"><span class="annottext">([(String, Int)] -&gt; Aunt) -&gt; [(String, Int)] -&gt; Aunt
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [(String, Int)]
+forall b. Read b =&gt; [String] -&gt; [(String, b)]
+</span><a href="#local-6989586621679224538"><span class="hs-identifier hs-var">toPair</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224539"><span class="hs-identifier hs-var">traits</span></a></span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679224538"><span class="annot"><span class="annottext">toPair :: [String] -&gt; [(String, b)]
+</span><a href="#local-6989586621679224538"><span class="hs-identifier hs-var hs-var">toPair</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679224537"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224537"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224536"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224536"><span class="hs-identifier hs-var">y</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679224535"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224535"><span class="hs-identifier hs-var">ys</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224537"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String -&gt; b
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679224536"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String, b) -&gt; [(String, b)] -&gt; [(String, b)]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [(String, b)]
+</span><a href="#local-6989586621679224538"><span class="hs-identifier hs-var">toPair</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679224535"><span class="hs-identifier hs-var">ys</span></a></span><span>
+</span><span id="line-53"></span><span>          </span><span class="annot"><a href="#local-6989586621679224538"><span class="hs-identifier hs-var">toPair</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span class="annot"><a href="Y2015.D16.html#toAunt"><span class="hs-identifier hs-var">toAunt</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(String, Int)] -&gt; Aunt
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">fromList</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-55"></span></pre></body></html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="%24con2tag_Ef0bTBWwKy6Ajgty943V9A"><span id="%24maxtag_Ef0bTBWwKy6Ajgty943V9A"><span id="%24tag2con_Ef0bTBWwKy6Ajgty943V9A"><span id="%24con2tag_7Xgz1V4kNYFIB207KnJyxx"></span></span></span></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">{-|
+Module:      Y2015.D22
+Description: Advent of Code Day 22 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the day 22 set of problems for &lt;adventofcode.com&gt;.
+-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Y2015.D22</span><span>
+</span><span id="line-13"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier">Result</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D22.html#spellBattle"><span class="hs-identifier">spellBattle</span></a></span><span>
+</span><span id="line-15"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Y2015.D22.html#testSpellBattle"><span class="hs-identifier">testSpellBattle</span></a></span><span>
+</span><span id="line-16"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Control.Lens</span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">insert</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">keys</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">member</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span>     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">data</span><span> </span><span id="Boss"><span class="annot"><a href="Y2015.D22.html#Boss"><span class="hs-identifier hs-var">Boss</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Boss"><span class="annot"><a href="Y2015.D22.html#Boss"><span class="hs-identifier hs-var">Boss</span></a></span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="_damage"><span class="annot"><span class="annottext">Boss -&gt; Int
+</span><a href="Y2015.D22.html#_damage"><span class="hs-identifier hs-var hs-var">_damage</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-25"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_hp"><span class="annot"><span class="annottext">Boss -&gt; Int
+</span><a href="Y2015.D22.html#_hp"><span class="hs-identifier hs-var hs-var">_hp</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225291"><span id="local-6989586621679225293"><span class="annot"><span class="annottext">Boss -&gt; Boss -&gt; Bool
+(Boss -&gt; Boss -&gt; Bool) -&gt; (Boss -&gt; Boss -&gt; Bool) -&gt; Eq Boss
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Boss -&gt; Boss -&gt; Bool
+$c/= :: Boss -&gt; Boss -&gt; Bool
+== :: Boss -&gt; Boss -&gt; Bool
+$c== :: Boss -&gt; Boss -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225284"><span id="local-6989586621679225286"><span id="local-6989586621679225288"><span class="annot"><span class="annottext">Int -&gt; Boss -&gt; ShowS
+[Boss] -&gt; ShowS
+Boss -&gt; String
+(Int -&gt; Boss -&gt; ShowS)
+-&gt; (Boss -&gt; String) -&gt; ([Boss] -&gt; ShowS) -&gt; Show Boss
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Boss] -&gt; ShowS
+$cshowList :: [Boss] -&gt; ShowS
+show :: Boss -&gt; String
+$cshow :: Boss -&gt; String
+showsPrec :: Int -&gt; Boss -&gt; ShowS
+$cshowsPrec :: Int -&gt; Boss -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">data</span><span> </span><span id="Player"><span class="annot"><a href="Y2015.D22.html#Player"><span class="hs-identifier hs-var">Player</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Player"><span class="annot"><a href="Y2015.D22.html#Player"><span class="hs-identifier hs-var">Player</span></a></span></span><span>
+</span><span id="line-29"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="_armor"><span class="annot"><span class="annottext">Player -&gt; Int
+</span><a href="Y2015.D22.html#_armor"><span class="hs-identifier hs-var hs-var">_armor</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_life"><span class="annot"><span class="annottext">Player -&gt; Int
+</span><a href="Y2015.D22.html#_life"><span class="hs-identifier hs-var hs-var">_life</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-31"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_mana"><span class="annot"><span class="annottext">Player -&gt; Int
+</span><a href="Y2015.D22.html#_mana"><span class="hs-identifier hs-var hs-var">_mana</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-32"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_spent"><span class="annot"><span class="annottext">Player -&gt; Int
+</span><a href="Y2015.D22.html#_spent"><span class="hs-identifier hs-var hs-var">_spent</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225274"><span id="local-6989586621679225276"><span class="annot"><span class="annottext">Player -&gt; Player -&gt; Bool
+(Player -&gt; Player -&gt; Bool)
+-&gt; (Player -&gt; Player -&gt; Bool) -&gt; Eq Player
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Player -&gt; Player -&gt; Bool
+$c/= :: Player -&gt; Player -&gt; Bool
+== :: Player -&gt; Player -&gt; Bool
+$c== :: Player -&gt; Player -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225268"><span id="local-6989586621679225270"><span id="local-6989586621679225272"><span class="annot"><span class="annottext">Int -&gt; Player -&gt; ShowS
+[Player] -&gt; ShowS
+Player -&gt; String
+(Int -&gt; Player -&gt; ShowS)
+-&gt; (Player -&gt; String) -&gt; ([Player] -&gt; ShowS) -&gt; Show Player
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Player] -&gt; ShowS
+$cshowList :: [Player] -&gt; ShowS
+show :: Player -&gt; String
+$cshow :: Player -&gt; String
+showsPrec :: Int -&gt; Player -&gt; ShowS
+$cshowsPrec :: Int -&gt; Player -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">data</span><span> </span><span id="State"><span class="annot"><a href="Y2015.D22.html#State"><span class="hs-identifier hs-var">State</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PlayerTurn"><span class="annot"><a href="Y2015.D22.html#PlayerTurn"><span class="hs-identifier hs-var">PlayerTurn</span></a></span></span><span>
+</span><span id="line-36"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="BossTurn"><span class="annot"><a href="Y2015.D22.html#BossTurn"><span class="hs-identifier hs-var">BossTurn</span></a></span></span><span>
+</span><span id="line-37"></span><span>           </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225260"><span id="local-6989586621679225262"><span id="local-6989586621679225264"><span class="annot"><span class="annottext">Int -&gt; State -&gt; ShowS
+[State] -&gt; ShowS
+State -&gt; String
+(Int -&gt; State -&gt; ShowS)
+-&gt; (State -&gt; String) -&gt; ([State] -&gt; ShowS) -&gt; Show State
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [State] -&gt; ShowS
+$cshowList :: [State] -&gt; ShowS
+show :: State -&gt; String
+$cshow :: State -&gt; String
+showsPrec :: Int -&gt; State -&gt; ShowS
+$cshowsPrec :: Int -&gt; State -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="Game"><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-var">Game</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Game"><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-var">Game</span></a></span></span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-special">{</span><span> </span><span id="_boss"><span class="annot"><span class="annottext">Game -&gt; Boss
+</span><a href="Y2015.D22.html#_boss"><span class="hs-identifier hs-var hs-var">_boss</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Boss"><span class="hs-identifier hs-type">Boss</span></a></span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_effects"><span class="annot"><span class="annottext">Game -&gt; Map Spell Int
+</span><a href="Y2015.D22.html#_effects"><span class="hs-identifier hs-var hs-var">_effects</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Y2015.D22.html#Spell"><span class="hs-identifier hs-type">Spell</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_hard"><span class="annot"><span class="annottext">Game -&gt; Bool
+</span><a href="Y2015.D22.html#_hard"><span class="hs-identifier hs-var hs-var">_hard</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_player"><span class="annot"><span class="annottext">Game -&gt; Player
+</span><a href="Y2015.D22.html#_player"><span class="hs-identifier hs-var hs-var">_player</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span>
+</span><span id="line-44"></span><span>    </span><span class="hs-special">,</span><span> </span><span id="_state"><span class="annot"><span class="annottext">Game -&gt; State
+</span><a href="Y2015.D22.html#_state"><span class="hs-identifier hs-var hs-var">_state</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#State"><span class="hs-identifier hs-type">State</span></a></span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225248"><span id="local-6989586621679225250"><span id="local-6989586621679225252"><span class="annot"><span class="annottext">Int -&gt; Game -&gt; ShowS
+[Game] -&gt; ShowS
+Game -&gt; String
+(Int -&gt; Game -&gt; ShowS)
+-&gt; (Game -&gt; String) -&gt; ([Game] -&gt; ShowS) -&gt; Show Game
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Game] -&gt; ShowS
+$cshowList :: [Game] -&gt; ShowS
+show :: Game -&gt; String
+$cshow :: Game -&gt; String
+showsPrec :: Int -&gt; Game -&gt; ShowS
+$cshowsPrec :: Int -&gt; Game -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">data</span><span> </span><span id="Spell"><span class="annot"><a href="Y2015.D22.html#Spell"><span class="hs-identifier hs-var">Spell</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MagicMissile"><span class="annot"><a href="Y2015.D22.html#MagicMissile"><span class="hs-identifier hs-var">MagicMissile</span></a></span></span><span>
+</span><span id="line-48"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Drain"><span class="annot"><a href="Y2015.D22.html#Drain"><span class="hs-identifier hs-var">Drain</span></a></span></span><span>
+</span><span id="line-49"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Shield"><span class="annot"><a href="Y2015.D22.html#Shield"><span class="hs-identifier hs-var">Shield</span></a></span></span><span>
+</span><span id="line-50"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Poison"><span class="annot"><a href="Y2015.D22.html#Poison"><span class="hs-identifier hs-var">Poison</span></a></span></span><span>
+</span><span id="line-51"></span><span>           </span><span class="hs-glyph">|</span><span> </span><span id="Recharge"><span class="annot"><a href="Y2015.D22.html#Recharge"><span class="hs-identifier hs-var">Recharge</span></a></span></span><span>
+</span><span id="line-52"></span><span>           </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225227"><span id="local-6989586621679225229"><span id="local-6989586621679225231"><span id="local-6989586621679225233"><span id="local-6989586621679225235"><span id="local-6989586621679225237"><span id="local-6989586621679225239"><span id="local-6989586621679225241"><span class="annot"><span class="annottext">Int -&gt; Spell
+Spell -&gt; Int
+Spell -&gt; [Spell]
+Spell -&gt; Spell
+Spell -&gt; Spell -&gt; [Spell]
+Spell -&gt; Spell -&gt; Spell -&gt; [Spell]
+(Spell -&gt; Spell)
+-&gt; (Spell -&gt; Spell)
+-&gt; (Int -&gt; Spell)
+-&gt; (Spell -&gt; Int)
+-&gt; (Spell -&gt; [Spell])
+-&gt; (Spell -&gt; Spell -&gt; [Spell])
+-&gt; (Spell -&gt; Spell -&gt; [Spell])
+-&gt; (Spell -&gt; Spell -&gt; Spell -&gt; [Spell])
+-&gt; Enum Spell
+forall a.
+(a -&gt; a)
+-&gt; (a -&gt; a)
+-&gt; (Int -&gt; a)
+-&gt; (a -&gt; Int)
+-&gt; (a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; [a])
+-&gt; (a -&gt; a -&gt; a -&gt; [a])
+-&gt; Enum a
+enumFromThenTo :: Spell -&gt; Spell -&gt; Spell -&gt; [Spell]
+$cenumFromThenTo :: Spell -&gt; Spell -&gt; Spell -&gt; [Spell]
+enumFromTo :: Spell -&gt; Spell -&gt; [Spell]
+$cenumFromTo :: Spell -&gt; Spell -&gt; [Spell]
+enumFromThen :: Spell -&gt; Spell -&gt; [Spell]
+$cenumFromThen :: Spell -&gt; Spell -&gt; [Spell]
+enumFrom :: Spell -&gt; [Spell]
+$cenumFrom :: Spell -&gt; [Spell]
+fromEnum :: Spell -&gt; Int
+$cfromEnum :: Spell -&gt; Int
+toEnum :: Int -&gt; Spell
+$ctoEnum :: Int -&gt; Spell
+pred :: Spell -&gt; Spell
+$cpred :: Spell -&gt; Spell
+succ :: Spell -&gt; Spell
+$csucc :: Spell -&gt; Spell
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225222"><span id="local-6989586621679225224"><span class="annot"><span class="annottext">Spell -&gt; Spell -&gt; Bool
+(Spell -&gt; Spell -&gt; Bool) -&gt; (Spell -&gt; Spell -&gt; Bool) -&gt; Eq Spell
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Spell -&gt; Spell -&gt; Bool
+$c/= :: Spell -&gt; Spell -&gt; Bool
+== :: Spell -&gt; Spell -&gt; Bool
+$c== :: Spell -&gt; Spell -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225207"><span id="local-6989586621679225209"><span id="local-6989586621679225211"><span id="local-6989586621679225213"><span id="local-6989586621679225215"><span id="local-6989586621679225217"><span id="local-6989586621679225219"><span class="annot"><span class="annottext">Eq Spell
+Eq Spell
+-&gt; (Spell -&gt; Spell -&gt; Ordering)
+-&gt; (Spell -&gt; Spell -&gt; Bool)
+-&gt; (Spell -&gt; Spell -&gt; Bool)
+-&gt; (Spell -&gt; Spell -&gt; Bool)
+-&gt; (Spell -&gt; Spell -&gt; Bool)
+-&gt; (Spell -&gt; Spell -&gt; Spell)
+-&gt; (Spell -&gt; Spell -&gt; Spell)
+-&gt; Ord Spell
+Spell -&gt; Spell -&gt; Bool
+Spell -&gt; Spell -&gt; Ordering
+Spell -&gt; Spell -&gt; Spell
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Spell -&gt; Spell -&gt; Spell
+$cmin :: Spell -&gt; Spell -&gt; Spell
+max :: Spell -&gt; Spell -&gt; Spell
+$cmax :: Spell -&gt; Spell -&gt; Spell
+&gt;= :: Spell -&gt; Spell -&gt; Bool
+$c&gt;= :: Spell -&gt; Spell -&gt; Bool
+&gt; :: Spell -&gt; Spell -&gt; Bool
+$c&gt; :: Spell -&gt; Spell -&gt; Bool
+&lt;= :: Spell -&gt; Spell -&gt; Bool
+$c&lt;= :: Spell -&gt; Spell -&gt; Bool
+&lt; :: Spell -&gt; Spell -&gt; Bool
+$c&lt; :: Spell -&gt; Spell -&gt; Bool
+compare :: Spell -&gt; Spell -&gt; Ordering
+$ccompare :: Spell -&gt; Spell -&gt; Ordering
+$cp1Ord :: Eq Spell
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225200"><span id="local-6989586621679225202"><span id="local-6989586621679225204"><span class="annot"><span class="annottext">Int -&gt; Spell -&gt; ShowS
+[Spell] -&gt; ShowS
+Spell -&gt; String
+(Int -&gt; Spell -&gt; ShowS)
+-&gt; (Spell -&gt; String) -&gt; ([Spell] -&gt; ShowS) -&gt; Show Spell
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Spell] -&gt; ShowS
+$cshowList :: [Spell] -&gt; ShowS
+show :: Spell -&gt; String
+$cshow :: Spell -&gt; String
+showsPrec :: Int -&gt; Spell -&gt; ShowS
+$cshowsPrec :: Int -&gt; Spell -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- |Represents the final result of a sequence of player moves.</span><span>
+</span><span id="line-55"></span><span class="hs-keyword">data</span><span> </span><span id="Result"><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier hs-var">Result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Won"><span class="annot"><a href="Y2015.D22.html#Won"><span class="hs-identifier hs-var">Won</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-comment">-- ^ Indicates a player win with the total mana spent.</span><span>
+</span><span id="line-56"></span><span>            </span><span class="hs-glyph">|</span><span> </span><span id="Lost"><span class="annot"><a href="Y2015.D22.html#Lost"><span class="hs-identifier hs-var">Lost</span></a></span></span><span>    </span><span class="hs-comment">-- ^ Player loss.</span><span>
+</span><span id="line-57"></span><span>            </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679225194"><span id="local-6989586621679225196"><span class="annot"><span class="annottext">Result -&gt; Result -&gt; Bool
+(Result -&gt; Result -&gt; Bool)
+-&gt; (Result -&gt; Result -&gt; Bool) -&gt; Eq Result
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Result -&gt; Result -&gt; Bool
+$c/= :: Result -&gt; Result -&gt; Bool
+== :: Result -&gt; Result -&gt; Bool
+$c== :: Result -&gt; Result -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225179"><span id="local-6989586621679225181"><span id="local-6989586621679225183"><span id="local-6989586621679225185"><span id="local-6989586621679225187"><span id="local-6989586621679225189"><span id="local-6989586621679225191"><span class="annot"><span class="annottext">Eq Result
+Eq Result
+-&gt; (Result -&gt; Result -&gt; Ordering)
+-&gt; (Result -&gt; Result -&gt; Bool)
+-&gt; (Result -&gt; Result -&gt; Bool)
+-&gt; (Result -&gt; Result -&gt; Bool)
+-&gt; (Result -&gt; Result -&gt; Bool)
+-&gt; (Result -&gt; Result -&gt; Result)
+-&gt; (Result -&gt; Result -&gt; Result)
+-&gt; Ord Result
+Result -&gt; Result -&gt; Bool
+Result -&gt; Result -&gt; Ordering
+Result -&gt; Result -&gt; Result
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+min :: Result -&gt; Result -&gt; Result
+$cmin :: Result -&gt; Result -&gt; Result
+max :: Result -&gt; Result -&gt; Result
+$cmax :: Result -&gt; Result -&gt; Result
+&gt;= :: Result -&gt; Result -&gt; Bool
+$c&gt;= :: Result -&gt; Result -&gt; Bool
+&gt; :: Result -&gt; Result -&gt; Bool
+$c&gt; :: Result -&gt; Result -&gt; Bool
+&lt;= :: Result -&gt; Result -&gt; Bool
+$c&lt;= :: Result -&gt; Result -&gt; Bool
+&lt; :: Result -&gt; Result -&gt; Bool
+$c&lt; :: Result -&gt; Result -&gt; Bool
+compare :: Result -&gt; Result -&gt; Ordering
+$ccompare :: Result -&gt; Result -&gt; Ordering
+$cp1Ord :: Eq Result
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225173"><span id="local-6989586621679225175"><span id="local-6989586621679225177"><span class="annot"><span class="annottext">Int -&gt; Result -&gt; ShowS
+[Result] -&gt; ShowS
+Result -&gt; String
+(Int -&gt; Result -&gt; ShowS)
+-&gt; (Result -&gt; String) -&gt; ([Result] -&gt; ShowS) -&gt; Show Result
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Result] -&gt; ShowS
+$cshowList :: [Result] -&gt; ShowS
+show :: Result -&gt; String
+$cshow :: Result -&gt; String
+showsPrec :: Int -&gt; Result -&gt; ShowS
+$cshowsPrec :: Int -&gt; Result -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span id="hp"><span id="damage"><span class="hs-identifier">makeLenses</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Boss</span></span></span><span>
+</span><span id="line-60"></span><span id="state"><span id="player"><span id="hard"><span id="effects"><span id="boss"><span class="hs-identifier">makeLenses</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Game</span></span></span></span></span></span><span>
+</span><span id="line-61"></span><span id="spent"><span id="mana"><span id="life"><span id="armor"><span class="hs-identifier">makeLenses</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Player</span></span></span></span></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="annot"><a href="Y2015.D22.html#cast"><span class="hs-identifier hs-type">cast</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Spell"><span class="hs-identifier hs-type">Spell</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-64"></span><span id="cast"><span class="annot"><span class="annottext">cast :: Spell -&gt; Game -&gt; Game
+</span><a href="Y2015.D22.html#cast"><span class="hs-identifier hs-var hs-var">cast</span></a></span></span><span> </span><span id="local-6989586621679225160"><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225160"><span class="hs-identifier hs-var">spell</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Game -&gt; Game
+</span><a href="#local-6989586621679225159"><span class="hs-identifier hs-var">action</span></a></span><span>
+</span><span id="line-65"></span><span>           </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; (Game -&gt; Game) -&gt; Game -&gt; Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#mana"><span class="hs-identifier hs-var">mana</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225156"><span class="hs-identifier hs-var">cost</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-66"></span><span>           </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; (Game -&gt; Game) -&gt; Game -&gt; Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#spent"><span class="hs-identifier hs-var">spent</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">+~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225156"><span class="hs-identifier hs-var">cost</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-68"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679225159"><span class="annot"><span class="annottext">Game -&gt; Game
+</span><a href="#local-6989586621679225159"><span class="hs-identifier hs-var">action</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225156"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225156"><span class="hs-identifier hs-var">cost</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225160"><span class="hs-identifier hs-var">spell</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-69"></span><span>            </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#MagicMissile"><span class="hs-identifier hs-var">MagicMissile</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game
+Lens' Game Boss
+</span><a href="Y2015.D22.html#boss"><span class="hs-identifier hs-var">boss</span></a></span><span class="annot"><span class="annottext">((Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss
+Lens' Boss Int
+</span><a href="Y2015.D22.html#hp"><span class="hs-identifier hs-var">hp</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">53</span></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>            </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Drain"><span class="hs-identifier hs-var">Drain</span></a></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game
+Lens' Game Boss
+</span><a href="Y2015.D22.html#boss"><span class="hs-identifier hs-var">boss</span></a></span><span class="annot"><span class="annottext">((Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss
+Lens' Boss Int
+</span><a href="Y2015.D22.html#hp"><span class="hs-identifier hs-var">hp</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; (Game -&gt; Game) -&gt; Game -&gt; Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#life"><span class="hs-identifier hs-var">life</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">+~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">73</span></span><span class="hs-special">)</span><span>
+</span><span id="line-71"></span><span>            </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Shield"><span class="hs-identifier hs-var">Shield</span></a></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Spell -&gt; Int -&gt; Game -&gt; Game
+</span><a href="#local-6989586621679225154"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Shield"><span class="hs-identifier hs-var">Shield</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">6</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">113</span></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>            </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Poison"><span class="hs-identifier hs-var">Poison</span></a></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Spell -&gt; Int -&gt; Game -&gt; Game
+</span><a href="#local-6989586621679225154"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Poison"><span class="hs-identifier hs-var">Poison</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">6</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">173</span></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>            </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Recharge"><span class="hs-identifier hs-var">Recharge</span></a></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Spell -&gt; Int -&gt; Game -&gt; Game
+</span><a href="#local-6989586621679225154"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Recharge"><span class="hs-identifier hs-var">Recharge</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">5</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">229</span></span><span class="hs-special">)</span><span>
+</span><span id="line-74"></span><span>        </span><span id="local-6989586621679225154"><span class="annot"><span class="annottext">e :: Spell -&gt; Int -&gt; Game -&gt; Game
+</span><a href="#local-6989586621679225154"><span class="hs-identifier hs-var hs-var">e</span></a></span></span><span> </span><span id="local-6989586621679225153"><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225153"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679225152"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225152"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Spell Int -&gt; Identity (Map Spell Int))
+-&gt; Game -&gt; Identity Game
+Lens' Game (Map Spell Int)
+</span><a href="Y2015.D22.html#effects"><span class="hs-identifier hs-var">effects</span></a></span><span> </span><span class="annot"><span class="annottext">((Map Spell Int -&gt; Identity (Map Spell Int))
+ -&gt; Game -&gt; Identity Game)
+-&gt; (Map Spell Int -&gt; Map Spell Int) -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; (a -&gt; b) -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">%~</span></span><span> </span><span class="annot"><span class="annottext">Spell -&gt; Int -&gt; Map Spell Int -&gt; Map Spell Int
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">insert</span></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225153"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225152"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-type">affect</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Spell"><span class="hs-identifier hs-type">Spell</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-77"></span><span id="affect"><span class="annot"><span class="annottext">affect :: Spell -&gt; Game -&gt; Game
+</span><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-var hs-var">affect</span></a></span></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Shield"><span class="hs-identifier hs-var">Shield</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#armor"><span class="hs-identifier hs-var">armor</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">7</span></span><span>
+</span><span id="line-78"></span><span class="annot"><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-var">affect</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Poison"><span class="hs-identifier hs-var">Poison</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game
+Lens' Game Boss
+</span><a href="Y2015.D22.html#boss"><span class="hs-identifier hs-var">boss</span></a></span><span class="annot"><span class="annottext">((Boss -&gt; Identity Boss) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Boss -&gt; Identity Boss
+Lens' Boss Int
+</span><a href="Y2015.D22.html#hp"><span class="hs-identifier hs-var">hp</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">3</span></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-var">affect</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#Recharge"><span class="hs-identifier hs-var">Recharge</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#mana"><span class="hs-identifier hs-var">mana</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">+~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">101</span></span><span>
+</span><span id="line-80"></span><span class="annot"><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-var">affect</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><span class="hs-identifier">_</span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Game -&gt; Game
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="annot"><a href="Y2015.D22.html#stepEffects"><span class="hs-identifier hs-type">stepEffects</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-83"></span><span id="stepEffects"><span class="annot"><span class="annottext">stepEffects :: Game -&gt; Game
+</span><a href="Y2015.D22.html#stepEffects"><span class="hs-identifier hs-var hs-var">stepEffects</span></a></span></span><span> </span><span id="local-6989586621679225146"><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225146"><span class="hs-identifier hs-var">game</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-84"></span><span>    </span><span class="annot"><span class="annottext">(Spell -&gt; Game -&gt; Game) -&gt; Game -&gt; [Spell] -&gt; Game
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">Spell -&gt; Game -&gt; Game
+</span><a href="Y2015.D22.html#affect"><span class="hs-identifier hs-var">affect</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225144"><span class="hs-identifier hs-var">game'</span></a></span><span> </span><span class="annot"><span class="annottext">Game -&gt; (Game -&gt; Game) -&gt; Game
+forall a b. a -&gt; (a -&gt; b) -&gt; b
+</span><span class="hs-operator hs-var">&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Map Spell Int -&gt; Identity (Map Spell Int))
+-&gt; Game -&gt; Identity Game
+Lens' Game (Map Spell Int)
+</span><a href="Y2015.D22.html#effects"><span class="hs-identifier hs-var">effects</span></a></span><span> </span><span class="annot"><span class="annottext">((Map Spell Int -&gt; Identity (Map Spell Int))
+ -&gt; Game -&gt; Identity Game)
+-&gt; (Map Spell Int -&gt; Map Spell Int) -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; (a -&gt; b) -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">%~</span></span><span> </span><span class="annot"><span class="annottext">Map Spell Int -&gt; Map Spell Int
+forall k. Map k Int -&gt; Map k Int
+</span><a href="#local-6989586621679225142"><span class="hs-identifier hs-var">step</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Spell Int -&gt; [Spell]
+forall k a. Map k a -&gt; [k]
+</span><span class="hs-identifier hs-var">keys</span></span><span> </span><span class="annot"><span class="annottext">(Map Spell Int -&gt; [Spell]) -&gt; Map Spell Int -&gt; [Spell]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225146"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game
+-&gt; Getting (Map Spell Int) Game (Map Spell Int) -&gt; Map Spell Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">Getting (Map Spell Int) Game (Map Spell Int)
+Lens' Game (Map Spell Int)
+</span><a href="Y2015.D22.html#effects"><span class="hs-identifier hs-var">effects</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225144"><span class="annot"><span class="annottext">game' :: Game
+</span><a href="#local-6989586621679225144"><span class="hs-identifier hs-var hs-var">game'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225146"><span class="hs-identifier hs-var">game</span></a></span><span> </span><span class="annot"><span class="annottext">Game -&gt; (Game -&gt; Game) -&gt; Game
+forall a b. a -&gt; (a -&gt; b) -&gt; b
+</span><span class="hs-operator hs-var">&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#armor"><span class="hs-identifier hs-var">armor</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-86"></span><span>          </span><span id="local-6989586621679225142"><span class="annot"><span class="annottext">step :: Map k Int -&gt; Map k Int
+</span><a href="#local-6989586621679225142"><span class="hs-identifier hs-var hs-var">step</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; Map k Int -&gt; Map k Int
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map k Int -&gt; Map k Int)
+-&gt; (Map k Int -&gt; Map k Int) -&gt; Map k Int -&gt; Map k Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; Map k Int -&gt; Map k Int
+forall a b k. (a -&gt; b) -&gt; Map k a -&gt; Map k b
+</span><span class="hs-identifier hs-var">M.map</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int
+forall a. Enum a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">pred</span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="annot"><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-type">stepGame</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier hs-type">Result</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-89"></span><span id="stepGame"><span class="annot"><span class="annottext">stepGame :: Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-var hs-var">stepGame</span></a></span></span><span> </span><span id="local-6989586621679225135"><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span></span><span>
+</span><span id="line-90"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Boss -&gt; Const Int Boss) -&gt; Game -&gt; Const Int Game
+Lens' Game Boss
+</span><a href="Y2015.D22.html#boss"><span class="hs-identifier hs-var">boss</span></a></span><span class="annot"><span class="annottext">((Boss -&gt; Const Int Boss) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Boss -&gt; Const Int Boss)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Boss -&gt; Const Int Boss
+Lens' Boss Int
+</span><a href="Y2015.D22.html#hp"><span class="hs-identifier hs-var">hp</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-91"></span><span>        </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int -&gt; Result
+</span><a href="Y2015.D22.html#Won"><span class="hs-identifier hs-var">Won</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Result) -&gt; Int -&gt; Result
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#spent"><span class="hs-identifier hs-var">spent</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-92"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#life"><span class="hs-identifier hs-var">life</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#mana"><span class="hs-identifier hs-var">mana</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-93"></span><span>        </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Result
+</span><a href="Y2015.D22.html#Lost"><span class="hs-identifier hs-var">Lost</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-95"></span><span>        </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting State Game State -&gt; State
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">Getting State Game State
+Lens' Game State
+</span><a href="Y2015.D22.html#state"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-96"></span><span>            </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#BossTurn"><span class="hs-identifier hs-var">BossTurn</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-var">stepGame</span></a></span><span> </span><span class="annot"><span class="annottext">(Game -&gt; [Result]) -&gt; Game -&gt; [Result]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Game -&gt; Game
+</span><a href="Y2015.D22.html#strike"><span class="hs-identifier hs-var">strike</span></a></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225131"><span class="hs-identifier hs-var">game'</span></a></span><span> </span><span class="annot"><span class="annottext">Game -&gt; (Game -&gt; Game) -&gt; Game
+forall a b. a -&gt; (a -&gt; b) -&gt; b
+</span><span class="hs-operator hs-var">&amp;</span></span><span> </span><span class="annot"><span class="annottext">(State -&gt; Identity State) -&gt; Game -&gt; Identity Game
+Lens' Game State
+</span><a href="Y2015.D22.html#state"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">((State -&gt; Identity State) -&gt; Game -&gt; Identity Game)
+-&gt; State -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#PlayerTurn"><span class="hs-identifier hs-var">PlayerTurn</span></a></span><span>
+</span><span id="line-97"></span><span>            </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#PlayerTurn"><span class="hs-identifier hs-var">PlayerTurn</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepSpells"><span class="hs-identifier hs-var">stepSpells</span></a></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225131"><span class="hs-identifier hs-var">game'</span></a></span><span>
+</span><span id="line-98"></span><span>            </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225131"><span class="annot"><span class="annottext">game' :: Game
+</span><a href="#local-6989586621679225131"><span class="hs-identifier hs-var hs-var">game'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Game -&gt; Game
+</span><a href="Y2015.D22.html#stepEffects"><span class="hs-identifier hs-var">stepEffects</span></a></span><span> </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; Game -&gt; Game
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Bool Game Bool -&gt; Bool
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">Getting Bool Game Bool
+Lens' Game Bool
+</span><a href="Y2015.D22.html#hard"><span class="hs-identifier hs-var">hard</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting State Game State -&gt; State
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">Getting State Game State
+Lens' Game State
+</span><a href="Y2015.D22.html#state"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-99"></span><span>                              </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#PlayerTurn"><span class="hs-identifier hs-var">PlayerTurn</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span> </span><span class="annot"><span class="annottext">Game -&gt; (Game -&gt; Game) -&gt; Game
+forall a b. a -&gt; (a -&gt; b) -&gt; b
+</span><span class="hs-operator hs-var">&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#life"><span class="hs-identifier hs-var">life</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-100"></span><span>                              </span><span class="annot"><span class="annottext">(Bool, State)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225135"><span class="hs-identifier hs-var">game</span></a></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="annot"><a href="Y2015.D22.html#stepSpells"><span class="hs-identifier hs-type">stepSpells</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier hs-type">Result</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-103"></span><span id="stepSpells"><span class="annot"><span class="annottext">stepSpells :: Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepSpells"><span class="hs-identifier hs-var hs-var">stepSpells</span></a></span></span><span> </span><span id="local-6989586621679225129"><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225129"><span class="hs-identifier hs-var">game</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Result
+</span><a href="#local-6989586621679225128"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679225127"><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225127"><span class="hs-identifier hs-var">spell</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-105"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225126"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679225126"><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225126"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Spell
+</span><a href="Y2015.D22.html#MagicMissile"><span class="hs-identifier hs-var">MagicMissile</span></a></span><span> </span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
+</span><span id="line-106"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Spell -&gt; Map Spell Int -&gt; Bool
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Bool
+</span><span class="hs-identifier hs-var">member</span></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225126"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Spell Int -&gt; Bool) -&gt; Map Spell Int -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225129"><span class="hs-identifier hs-var">game</span></a></span><span class="annot"><span class="annottext">Game
+-&gt; Getting (Map Spell Int) Game (Map Spell Int) -&gt; Map Spell Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">Getting (Map Spell Int) Game (Map Spell Int)
+Lens' Game (Map Spell Int)
+</span><a href="Y2015.D22.html#effects"><span class="hs-identifier hs-var">effects</span></a></span><span>
+</span><span id="line-107"></span><span>            </span><span class="hs-special">]</span><span>
+</span><span id="line-108"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679225124"><span class="annot"><span class="annottext">nextTurn :: Game
+</span><a href="#local-6989586621679225124"><span class="hs-identifier hs-var hs-var">nextTurn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Spell -&gt; Game -&gt; Game
+</span><a href="Y2015.D22.html#cast"><span class="hs-identifier hs-var">cast</span></a></span><span> </span><span class="annot"><span class="annottext">Spell
+</span><a href="#local-6989586621679225127"><span class="hs-identifier hs-var">spell</span></a></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225129"><span class="hs-identifier hs-var">game</span></a></span><span> </span><span class="annot"><span class="annottext">Game -&gt; (Game -&gt; Game) -&gt; Game
+forall a b. a -&gt; (a -&gt; b) -&gt; b
+</span><span class="hs-operator hs-var">&amp;</span></span><span> </span><span class="annot"><span class="annottext">(State -&gt; Identity State) -&gt; Game -&gt; Identity Game
+Lens' Game State
+</span><a href="Y2015.D22.html#state"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="annot"><span class="annottext">((State -&gt; Identity State) -&gt; Game -&gt; Identity Game)
+-&gt; State -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#BossTurn"><span class="hs-identifier hs-var">BossTurn</span></a></span><span>
+</span><span id="line-109"></span><span>        </span><span class="hs-special">,</span><span> </span><span id="local-6989586621679225128"><span class="annot"><span class="annottext">Result
+</span><a href="#local-6989586621679225128"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-var">stepGame</span></a></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225124"><span class="hs-identifier hs-var">nextTurn</span></a></span><span>
+</span><span id="line-110"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span class="annot"><a href="Y2015.D22.html#strike"><span class="hs-identifier hs-type">strike</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-113"></span><span id="strike"><span class="annot"><span class="annottext">strike :: Game -&gt; Game
+</span><a href="Y2015.D22.html#strike"><span class="hs-identifier hs-var hs-var">strike</span></a></span></span><span> </span><span id="local-6989586621679225123"><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225123"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#life"><span class="hs-identifier hs-var">life</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall a s t. Num a =&gt; ASetter s t a a -&gt; a -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">-~</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">max</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225123"><span class="hs-identifier hs-var">g</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Boss -&gt; Const Int Boss) -&gt; Game -&gt; Const Int Game
+Lens' Game Boss
+</span><a href="Y2015.D22.html#boss"><span class="hs-identifier hs-var">boss</span></a></span><span class="annot"><span class="annottext">((Boss -&gt; Const Int Boss) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Boss -&gt; Const Int Boss)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Boss -&gt; Const Int Boss
+Lens' Boss Int
+</span><a href="Y2015.D22.html#damage"><span class="hs-identifier hs-var">damage</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225123"><span class="hs-identifier hs-var">g</span></a></span><span class="annot"><span class="annottext">Game -&gt; Getting Int Game Int -&gt; Int
+forall s a. s -&gt; Getting a s a -&gt; a
+</span><span class="hs-operator hs-var">^.</span></span><span class="annot"><span class="annottext">(Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Const Int Player) -&gt; Game -&gt; Const Int Game)
+-&gt; ((Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player)
+-&gt; Getting Int Game Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Const Int Int) -&gt; Player -&gt; Const Int Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#armor"><span class="hs-identifier hs-var">armor</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; Game -&gt; Game
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Game
+</span><a href="#local-6989586621679225123"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span class="annot"><a href="Y2015.D22.html#newGame"><span class="hs-identifier hs-type">newGame</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-117"></span><span id="newGame"><span class="annot"><span class="annottext">newGame :: Bool -&gt; String -&gt; Game
+</span><a href="Y2015.D22.html#newGame"><span class="hs-identifier hs-var hs-var">newGame</span></a></span></span><span> </span><span id="local-6989586621679225120"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225120"><span class="hs-identifier hs-var">hardMode</span></a></span></span><span> </span><span id="local-6989586621679225119"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225119"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-118"></span><span>    </span><span class="annot"><span class="annottext">Game :: Boss -&gt; Map Spell Int -&gt; Bool -&gt; Player -&gt; State -&gt; Game
+</span><a href="Y2015.D22.html#Game"><span class="hs-identifier hs-type">Game</span></a></span><span>
+</span><span id="line-119"></span><span>        </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">_player :: Player
+</span><a href="Y2015.D22.html#_player"><span class="hs-identifier hs-var">_player</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Player :: Int -&gt; Int -&gt; Int -&gt; Int -&gt; Player
+</span><a href="Y2015.D22.html#Player"><span class="hs-identifier hs-type">Player</span></a></span><span>
+</span><span id="line-120"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">_life :: Int
+</span><a href="Y2015.D22.html#_life"><span class="hs-identifier hs-var">_life</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">50</span></span><span>
+</span><span id="line-121"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_armor :: Int
+</span><a href="Y2015.D22.html#_armor"><span class="hs-identifier hs-var">_armor</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-122"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_mana :: Int
+</span><a href="Y2015.D22.html#_mana"><span class="hs-identifier hs-var">_mana</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">500</span></span><span>
+</span><span id="line-123"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_spent :: Int
+</span><a href="Y2015.D22.html#_spent"><span class="hs-identifier hs-var">_spent</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-124"></span><span>            </span><span class="hs-special">}</span><span>
+</span><span id="line-125"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_boss :: Boss
+</span><a href="Y2015.D22.html#_boss"><span class="hs-identifier hs-var">_boss</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Boss
+</span><a href="#local-6989586621679225118"><span class="hs-identifier hs-var">boss'</span></a></span><span>
+</span><span id="line-126"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_effects :: Map Spell Int
+</span><a href="Y2015.D22.html#_effects"><span class="hs-identifier hs-var">_effects</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Spell Int
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">M.empty</span></span><span>
+</span><span id="line-127"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_state :: State
+</span><a href="Y2015.D22.html#_state"><span class="hs-identifier hs-var">_state</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State
+</span><a href="Y2015.D22.html#PlayerTurn"><span class="hs-identifier hs-var">PlayerTurn</span></a></span><span>
+</span><span id="line-128"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_hard :: Bool
+</span><a href="Y2015.D22.html#_hard"><span class="hs-identifier hs-var">_hard</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225120"><span class="hs-identifier hs-var">hardMode</span></a></span><span>
+</span><span id="line-129"></span><span>        </span><span class="hs-special">}</span><span>
+</span><span id="line-130"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225118"><span class="annot"><span class="annottext">boss' :: Boss
+</span><a href="#local-6989586621679225118"><span class="hs-identifier hs-var hs-var">boss'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Boss
+</span><a href="Y2015.D22.html#pBoss"><span class="hs-identifier hs-var">pBoss</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225119"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="Y2015.D22.html#pBoss"><span class="hs-identifier hs-type">pBoss</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Boss"><span class="hs-identifier hs-type">Boss</span></a></span><span>
+</span><span id="line-133"></span><span id="pBoss"><span class="annot"><span class="annottext">pBoss :: String -&gt; Boss
+</span><a href="Y2015.D22.html#pBoss"><span class="hs-identifier hs-var hs-var">pBoss</span></a></span></span><span> </span><span id="local-6989586621679225115"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225115"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Boss :: Int -&gt; Int -&gt; Boss
+</span><a href="Y2015.D22.html#Boss"><span class="hs-identifier hs-type">Boss</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">_hp :: Int
+</span><a href="Y2015.D22.html#_hp"><span class="hs-identifier hs-var">_hp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225114"><span class="hs-identifier hs-var">hp'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_damage :: Int
+</span><a href="Y2015.D22.html#_damage"><span class="hs-identifier hs-var">_damage</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679225113"><span class="hs-identifier hs-var">dmg</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679225112"><span class="annot"><span class="annottext">parse :: ([String] -&gt; String) -&gt; a
+</span><a href="#local-6989586621679225112"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679225111"><span class="annot"><span class="annottext">[String] -&gt; String
+</span><a href="#local-6989586621679225111"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; a
+forall a. Read a =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">read</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; a) -&gt; String -&gt; a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">words</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; [String]) -&gt; String -&gt; [String]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><a href="#local-6989586621679225111"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">lines</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679225115"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-135"></span><span>          </span><span id="local-6989586621679225114"><span class="annot"><span class="annottext">hp' :: Int
+</span><a href="#local-6989586621679225114"><span class="hs-identifier hs-var hs-var">hp'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; Int
+forall a. Read a =&gt; ([String] -&gt; String) -&gt; a
+</span><a href="#local-6989586621679225112"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">head</span></span><span>
+</span><span id="line-136"></span><span>          </span><span id="local-6989586621679225113"><span class="annot"><span class="annottext">dmg :: Int
+</span><a href="#local-6989586621679225113"><span class="hs-identifier hs-var hs-var">dmg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; Int
+forall a. Read a =&gt; ([String] -&gt; String) -&gt; a
+</span><a href="#local-6989586621679225112"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span class="hs-comment">-- |Finds the minimum required mana to win a game.</span><span>
+</span><span id="line-139"></span><span class="annot"><a href="Y2015.D22.html#spellBattle"><span class="hs-identifier hs-type">spellBattle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>   </span><span class="hs-comment">-- ^ Whether to run the game in &quot;hard mode&quot;</span><span>
+</span><span id="line-140"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Boss stats input string</span><span>
+</span><span id="line-141"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier hs-type">Result</span></a></span><span> </span><span class="hs-comment">-- ^ Best possible battle outcome</span><span>
+</span><span id="line-142"></span><span id="spellBattle"><span class="annot"><span class="annottext">spellBattle :: Bool -&gt; String -&gt; Result
+</span><a href="Y2015.D22.html#spellBattle"><span class="hs-identifier hs-var hs-var">spellBattle</span></a></span></span><span> </span><span id="local-6989586621679225105"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225105"><span class="hs-identifier hs-var">hardMode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Result] -&gt; Result
+forall (t :: * -&gt; *) a. (Foldable t, Ord a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">minimum</span></span><span> </span><span class="annot"><span class="annottext">([Result] -&gt; Result) -&gt; (String -&gt; [Result]) -&gt; String -&gt; Result
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-var">stepGame</span></a></span><span> </span><span class="annot"><span class="annottext">(Game -&gt; [Result]) -&gt; (String -&gt; Game) -&gt; String -&gt; [Result]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; String -&gt; Game
+</span><a href="Y2015.D22.html#newGame"><span class="hs-identifier hs-var">newGame</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225105"><span class="hs-identifier hs-var">hardMode</span></a></span><span>
+</span><span id="line-143"></span><span>
+</span><span id="line-144"></span><span class="hs-comment">-- |Provided as a quicker method for testing shorter player battles.</span><span>
+</span><span id="line-145"></span><span class="annot"><a href="Y2015.D22.html#testSpellBattle"><span class="hs-identifier hs-type">testSpellBattle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>   </span><span class="hs-comment">-- ^ Whether to run the game in &quot;hard mode&quot;</span><span>
+</span><span id="line-146"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ Boss stats input string</span><span>
+</span><span id="line-147"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Y2015.D22.html#Result"><span class="hs-identifier hs-type">Result</span></a></span><span> </span><span class="hs-comment">-- ^ Best possible battle outcome</span><span>
+</span><span id="line-148"></span><span id="testSpellBattle"><span class="annot"><span class="annottext">testSpellBattle :: Bool -&gt; String -&gt; Result
+</span><a href="Y2015.D22.html#testSpellBattle"><span class="hs-identifier hs-var hs-var">testSpellBattle</span></a></span></span><span> </span><span id="local-6989586621679225103"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225103"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Result] -&gt; Result
+forall (t :: * -&gt; *) a. (Foldable t, Ord a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">minimum</span></span><span> </span><span class="annot"><span class="annottext">([Result] -&gt; Result) -&gt; (String -&gt; [Result]) -&gt; String -&gt; Result
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Game -&gt; [Result]
+</span><a href="Y2015.D22.html#stepGame"><span class="hs-identifier hs-var">stepGame</span></a></span><span>
+</span><span id="line-149"></span><span>                  </span><span class="annot"><span class="annottext">(Game -&gt; [Result]) -&gt; (String -&gt; Game) -&gt; String -&gt; [Result]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#mana"><span class="hs-identifier hs-var">mana</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">250</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; (String -&gt; Game) -&gt; String -&gt; Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game
+Lens' Game Player
+</span><a href="Y2015.D22.html#player"><span class="hs-identifier hs-var">player</span></a></span><span class="annot"><span class="annottext">((Player -&gt; Identity Player) -&gt; Game -&gt; Identity Game)
+-&gt; ((Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player)
+-&gt; (Int -&gt; Identity Int)
+-&gt; Game
+-&gt; Identity Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span class="annot"><span class="annottext">(Int -&gt; Identity Int) -&gt; Player -&gt; Identity Player
+Lens' Player Int
+</span><a href="Y2015.D22.html#life"><span class="hs-identifier hs-var">life</span></a></span><span> </span><span class="annot"><span class="annottext">((Int -&gt; Identity Int) -&gt; Game -&gt; Identity Game)
+-&gt; Int -&gt; Game -&gt; Game
+forall s t a b. ASetter s t a b -&gt; b -&gt; s -&gt; t
+</span><span class="hs-operator hs-var">.~</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">10</span></span><span class="hs-special">)</span><span>
+</span><span id="line-150"></span><span>                  </span><span class="annot"><span class="annottext">(Game -&gt; Game) -&gt; (String -&gt; Game) -&gt; String -&gt; Game
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; String -&gt; Game
+</span><a href="Y2015.D22.html#newGame"><span class="hs-identifier hs-var">newGame</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679225103"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-151"></span></pre></body></html>
