@@ -1,18 +1,36 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Main where
 
-import Control.Monad
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as L
 import Data.String.Utils (rstrip)
-import Safe
-import System.Environment (getArgs)
-import Text.Read (readMaybe)
+import Options.Generic
 import Y2015
 import Y2016
 import Y2018
 
-usage :: String
-usage = "Usage: <year> <day number> [input file or string]"
+type ArgYear = Int
+type ArgDay  = Int
+type ArgPath = String
+data Options w =
+  Options (w ::: ArgYear <?> "Year")
+          (w ::: ArgDay <?> "Day")
+          (w ::: ArgPath <?> "Input file path")
+  deriving Generic
+instance ParseRecord (Options Wrapped)
+
+usage :: Text
+usage = "Advent of Code solutions in Haskell"
+
+main :: IO ()
+main = do
+  (Options year day path) <- unwrapRecord usage
+  run year day path
 
 run :: Int -> Int -> String -> IO ()
 run 2015 1 file = do
@@ -132,7 +150,7 @@ run 2018 2 file = do
   contents <- readFile file
   print $ checksum contents
   case boxID contents of
-    Nothing -> print "Couldn't find matching box."
+    Nothing -> print ("Couldn't find matching box." :: String)
     Just s  -> print s
 
 run 2018 3 file = do
@@ -157,15 +175,3 @@ run 2018 5 file = do
   print $ reactBest $ rstrip contents
 
 run _ _ _ = putStrLn "Not implemented yet."
-
-main :: IO ()
-main = do
-  args <- getArgs
-  let mYear = (readMaybe <=< flip atMay 0) args
-      mDay  = (readMaybe <=< flip atMay 1) args
-      mInp  = args `atMay` 2
-  case (mYear, mDay, mInp) of
-    (Nothing, _, _) -> putStr $ unlines ["Error: missing year.", usage]
-    (_, Nothing, _) -> putStr $ unlines ["Error: missing day number.", usage]
-    (_, _, Nothing) -> putStr $ unlines ["Error: missing input.", usage]
-    (Just y, Just d, Just i) -> run y d i

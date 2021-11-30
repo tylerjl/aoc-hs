@@ -20,6 +20,7 @@ executable adventofcode
   build-depends:       adventofcode
                      , base
                      , bytestring
+                     , optparse-generic
                      , safe
                      , MissingH
   default-language:    Haskell2010
