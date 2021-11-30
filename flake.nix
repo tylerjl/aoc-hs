@@ -34,6 +34,6 @@
       flake = pkgs.adventofcode.flake {};
     in flake // {
       # Built by `nix build .`
-      defaultPackage = flake.packages."advenctofcode:exe:adventofcode";
+      defaultPackage = flake.packages."adventofcode:exe:adventofcode";
     });
 }
