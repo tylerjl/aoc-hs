@@ -12,6 +12,16 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install nix
         uses: cachix/install-nix-action@v16
+      - name: Add haskell.nix pub keys
+        run: |
+          sed -i \
+            '/^trusted-public-keys =/ s/$/ hydra.iohk.io:f\/Ea+s+dFdN+3Y\/G+FDgSq+a5NEWhJGzdjvKNGv0\/EQ=/' \
+            ~/.config/nix/nix.conf
+      - name: Add haskell.nix substituters
+        run: |
+          sed -i \
+            '/^substituters =/ s/$/ https:\/\/hydra.iohk.io/' \
+            ~/.config/nix/nix.conf
       - name: Build the project
         run: nix build
       - name: Run the executable
