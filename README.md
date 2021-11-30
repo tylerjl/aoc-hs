@@ -1,4 +1,4 @@
-# aoc-hs [![Build Status](https://travis-ci.org/tylerjl/adventofcode.svg?branch=master)](https://travis-ci.org/tylerjl/adventofcode)
+# aoc-hs [![Build Status](https://github.com/tylerjl/aoc-hs/actions/workflows/main.yml/badge.svg)](https://github.com/tylerjl/aoc-hs/actions)
 
 Solutions to Advent of Code exercises.
 
