@@ -1,5 +1,13 @@
+allow-newer: true
 flags: {}
 packages:
 - '.'
-extra-deps: []
-resolver: lts-6.15
+extra-deps:
+- MissingH-1.4.3.0@sha256:32f9892ec98cd21df4f4d3ed8d95a3831ae74287ea0641d6f09b2dc6ef061d39,4859
+- memoize-1.1.1@sha256:a4c636df010564307ce1fe6e69379192de0c756f7766e61224da8a896ffd5fe1,1926
+- repa-3.4.1.4@sha256:df02acc0f65be7ff67cf71058841644425337c5ebd44c95b1ac1564a1e3c4858,3323
+resolver: lts-18.18
+system-ghc: true
+nix:
+  enable: false
+  packages: [zlib.dev, zlib.out]

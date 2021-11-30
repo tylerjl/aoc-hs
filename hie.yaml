@@ -1,0 +1,16 @@
+cradle:
+  stack:
+    - path: "./app/Main.hs"
+      component: "adventofcode:exe:adventofcode"
+
+    - path: "./src"
+      component: "adventofcode:lib"
+
+    - path: "./test"
+      component: "adventofcode:test:adventofcode-test"
+
+    - path: "./benchmark/Bench.hs"
+      component: "adventofcode:bench:criterion"
+
+    - path: "./test"
+      component: "adventofcode:test:haddock"

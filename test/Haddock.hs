@@ -8,7 +8,7 @@ import           Data.Maybe       (catMaybes)
 import           Data.Text        (unpack)
 import           System.Exit      (exitFailure, exitSuccess)
 import           Text.Regex       (matchRegex, mkRegex)
-import           Turtle           (inprocWithErr, fold)
+import           Turtle           (inprocWithErr, fold, lineToText)
 
 average :: (Fractional a, Real b) => [b] -> a
 average xs = realToFrac (sum xs) / genericLength xs
@@ -21,7 +21,7 @@ main = do
     text <- fold
         (fmap (\(Left o) -> o) (inprocWithErr "stack" ["haddock"] ""))
         Fold.list
-    let output = map unpack text
+    let output = map (unpack . lineToText) text
         avg = average $ match output
     putStrLn $ "\nAverage documentation coverage: " ++ show avg
     if avg >= expected

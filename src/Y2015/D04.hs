@@ -13,7 +13,6 @@ module Y2015.D04
 import Crypto.Hash.MD5 (hash)
 import Data.ByteString.Base16 (encode)
 import qualified Data.ByteString.Char8 as C
-import Data.Monoid ((<>))
 
 -- |Cracks password hash to retrieve original value
 crack
