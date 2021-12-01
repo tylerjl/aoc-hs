@@ -66,4 +66,4 @@ thriceVoweled
 thriceVoweled = (> 2) . length . filter isVowel
 
 isVowel :: Char -> Bool
-isVowel = flip elem "aeiou"
+isVowel = flip elem ("aeiou" :: String)

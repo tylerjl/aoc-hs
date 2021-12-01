@@ -24,7 +24,7 @@ hasPairs :: String -> Bool
 hasPairs = (1 <) . length . filter ((<) 1 . length) . group
 
 forbidden :: String -> Bool
-forbidden = any (`elem` "iol")
+forbidden = any (`elem` ("iol" :: String))
 
 hasStraightFast :: String -> Bool
 hasStraightFast = not . null . filterAsc . subSeqs
