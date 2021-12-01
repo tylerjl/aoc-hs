@@ -38,6 +38,7 @@ library
   exposed-modules:     Y2015
                      , Y2016
                      , Y2018
+                     , Y2021
                      , Y2015.Util
                      , Y2015.D01
                      , Y2015.D02
@@ -71,6 +72,7 @@ library
                      , Y2018.D03
                      , Y2018.D04
                      , Y2018.D05
+                     , Y2021.D01
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring

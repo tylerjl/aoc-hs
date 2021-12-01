@@ -14,11 +14,13 @@ import Options.Generic   (unwrapRecord)
 
 import qualified Data.ByteString      as B
 import qualified Data.ByteString.Lazy as L
+import qualified Data.Text.IO         as TIO
 
 import Options
 import Y2015
 import Y2016
 import Y2018
+import Y2021
 
 -- |CLI boilerplate
 usage :: Text
@@ -29,7 +31,7 @@ usage = "Advent of Code solutions in Haskell"
 -}
 main :: IO ()
 main = do
-  (Options (ArgYear year) (ArgDay day) (ArgPath path)) <- unwrapRecord usage
+  (Options year day path) <- unwrapRecord usage
   run year day path
 
 {-|Is there a nicer way to "dynamically" invoke these module functions based on
@@ -177,5 +179,9 @@ run 2018 5 file = do
   contents <- readFile file
   print $ react $ rstrip contents
   print $ reactBest $ rstrip contents
+
+run 2021 1 file = do
+  contents <- TIO.readFile file
+  print $ Y2021.partA contents
 
 run _ _ _ = putStrLn "Not implemented yet."

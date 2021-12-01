@@ -16,20 +16,9 @@ module Options where
 
 import Options.Generic
 
-newtype Year = ArgYear Int deriving (Generic, Read)
-instance ParseRecord Year
-instance ParseField Year
-instance ParseFields Year
-
-newtype Day = ArgDay Int deriving (Generic, Read)
-instance ParseRecord Day
-instance ParseField Day
-
-instance ParseFields Day
-newtype Path = ArgPath String deriving (Generic, Read)
-instance ParseRecord Path
-instance ParseField Path
-instance ParseFields Path
+type Year = Int
+type Day  = Int
+type Path = String
 
 data Options w =
   Options (w ::: Year <?> "Year")
