@@ -109,15 +109,18 @@ test-suite adventofcode-test
   default-language:    Haskell2010
 
 benchmark criterion
-  default-language: Haskell2010
-  hs-source-dirs:   benchmark
-  main-is:          Bench.hs
-  build-depends:    base
-                  , bytestring
-                  , adventofcode
-                  , criterion
-                  , mwc-random
-  type:             exitcode-stdio-1.0
+  default-language:   Haskell2010
+  default-extensions: TypeApplications
+  hs-source-dirs:     benchmark
+  main-is:            Bench.hs
+  build-depends:      base
+                    , bytestring
+                    , adventofcode
+                    , criterion
+                    , mwc-random
+                    , text
+                    , witch
+  type:               exitcode-stdio-1.0
 
 test-suite haddock
   default-language: Haskell2010

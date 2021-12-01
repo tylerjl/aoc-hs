@@ -17,6 +17,12 @@ spec = parallel $ do
         describe "partA" $ do
           it "solves the example case" $
             partA sample `shouldBe` 7
+        describe "partAZip" $ do
+          it "solves the example case" $
+            partAZip sample `shouldBe` 7
         describe "partB" $ do
           it "solves the example case" $
             partB sample `shouldBe` 5
+        describe "partBZip" $ do
+          it "solves the example case" $
+            partBZip sample `shouldBe` 5

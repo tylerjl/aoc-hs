@@ -1,15 +1,28 @@
 module Y2021.D01 where
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import Witch
 import Data.Foldable (foldl')
+import Data.Text (Text)
+import Witch
+
+import qualified Data.Text as T
 
 partA :: Text -> Int
 partA = stepwise . asInts
 
+partAZip :: Text -> Int
+partAZip = length . compareAdj . asInts
+
 partB :: Text -> Int
 partB = stepwise . toWindows . asInts
+
+partBZip :: Text -> Int
+partBZip = length . compareAdj . map trisum . (zip3 <*> tail <*> tail . tail) . asInts
+
+compareAdj :: [Int] -> [(Int, Int)]
+compareAdj = filter (uncurry (<)) . (zip <*> tail)
+
+trisum :: Num a => (a, a, a) -> a
+trisum (a, b, c) = a + b + c
 
 stepwise :: [Int] -> Int
 stepwise = snd . foldl' steps (Nothing, 0)

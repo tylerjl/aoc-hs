@@ -10,7 +10,7 @@ test:
 benchmarks:
 	stack bench \
 		--benchmark-arguments '--output docs/benchmarks/index.html' \
-		&& open docs/benchmarks/index.html
+		&& xdg-open docs/benchmarks/index.html
 
 .PHONY: coverage
 coverage:
