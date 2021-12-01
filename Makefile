@@ -4,7 +4,7 @@ build:
 
 .PHONY: test
 test:
-	stack test --coverage
+	stack test --coverage adventofcode:test:adventofcode-test
 
 .PHONY: benchmarks
 benchmarks:
