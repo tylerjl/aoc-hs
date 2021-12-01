@@ -12,6 +12,11 @@ partA = stepwise . asInts
 partAZip :: Text -> Int
 partAZip = length . compareAdj . asInts
 
+partARecur :: Text -> Int
+partARecur = go . asInts
+  where go (x:y:zs) = (if x < y then 1 else 0) + go (y:zs)
+        go _ = 0
+
 partB :: Text -> Int
 partB = stepwise . toWindows . asInts
 

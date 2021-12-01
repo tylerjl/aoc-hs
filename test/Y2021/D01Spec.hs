@@ -20,6 +20,9 @@ spec = parallel $ do
         describe "partAZip" $ do
           it "solves the example case" $
             partAZip sample `shouldBe` 7
+        describe "partARecur" $ do
+          it "solves the example case" $
+            partARecur sample `shouldBe` 7
         describe "partB" $ do
           it "solves the example case" $
             partB sample `shouldBe` 5

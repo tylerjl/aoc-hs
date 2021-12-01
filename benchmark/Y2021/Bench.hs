@@ -32,6 +32,10 @@ benchmarks = env getInput $ \ ~largeInput ->
                 [ bench "simple" $ nf partAZip sample
                 , bench "larger" $ nf partAZip largeInput
                 ]
+              , bgroup "recursive"
+                [ bench "simple" $ nf partARecur sample
+                , bench "larger" $ nf partARecur largeInput
+                ]
               ]
             , bgroup "partB"
               [ bgroup "naive"
