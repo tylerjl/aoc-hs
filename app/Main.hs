@@ -183,5 +183,6 @@ run 2018 5 file = do
 run 2021 1 file = do
   contents <- TIO.readFile file
   print $ Y2021.partA contents
+  print $ Y2021.partB contents
 
 run _ _ _ = putStrLn "Not implemented yet."
