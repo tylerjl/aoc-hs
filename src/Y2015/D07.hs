@@ -25,8 +25,7 @@ import           Data.Word             (Word16)
 import           Text.Parsec.Char      (digit, letter, endOfLine)
 import           Text.Parsec.String    (Parser)
 import           Text.Parsec
-    ( ParseError
-    , lookAhead
+    ( lookAhead
     , many
     , many1
     , optional
@@ -107,8 +106,10 @@ wire s = flip voltageOn s . M.fromList . map toPair
 
 -- |Helper function to parse 'Instruction's
 parseCircuits :: String                            -- ^ Input string
-              -> Either ParseError [Instruction] -- ^ Either parse error or 'Instruction's
-parseCircuits = regularParse circuitParser
+              -> [Instruction] -- ^ Either parse error or 'Instruction's
+parseCircuits = either err suc . regularParse circuitParser
+  where err = error . show
+        suc r = r
 
 -- |Inject a manual instruction.
 override :: Word16      -- ^ Value to inject into 'Instruction'.

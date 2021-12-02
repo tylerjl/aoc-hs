@@ -18,11 +18,13 @@ import Options.Generic
 
 type Year = Int
 type Day  = Int
+type Part = Char
 type Path = String
 
 data Options w =
   Options (w ::: Year <?> "Year")
           (w ::: Day  <?> "Day")
+          (w ::: Part <?> "Part")
           (w ::: Path <?> "Input file path")
   deriving Generic
 instance ParseRecord (Options Wrapped)

@@ -130,13 +130,15 @@ testB = R.foldAllS (+) 0 . configureGridB initialGrid
 -- |Parses a string into a list of 'Instruction's.
 parseInstructions
   :: String -- ^ Input string to parse.
-  -> Either P.ParseError [Instruction] -- ^ Either an error or parsed structure.
-parseInstructions = regularParse instructionsParser
+  -> [Instruction] -- ^ Either an error or parsed structure.
+parseInstructions = either err suc . regularParse instructionsParser
+  where err = error . show
+        suc r = r
 
 -- |Run a light simulation
 lightSimulation
-  :: (Monad m, Foldable t)
+  :: Foldable t
   => (R.Array R.U R.DIM2 Int -> a -> R.Array R.U R.DIM2 Int) -- ^ REPA Light grid
   -> t a -- ^ 'Instruction's
-  -> m Int -- ^ Lit lights
-lightSimulation f = R.sumAllP . foldl' f initialGrid
+  -> Int -- ^ Lit lights
+lightSimulation f = R.sumAllS . foldl' f initialGrid
