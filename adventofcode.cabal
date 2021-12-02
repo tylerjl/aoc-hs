@@ -74,6 +74,7 @@ library
                      , Y2018.D04
                      , Y2018.D05
                      , Y2021.D01
+                     , Y2021.D02
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
@@ -97,6 +98,7 @@ library
 test-suite adventofcode-test
   type:                exitcode-stdio-1.0
   default-extensions:  TypeApplications
+                     , OverloadedStrings
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base

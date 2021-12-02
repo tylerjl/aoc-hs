@@ -146,5 +146,8 @@ solver 2018 5 'b' (reactBest . rstrip -> solution) = show solution
 solver 2021 1 'a' (partA . into @Text -> solution) = show solution
 solver 2021 1 'b' (partB . into @Text -> solution) = show solution
 
+solver 2021 2 'a' (part2A . into @Text -> solution) = show solution
+solver 2021 2 'b' (part2B . into @Text -> solution) = show solution
+
 solver y d p _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p
