@@ -26,13 +26,14 @@ d2sample =
   , "forward 2"
   ] & T.unlines
 
-getInput :: IO (Text, Text)
+getInput :: IO (Text, Text, Text)
 getInput =
-  (,) <$> TIO.readFile "dist/resources/2021/day1.txt"
-      <*> TIO.readFile "dist/resources/2021/day2.txt"
+  (,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
+       <*> TIO.readFile "dist/resources/2021/day2.txt"
+       <*> TIO.readFile "dist/resources/2021/day3.txt"
 
 benchmarks :: Benchmark
-benchmarks = env getInput $ \ ~(d1, d2) ->
+benchmarks = env getInput $ \ ~(d1, d2, d3) ->
     bgroup "Y2021"
         [ bgroup "Day 1"
             [ bgroup "partA"
@@ -71,6 +72,20 @@ benchmarks = env getInput $ \ ~(d1, d2) ->
               [ bgroup "naive"
                 [ bench "simple" $ nf part2B d2sample
                 , bench "larger" $ nf part2B d2
+                ]
+              ]
+            ]
+        , bgroup "Day 3"
+            [ bgroup "partA"
+              [ bgroup "naive"
+                [ bench "simple" $ nf part3A Y2021.sample3
+                , bench "larger" $ nf part3A d3
+                ]
+              ]
+            , bgroup "partB"
+              [ bgroup "naive"
+                [ bench "simple" $ nf part3B Y2021.sample3
+                , bench "larger" $ nf part3B d3
                 ]
               ]
             ]

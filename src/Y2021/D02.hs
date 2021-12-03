@@ -1,5 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 
+{-|
+Module:      Y2021.D02
+Description: Advent of Code 2021 Day 02 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the 2021 day 02 set of problems for <adventofcode.com>.
+-}
 module Y2021.D02 where
 
 import Data.Text (Text)

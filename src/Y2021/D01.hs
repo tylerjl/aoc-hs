@@ -1,3 +1,11 @@
+{-|
+Module:      Y2021.D01
+Description: Advent of Code 2021 Day 01 Solutions.
+License:     MIT
+Maintainer:  @tylerjl
+
+Solutions to the 2021 day 01 set of problems for <adventofcode.com>.
+-}
 module Y2021.D01 where
 
 import Data.Foldable (foldl')
