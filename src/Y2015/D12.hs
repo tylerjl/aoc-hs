@@ -12,8 +12,9 @@ Solutions to the day 12 set of problems for <adventofcode.com>.
 module Y2015.D12 (jsonSum, jsonSumFixed) where
 
 import           Data.Aeson           (Value(..), decode)
+import qualified Data.Aeson.KeyMap    as KM
 import           Data.ByteString.Lazy (ByteString)
-import qualified Data.HashMap.Strict  as M
+import           Data.Foldable        (foldl')
 import           Data.Scientific      (floatingOrInteger)
 import qualified Data.Vector          as V
 
@@ -33,9 +34,9 @@ jsonSumFixed = jSum . decode
 
 filterV :: Value -> Value
 filterV o@(Object x) | r o    = Null
-                     | otherwise  = Object (M.map filterV x)
+                     | otherwise  = Object (KM.map filterV x)
                      where r (String x') = x' == "red"
-                           r (Object o') = any r $ filter string $ M.elems o'
+                           r (Object o') = any r $ KM.filter string  o'
                            r _          = False
                            string (String _) = True
                            string _          = False
@@ -45,7 +46,7 @@ filterV s@(String x) | x == "red" = Null
 filterV v                         = v
 
 sumValue :: Value -> Int
-sumValue (Object o) = M.foldl' valAcc 0 o
+sumValue (Object o) = foldl' valAcc 0 o
 sumValue (Number n) = case (floatingOrInteger n :: Either Double Int) of
                            Left _  -> 0
                            Right i -> i

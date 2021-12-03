@@ -24,8 +24,8 @@
               };
               # Non-Haskell shell tools go here
               shell.buildInputs = with pkgs; [
+                cabal-install
                 haskellPackages.hspec-discover
-                stack
               ];
             };
         })

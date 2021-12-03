@@ -1,15 +1,15 @@
 .PHONY: build
 build:
-	stack build --coverage
+	cabal new-build --enable-coverage
 
 .PHONY: test
 test:
-	stack test --coverage adventofcode:test:adventofcode-test
+	cabal new-test --enable-coverage adventofcode:test:adventofcode-test
 
 .PHONY: benchmarks
 benchmarks:
-	stack bench \
-		--benchmark-arguments '--output docs/benchmarks/index.html' \
+	cabal bench --enable-coverage \
+		--benchmark-options '--output docs/benchmarks/index.html' \
 		&& xdg-open docs/benchmarks/index.html
 
 .PHONY: coverage
@@ -23,4 +23,4 @@ coverage:
 .PHONY: docs
 docs:
 	rm -rf docs/haddock/*
-	cp -r $$(stack path --local-doc-root)/adventofcode-*/* docs/haddock
+	cabal new-haddock --htmldir=docs/haddock

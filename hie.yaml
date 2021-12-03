@@ -1,16 +1,19 @@
 cradle:
-  stack:
-    - path: "./app"
+  cabal:
+    - path: "app/Main.hs"
       component: "adventofcode:exe:adventofcode"
 
-    - path: "./src"
-      component: "adventofcode:lib"
+    - path: "app/Options.hs"
+      component: "adventofcode:exe:adventofcode"
 
-    - path: "./test"
+    - path: "src"
+      component: "lib:adventofcode"
+
+    - path: "test"
       component: "adventofcode:test:adventofcode-test"
 
-    - path: "./benchmark/Bench.hs"
+    - path: "benchmark/Bench.hs"
       component: "adventofcode:bench:criterion"
 
-    - path: "./test"
+    - path: "test"
       component: "adventofcode:test:haddock"
