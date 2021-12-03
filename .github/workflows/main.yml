@@ -38,5 +38,7 @@ jobs:
         with:
           name: tylerjl-pub
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Build the test suite
+        run: nix build '.#adventofcode:test:adventofcode-test'
       - name: Run the test suite
-        run: make test
+        run: ./result/bin/adventofcode-test
