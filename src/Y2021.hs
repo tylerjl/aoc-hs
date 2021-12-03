@@ -16,3 +16,4 @@ module Y2021 (module X) where
 
 import Y2021.D01 as X
 import Y2021.D02 as X
+import Y2021.D03 as X
