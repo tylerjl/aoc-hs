@@ -17,6 +17,7 @@
               # `cabal`, `hlint` and `haskell-language-server`
               shell.tools = {
                 cabal = {};
+                hindent = {};
                 hlint = {};
                 haskell-language-server = {
                   version = "1.5.0.0";
