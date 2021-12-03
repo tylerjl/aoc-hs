@@ -23,4 +23,6 @@ coverage:
 .PHONY: docs
 docs:
 	rm -rf docs/haddock/*
-	cabal new-haddock --htmldir=docs/haddock
+	cabal new-haddock
+	find dist-newstyle -type d -path '*html/adventofcode' \
+		| xargs -I{} cp -r {}/. docs/haddock/
