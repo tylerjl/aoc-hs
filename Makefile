@@ -8,9 +8,8 @@ test:
 
 .PHONY: benchmarks
 benchmarks:
-	cabal bench --enable-coverage \
-		--benchmark-options '--output docs/benchmarks/index.html' \
-		&& xdg-open docs/benchmarks/index.html
+	nix build '.#adventofcode:bench:criterion'
+	./result/bin/criterion --output docs/benchmarks/index.html
 
 .PHONY: coverage
 coverage: test
