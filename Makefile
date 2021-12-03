@@ -13,11 +13,11 @@ benchmarks:
 		&& xdg-open docs/benchmarks/index.html
 
 .PHONY: coverage
-coverage:
+coverage: test
 	rm -rf docs/coverage/*
-	stack hpc report \
-		$$(stack path --local-install-root)/hpc/adventofcode/adventofcode-test/adventofcode-test.tix \
-		--destdir docs/coverage
+	find dist-newstyle -type d -path '*hpc/*/html/adventofcode*' \
+		| grep -v test | grep -v inplace \
+		| xargs -I{} cp -r {}/. docs/coverage/
 	ln -s hpc_index.html docs/coverage/index.html
 
 .PHONY: docs

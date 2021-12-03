@@ -43,7 +43,7 @@ span.spaces    { background: white }
 <span class="lineno">   24 </span><span class="decl"><span class="istickedoff">hasPairs = (1 &lt;) . length . filter ((&lt;) 1 . length) . group</span></span>
 <span class="lineno">   25 </span>
 <span class="lineno">   26 </span>forbidden :: String -&gt; Bool
-<span class="lineno">   27 </span><span class="decl"><span class="istickedoff">forbidden = any (`elem` &quot;iol&quot;)</span></span>
+<span class="lineno">   27 </span><span class="decl"><span class="istickedoff">forbidden = any (`elem` (&quot;iol&quot; :: String))</span></span>
 <span class="lineno">   28 </span>
 <span class="lineno">   29 </span>hasStraightFast :: String -&gt; Bool
 <span class="lineno">   30 </span><span class="decl"><span class="istickedoff">hasStraightFast = not . null . filterAsc . subSeqs</span>

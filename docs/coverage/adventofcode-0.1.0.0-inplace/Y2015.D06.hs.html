@@ -149,16 +149,18 @@ span.spaces    { background: white }
 <span class="lineno">  130 </span>-- |Parses a string into a list of 'Instruction's.
 <span class="lineno">  131 </span>parseInstructions
 <span class="lineno">  132 </span>  :: String -- ^ Input string to parse.
-<span class="lineno">  133 </span>  -&gt; Either P.ParseError [Instruction] -- ^ Either an error or parsed structure.
-<span class="lineno">  134 </span><span class="decl"><span class="nottickedoff">parseInstructions = regularParse instructionsParser</span></span>
-<span class="lineno">  135 </span>
-<span class="lineno">  136 </span>-- |Run a light simulation
-<span class="lineno">  137 </span>lightSimulation
-<span class="lineno">  138 </span>  :: (Monad m, Foldable t)
-<span class="lineno">  139 </span>  =&gt; (R.Array R.U R.DIM2 Int -&gt; a -&gt; R.Array R.U R.DIM2 Int) -- ^ REPA Light grid
-<span class="lineno">  140 </span>  -&gt; t a -- ^ 'Instruction's
-<span class="lineno">  141 </span>  -&gt; m Int -- ^ Lit lights
-<span class="lineno">  142 </span><span class="decl"><span class="nottickedoff">lightSimulation f = R.sumAllP . foldl' f initialGrid</span></span>
+<span class="lineno">  133 </span>  -&gt; [Instruction] -- ^ Either an error or parsed structure.
+<span class="lineno">  134 </span><span class="decl"><span class="nottickedoff">parseInstructions = either err suc . regularParse instructionsParser</span>
+<span class="lineno">  135 </span><span class="spaces">  </span><span class="nottickedoff">where err = error . show</span>
+<span class="lineno">  136 </span><span class="spaces">        </span><span class="nottickedoff">suc r = r</span></span>
+<span class="lineno">  137 </span>
+<span class="lineno">  138 </span>-- |Run a light simulation
+<span class="lineno">  139 </span>lightSimulation
+<span class="lineno">  140 </span>  :: Foldable t
+<span class="lineno">  141 </span>  =&gt; (R.Array R.U R.DIM2 Int -&gt; a -&gt; R.Array R.U R.DIM2 Int) -- ^ REPA Light grid
+<span class="lineno">  142 </span>  -&gt; t a -- ^ 'Instruction's
+<span class="lineno">  143 </span>  -&gt; Int -- ^ Lit lights
+<span class="lineno">  144 </span><span class="decl"><span class="nottickedoff">lightSimulation f = R.sumAllS . foldl' f initialGrid</span></span>
 
 </pre>
 </body>

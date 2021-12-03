@@ -1,0 +1,107 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2021.D03
+<span class="lineno">    3 </span>Description: Advent of Code 2021 Day 03 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the 2021 day 03 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2021.D03 where
+<span class="lineno">   10 </span>
+<span class="lineno">   11 </span>import Data.Text (Text)
+<span class="lineno">   12 </span>import qualified Data.Text as T
+<span class="lineno">   13 </span>import GHC.Exts
+<span class="lineno">   14 </span>import Data.List (transpose, group, sort, sortOn, groupBy)
+<span class="lineno">   15 </span>import Data.Function (on)
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>-- |For clearer function signatures.
+<span class="lineno">   18 </span>type Bit  = Int
+<span class="lineno">   19 </span>-- |Also, for clearer function signatures.
+<span class="lineno">   20 </span>type Bits = [Bit]
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>-- |Accept a list of bits and multiply the common indexes.
+<span class="lineno">   23 </span>part3A :: Text -&gt; Float
+<span class="lineno">   24 </span><span class="decl"><span class="istickedoff">part3A (toBits -&gt; input)</span>
+<span class="lineno">   25 </span><span class="spaces">  </span><span class="istickedoff">= bitsToDec (commonOn id input)</span>
+<span class="lineno">   26 </span><span class="spaces">  </span><span class="istickedoff">* bitsToDec (commonOn Down input)</span></span>
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>-- |Accept a list of bits and multiply the matching value with the matching
+<span class="lineno">   29 </span>-- common and least-common bits, respectively.
+<span class="lineno">   30 </span>part3B :: Text -&gt; Float
+<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">part3B (toBits -&gt; input) = oxygen * co2</span>
+<span class="lineno">   32 </span><span class="spaces">  </span><span class="istickedoff">where oxygen = pinpoint 0 input id</span>
+<span class="lineno">   33 </span><span class="spaces">        </span><span class="istickedoff">co2 = pinpoint 0 input Down</span>
+<span class="lineno">   34 </span><span class="spaces">        </span><span class="istickedoff">pinpoint _ [] _ = <span class="nottickedoff">error &quot;couldn't find matching bits&quot;</span></span>
+<span class="lineno">   35 </span><span class="spaces">        </span><span class="istickedoff">pinpoint _ [x] _ = bitsToDec x</span>
+<span class="lineno">   36 </span><span class="spaces">        </span><span class="istickedoff">pinpoint idx bits f = let common = commonOn f bits</span>
+<span class="lineno">   37 </span><span class="spaces">          </span><span class="istickedoff">in pinpoint (succ idx) (keepAt bits (common !! idx) idx) f</span></span>
+<span class="lineno">   38 </span>
+<span class="lineno">   39 </span>-- |Keep bit arrays that have a particular bit set at a particular index.
+<span class="lineno">   40 </span>keepAt :: [Bits] -&gt; Bit -&gt; Int -&gt; [Bits]
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">keepAt bitsList bit idx = filter ((==) bit . flip (!!) idx) bitsList</span></span>
+<span class="lineno">   42 </span>
+<span class="lineno">   43 </span>-- |Convert a bit array to a decimal value.
+<span class="lineno">   44 </span>bitsToDec :: Bits -&gt; Float
+<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">bitsToDec = go 0 . reverse</span>
+<span class="lineno">   46 </span><span class="spaces">  </span><span class="istickedoff">where go n (x:xs)</span>
+<span class="lineno">   47 </span><span class="spaces">          </span><span class="istickedoff">| x == 1 = 2 ** n + go (succ n) xs</span>
+<span class="lineno">   48 </span><span class="spaces">          </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = go (succ n) xs</span>
+<span class="lineno">   49 </span><span class="spaces">        </span><span class="istickedoff">go _ []     = 0</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>-- |Big fugly function to take a list of bits and return the common bit set in
+<span class="lineno">   52 </span>-- each position.
+<span class="lineno">   53 </span>commonOn :: Ord b =&gt; (Int -&gt; b) -&gt; [Bits] -&gt; Bits
+<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">commonOn f =</span>
+<span class="lineno">   55 </span><span class="spaces">  </span><span class="istickedoff">map ( head . head . head . map (sortOn (f . head))</span>
+<span class="lineno">   56 </span><span class="spaces">        </span><span class="istickedoff">. groupBy ((==) `on` length) . sortOn (f . length) . group . sort)</span>
+<span class="lineno">   57 </span><span class="spaces">  </span><span class="istickedoff">-- Turn rows into lists of each position</span>
+<span class="lineno">   58 </span><span class="spaces">  </span><span class="istickedoff">. transpose</span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>-- |Input parser to accept newline-separated bits
+<span class="lineno">   61 </span>toBits :: Text -&gt; [Bits]
+<span class="lineno">   62 </span><span class="decl"><span class="istickedoff">toBits = map (map toBit . toList) . T.lines</span></span>
+<span class="lineno">   63 </span>
+<span class="lineno">   64 </span>-- |Fail-fast char-to-int parser.
+<span class="lineno">   65 </span>toBit :: Char -&gt; Int
+<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">toBit '0' = 0</span>
+<span class="lineno">   67 </span><span class="spaces"></span><span class="istickedoff">toBit '1' = 1</span>
+<span class="lineno">   68 </span><span class="spaces"></span><span class="istickedoff">toBit  _  = <span class="nottickedoff">error &quot;unknown value&quot;</span></span></span>
+<span class="lineno">   69 </span>
+<span class="lineno">   70 </span>sample3 :: Text
+<span class="lineno">   71 </span><span class="decl"><span class="istickedoff">sample3 = T.unlines</span>
+<span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">[ &quot;00100&quot;</span>
+<span class="lineno">   73 </span><span class="spaces">  </span><span class="istickedoff">, &quot;11110&quot;</span>
+<span class="lineno">   74 </span><span class="spaces">  </span><span class="istickedoff">, &quot;10110&quot;</span>
+<span class="lineno">   75 </span><span class="spaces">  </span><span class="istickedoff">, &quot;10111&quot;</span>
+<span class="lineno">   76 </span><span class="spaces">  </span><span class="istickedoff">, &quot;10101&quot;</span>
+<span class="lineno">   77 </span><span class="spaces">  </span><span class="istickedoff">, &quot;01111&quot;</span>
+<span class="lineno">   78 </span><span class="spaces">  </span><span class="istickedoff">, &quot;00111&quot;</span>
+<span class="lineno">   79 </span><span class="spaces">  </span><span class="istickedoff">, &quot;11100&quot;</span>
+<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">, &quot;10000&quot;</span>
+<span class="lineno">   81 </span><span class="spaces">  </span><span class="istickedoff">, &quot;11001&quot;</span>
+<span class="lineno">   82 </span><span class="spaces">  </span><span class="istickedoff">, &quot;00010&quot;</span>
+<span class="lineno">   83 </span><span class="spaces">  </span><span class="istickedoff">, &quot;01010&quot;</span>
+<span class="lineno">   84 </span><span class="spaces">  </span><span class="istickedoff">]</span></span>
+
+</pre>
+</body>
+</html>
