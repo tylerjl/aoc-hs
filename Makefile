@@ -5,6 +5,11 @@ build:
 .PHONY: test
 test:
 	cabal new-test --enable-coverage adventofcode:test:adventofcode-test
+	$(eval MIX=$(shell find dist-newstyle -type d -path '*dyn/mix/adventofcode*' | grep -v inplace))
+	$(eval TIX=$(shell find dist-newstyle -type f -path '*adventofcode*adventofcode*.tix' | grep -v test))
+	hpc report --hpcdir=$(MIX) $(TIX) \
+		| sed '/^  /d' \
+		| awk '{ p += $$1; } END { t = p/NR; if (t <= 70) { print t; exit 1 } else { print t " OK"; } }'
 
 .PHONY: benchmarks
 benchmarks:

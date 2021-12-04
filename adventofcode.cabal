@@ -135,6 +135,9 @@ test-suite adventofcode-test
                      , Y2018.D03Spec
                      , Y2018.D04Spec
                      , Y2018.D05Spec
+                     , Y2021.D01Spec
+                     , Y2021.D02Spec
+                     , Y2021.D03Spec
   build-depends:       base
                      , adventofcode
                      , bytestring
@@ -150,6 +153,9 @@ benchmark criterion
   default-extensions: TypeApplications
   hs-source-dirs:     benchmark
   main-is:            Bench.hs
+  other-modules:      Y2015.Bench
+                    , Y2016.Bench
+                    , Y2021.Bench
   build-depends:      base
                     , bytestring
                     , adventofcode
@@ -158,17 +164,6 @@ benchmark criterion
                     , text
                     , witch
   type:               exitcode-stdio-1.0
-
-test-suite haddock
-  default-language: Haskell2010
-  hs-source-dirs:   test
-  main-is:          Haddock.hs
-  build-depends:    base
-                  , foldl
-                  , regex-compat
-                  , text
-                  , turtle
-  type:             exitcode-stdio-1.0
 
 source-repository head
   type:     git
