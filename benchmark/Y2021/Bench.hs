@@ -10,21 +10,9 @@ import qualified Data.Text    as T
 import qualified Data.Text.IO as TIO
 import Witch
 
-import Y2021
-
-sample :: Text
-sample = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
-  & map (into @Text . show) & T.unlines
-
-d2sample :: Text
-d2sample =
-  [ "forward 5"
-  , "down 5"
-  , "forward 8"
-  , "up 3"
-  , "down 8"
-  , "forward 2"
-  ] & T.unlines
+import Y2021.D01
+import Y2021.D02
+import Y2021.D03
 
 getInput :: IO (Text, Text, Text)
 getInput =
@@ -38,25 +26,25 @@ benchmarks = env getInput $ \ ~(d1, d2, d3) ->
         [ bgroup "Day 1"
             [ bgroup "partA"
               [ bgroup "naive"
-                [ bench "simple" $ nf partA sample
+                [ bench "simple" $ nf partA d1sample
                 , bench "larger" $ nf partA d1
                 ]
               , bgroup "zipped"
-                [ bench "simple" $ nf partAZip sample
+                [ bench "simple" $ nf partAZip d1sample
                 , bench "larger" $ nf partAZip d1
                 ]
               , bgroup "recursive"
-                [ bench "simple" $ nf partARecur sample
+                [ bench "simple" $ nf partARecur d1sample
                 , bench "larger" $ nf partARecur d1
                 ]
               ]
             , bgroup "partB"
               [ bgroup "naive"
-                [ bench "simple" $ nf partB sample
+                [ bench "simple" $ nf partB d1sample
                 , bench "larger" $ nf partB d1
                 ]
               , bgroup "zipped"
-                [ bench "simple" $ nf partBZip sample
+                [ bench "simple" $ nf partBZip d1sample
                 , bench "larger" $ nf partBZip d1
                 ]
               ]
@@ -78,13 +66,13 @@ benchmarks = env getInput $ \ ~(d1, d2, d3) ->
         , bgroup "Day 3"
             [ bgroup "partA"
               [ bgroup "naive"
-                [ bench "simple" $ nf part3A Y2021.sample3
+                [ bench "simple" $ nf part3A d3sample
                 , bench "larger" $ nf part3A d3
                 ]
               ]
             , bgroup "partB"
               [ bgroup "naive"
-                [ bench "simple" $ nf part3B Y2021.sample3
+                [ bench "simple" $ nf part3B d3sample
                 , bench "larger" $ nf part3B d3
                 ]
               ]

@@ -8,24 +8,20 @@ import Y2021
 
 import Test.Hspec
 
-sample :: Text
-sample = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
-  & map (into @Text . show) & T.unlines
-
 spec :: Spec
 spec = parallel $ do
         describe "partA" $ do
           it "solves the example case" $
-            partA sample `shouldBe` 7
+            partA d1sample `shouldBe` 7
         describe "partAZip" $ do
           it "solves the example case" $
-            partAZip sample `shouldBe` 7
+            partAZip d1sample `shouldBe` 7
         describe "partARecur" $ do
           it "solves the example case" $
-            partARecur sample `shouldBe` 7
+            partARecur d1sample `shouldBe` 7
         describe "partB" $ do
           it "solves the example case" $
-            partB sample `shouldBe` 5
+            partB d1sample `shouldBe` 5
         describe "partBZip" $ do
           it "solves the example case" $
-            partBZip sample `shouldBe` 5
+            partBZip d1sample `shouldBe` 5

@@ -67,8 +67,8 @@ toBit '0' = 0
 toBit '1' = 1
 toBit  _  = error "unknown value"
 
-sample3 :: Text
-sample3 = T.unlines
+d3sample :: Text
+d3sample = T.unlines
   [ "00100"
   , "11110"
   , "10110"

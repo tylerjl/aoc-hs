@@ -61,3 +61,7 @@ toWindows _ = []
 -- |Unsafe-ish `Text` traversal to transform into a list of `Int`s.
 asInts :: Text -> [Int]
 asInts = map (read . into @String) . T.lines
+
+d1sample :: Text
+d1sample = T.unlines $ map (into @Text . show)
+  ([199, 200, 208, 210, 200, 207, 240, 269, 260, 263] :: [Int])

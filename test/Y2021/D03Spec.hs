@@ -12,7 +12,7 @@ spec :: Spec
 spec = parallel $ do
         describe "part3A" $ do
           it "solves the example case" $
-            part3A sample3 `shouldBe` 198
+            part3A d3sample `shouldBe` 198
         describe "part3B" $ do
           it "solves the example case" $
-            part3B sample3 `shouldBe` 230
+            part3B d3sample `shouldBe` 230

@@ -104,6 +104,37 @@ test-suite adventofcode-test
                      , OverloadedStrings
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       Y2015.D01Spec
+                     , Y2015.D02Spec
+                     , Y2015.D03Spec
+                     , Y2015.D04Spec
+                     , Y2015.D05Spec
+                     , Y2015.D06Spec
+                     , Y2015.D07Spec
+                     , Y2015.D08Spec
+                     , Y2015.D09Spec
+                     , Y2015.D10Spec
+                     , Y2015.D11Spec
+                     , Y2015.D12Spec
+                     , Y2015.D13Spec
+                     , Y2015.D14Spec
+                     , Y2015.D15Spec
+                     , Y2015.D17Spec
+                     , Y2015.D18Spec
+                     , Y2015.D19Spec
+                     , Y2015.D20Spec
+                     , Y2015.D21Spec
+                     , Y2015.D22Spec
+                     , Y2015.D23Spec
+                     , Y2015.D24Spec
+                     , Y2015.D25Spec
+                     , Y2016.D01Spec
+                     , Y2016.D02Spec
+                     , Y2018.D01Spec
+                     , Y2018.D02Spec
+                     , Y2018.D03Spec
+                     , Y2018.D04Spec
+                     , Y2018.D05Spec
   build-depends:       base
                      , adventofcode
                      , bytestring

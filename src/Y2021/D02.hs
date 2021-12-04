@@ -15,6 +15,7 @@ import qualified Text.Parsec as P
 import Text.Parsec.Text (Parser)
 import Y2015.Util (regularParse', intParser')
 import Control.Applicative ((<|>))
+import qualified Data.Text as T
 
 data Navigation
   = Forward Int
@@ -47,3 +48,13 @@ part2B (regularParse' navParser -> Right navs) = (\(x, y, _) -> x * y) $ go (0, 
         go (x, y, aim) (Up n:xs)      = go (x, y, aim - n) xs
         go coords []                  = coords
 part2B (regularParse' navParser -> Left err) = error (show err)
+
+d2sample :: Text
+d2sample = T.unlines
+  [ "forward 5"
+  , "down 5"
+  , "forward 8"
+  , "up 3"
+  , "down 8"
+  , "forward 2"
+  ]
