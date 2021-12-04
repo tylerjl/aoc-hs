@@ -12,7 +12,7 @@ cradle:
     - path: "test"
       component: "adventofcode:test:adventofcode-test"
 
-    - path: "benchmark/Bench.hs"
+    - path: "benchmark"
       component: "adventofcode:bench:criterion"
 
     - path: "test"
