@@ -21,6 +21,11 @@
                 hlint = {};
                 haskell-language-server = {
                   version = "1.5.0.0";
+                  cabalProject = ''
+                    packages: .
+                    package haskell-language-server
+                      flags: +rename
+                  '';
                 };
               };
               # Non-Haskell shell tools go here
