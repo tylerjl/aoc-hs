@@ -103,11 +103,19 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
                 [ bench "simple" $ nf part5A d5s
                 , bench "larger" $ nf part5A d5l
                 ]
+              , bgroup "hashmap"
+                [ bench "simple" $ nf part5AHM d5s
+                , bench "larger" $ nf part5AHM d5l
+                ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
                 [ bench "simple" $ nf part5B d5s
                 , bench "larger" $ nf part5B d5l
+                ]
+              , bgroup "hashmap"
+                [ bench "simple" $ nf part5BHM d5s
+                , bench "larger" $ nf part5BHM d5l
                 ]
               ]
             ]
