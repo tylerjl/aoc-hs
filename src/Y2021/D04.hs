@@ -24,14 +24,15 @@ type Card = [[Square]]
 data Square = Marked | Unmarked Int deriving Show
 
 part4A :: Text -> Int
-part4A (regularParse' bingoParser -> Right (ns, cs)) = solve4A ns cs
+part4A (regularParse' bingoParser -> Right (ns, cs)) = solve4 head ns cs
 part4A (regularParse' bingoParser -> Left (show -> err)) = error err
 
-solve4A :: [Int] -> [Bingo Card] -> Int
-solve4A x = tally . head . iterateMap x
+solve4 :: ([Bingo Card] -> Bingo Card) -> [Int] -> [Bingo Card] -> Int
+solve4 f x = tally . f . iterateMap x
 
 part4B :: Text -> Int
-part4B = error "not implemented"
+part4B (regularParse' bingoParser -> Right (ns, cs)) = solve4 last ns cs
+part4B (regularParse' bingoParser -> Left (show -> err)) = error err
 
 tally :: Bingo Card -> Int
 tally (Playing card)  = sumCard card
