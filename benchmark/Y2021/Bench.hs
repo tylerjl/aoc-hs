@@ -29,7 +29,7 @@ getInput =
 benchmarks :: Benchmark
 benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
     bgroup "Y2021"
-        [ bgroup "Day 1"
+        [ bgroup "D01"
             [ bgroup "partA"
               [ bgroup "naive"
                 [ bench "simple" $ nf partA d1sample
@@ -55,7 +55,7 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
                 ]
               ]
             ]
-        , bgroup "Day 2"
+        , bgroup "D02"
             [ bgroup "partA"
               [ bgroup "initial"
                 [ bench "simple" $ nf part2A d2sample
@@ -69,7 +69,7 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
                 ]
               ]
             ]
-        , bgroup "Day 3"
+        , bgroup "D03"
             [ bgroup "partA"
               [ bgroup "initial"
                 [ bench "simple" $ nf part3A d3sample
@@ -83,7 +83,7 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
                 ]
               ]
             ]
-        , bgroup "Day 4"
+        , bgroup "D04"
             [ bgroup "partA"
               [ bgroup "initial"
                 [ bench "simple" $ nf part4A d4s
@@ -97,7 +97,7 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
                 ]
               ]
             ]
-        , bgroup "Day 5"
+        , bgroup "D05"
             [ bgroup "partA"
               [ bgroup "initial"
                 [ bench "simple" $ nf part5A d5s
