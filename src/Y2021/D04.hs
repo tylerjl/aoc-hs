@@ -14,33 +14,46 @@ import Text.Parsec.Text
 import Y2015.Util (intParser', regularParse')
 import Data.List (transpose, partition)
 
+-- |Fancy data type to represent _game_ state, not just a card
 data Bingo a
   = Ended (Int, a)
   | Playing a
+-- |I'm not sure if a derive would get this right
 instance Functor Bingo where
   fmap f (Ended (i, c)) = Ended (i, f c)
   fmap f (Playing a) = Playing (f a)
+-- |Represents a game board state
 type Card = [[Square]]
+-- |Small wrapper over how to record marked/unmarked squares
 data Square = Marked | Unmarked Int deriving Show
 
+-- |Solve part A
 part4A :: Text -> Int
 part4A (regularParse' bingoParser -> Right (ns, cs)) = solve4 head ns cs
 part4A (regularParse' bingoParser -> Left (show -> err)) = error err
 
-solve4 :: ([Bingo Card] -> Bingo Card) -> [Int] -> [Bingo Card] -> Int
-solve4 f x = tally . f . iterateMap x
-
+-- |Solve part B
 part4B :: Text -> Int
 part4B (regularParse' bingoParser -> Right (ns, cs)) = solve4 last ns cs
 part4B (regularParse' bingoParser -> Left (show -> err)) = error err
 
+-- |Fortunately both A and B are just asking slightly different questions, so we
+-- have a higher-order function to determine how to pull the matching value from
+-- our resultant list.
+solve4 :: ([Bingo Card] -> Bingo Card) -> [Int] -> [Bingo Card] -> Int
+solve4 f x = tally . f . iterateMap x
+
+-- |Problem-defined method of scoring a card. The "in-progress" scoring isn't
+-- actually ever used. Probably a bug.
 tally :: Bingo Card -> Int
 tally (Playing card)  = sumCard card
 tally (Ended (n, card)) = n * sumCard card
 
-sumCard :: [[Square]] -> Int
+-- |Yank out the total values for a card.
+sumCard :: Card -> Int
 sumCard = sum . map (\(Unmarked n') -> n') . filter (not . marked) . concat
 
+-- |Our main recursive loop to walk through the "called" numbers.
 iterateMap :: [Int] -> [Bingo Card] -> [Bingo Card]
 iterateMap [] _ = []
 iterateMap (n:nums) cards = needles ++ iterateMap nums haystacks
