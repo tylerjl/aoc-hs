@@ -25,24 +25,28 @@ benchmarks =
     env entropy $ \levels ->
         bgroup "Y2015"
             [ bgroup "D01"
-                [ bench "simple" $ nf level "()((()(())))(((((((())))))))(()))))))"
+              [ bgroup "partA"
+                [ bench "small" $ nf level "()((()(())))(((((((())))))))(()))))))"
                 , bench "large"  $ nf level (Prelude.take 100 levels)
                 , bench "huge"   $ nf level levels
                 ]
+              ]
             , bgroup "D22"
-                [ bench "simple" $ whnf (testSpellBattle False)
-                    (unlines ["Hit Points: 13", "Damage: 8"])
-                , bench "alternate" $ whnf (testSpellBattle False)
-                    (unlines ["Hit Points: 14", "Damage: 8"])
+              [ bgroup "partA"
+                [ bench "small" $ whnf (testSpellBattle False)
+                  (unlines ["Hit Points: 13", "Damage: 8"])
+                , bench "small'" $ whnf (testSpellBattle False)
+                  (unlines ["Hit Points: 14", "Damage: 8"])
                 ]
+              ]
             , bgroup "D24"
-                [ bgroup "idealEntanglement"
+                [ bgroup "partA"
                     [ bench "small" $ whnf (idealEntanglement 3)
                         (unlines $ map show [1, 3, 2, 2, 4])
                     , bench "large" $ whnf (idealEntanglement 3)
                         (unlines $ map show $ [1..5] ++ [7..11])
                     ]
-                , bgroup "idealEntanglementOptimized"
+                , bgroup "partB"
                     [ bench "small" $ whnf (idealEntanglementOptimized 3)
                         (unlines $ map show [1, 3, 2, 2, 4])
                     , bench "large" $ whnf (idealEntanglementOptimized 3)

@@ -18,18 +18,20 @@ benchmarks :: Benchmark
 benchmarks =
     bgroup "Y2016"
         [ bgroup "D01"
-            [ bgroup "blockDistance"
-              [ bench "simple" $ nf blockDistance "R2, L3"
-              , bench "larger" $ nf blockDistance "R5, L5, R5, R3"
+            [ bgroup "partA"
+              [ bench "small" $ nf blockDistance "R2, L3"
+              , bench "large" $ nf blockDistance "R5, L5, R5, R3"
               ]
-            , bgroup "visitedTwice"
-              [ bench "simple" $ nf visitedTwice "R8, R4, R4, R8"
+            , bgroup "partB"
+              [ bench "small" $ nf visitedTwice "R8, R4, R4, R8"
               ]
             ]
         , bgroup "D02"
-            [ bgroup "bathroomCode"
-              [ bench "part 1" $ nf (bathroomCode grid1 (2,2)) bathroomDirections
-              , bench "part 2" $ nf (bathroomCode grid2 (1,3)) bathroomDirections
-              ]
+          [ bgroup "partA"
+            [ bench "small" $ nf (bathroomCode grid1 (2,2)) bathroomDirections
             ]
+          , bgroup "partB"
+            [ bench "small" $ nf (bathroomCode grid2 (1,3)) bathroomDirections
+            ]
+          ]
         ]

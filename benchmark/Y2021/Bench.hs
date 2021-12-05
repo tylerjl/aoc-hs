@@ -31,91 +31,91 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
     bgroup "Y2021"
         [ bgroup "D01"
             [ bgroup "partA"
-              [ bgroup "naive"
-                [ bench "simple" $ nf partA d1sample
-                , bench "larger" $ nf partA d1
+              [ bgroup "initial"
+                [ bench "small" $ nf partA d1sample
+                , bench "large" $ nf partA d1
                 ]
               , bgroup "zipped"
-                [ bench "simple" $ nf partAZip d1sample
-                , bench "larger" $ nf partAZip d1
+                [ bench "small" $ nf partAZip d1sample
+                , bench "large" $ nf partAZip d1
                 ]
               , bgroup "recursive"
-                [ bench "simple" $ nf partARecur d1sample
-                , bench "larger" $ nf partARecur d1
+                [ bench "small" $ nf partARecur d1sample
+                , bench "large" $ nf partARecur d1
                 ]
               ]
             , bgroup "partB"
-              [ bgroup "naive"
-                [ bench "simple" $ nf partB d1sample
-                , bench "larger" $ nf partB d1
+              [ bgroup "initial"
+                [ bench "small" $ nf partB d1sample
+                , bench "large" $ nf partB d1
                 ]
               , bgroup "zipped"
-                [ bench "simple" $ nf partBZip d1sample
-                , bench "larger" $ nf partBZip d1
+                [ bench "small" $ nf partBZip d1sample
+                , bench "large" $ nf partBZip d1
                 ]
               ]
             ]
         , bgroup "D02"
             [ bgroup "partA"
               [ bgroup "initial"
-                [ bench "simple" $ nf part2A d2sample
-                , bench "larger" $ nf part2A d2
+                [ bench "small" $ nf part2A d2sample
+                , bench "large" $ nf part2A d2
                 ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
-                [ bench "simple" $ nf part2B d2sample
-                , bench "larger" $ nf part2B d2
+                [ bench "small" $ nf part2B d2sample
+                , bench "large" $ nf part2B d2
                 ]
               ]
             ]
         , bgroup "D03"
             [ bgroup "partA"
               [ bgroup "initial"
-                [ bench "simple" $ nf part3A d3sample
-                , bench "larger" $ nf part3A d3
+                [ bench "small" $ nf part3A d3sample
+                , bench "large" $ nf part3A d3
                 ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
-                [ bench "simple" $ nf part3B d3sample
-                , bench "larger" $ nf part3B d3
+                [ bench "small" $ nf part3B d3sample
+                , bench "large" $ nf part3B d3
                 ]
               ]
             ]
         , bgroup "D04"
             [ bgroup "partA"
               [ bgroup "initial"
-                [ bench "simple" $ nf part4A d4s
-                , bench "larger" $ nf part4A d4l
+                [ bench "small" $ nf part4A d4s
+                , bench "large" $ nf part4A d4l
                 ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
-                [ bench "simple" $ nf part4B d4s
-                , bench "larger" $ nf part4B d4l
+                [ bench "small" $ nf part4B d4s
+                , bench "large" $ nf part4B d4l
                 ]
               ]
             ]
         , bgroup "D05"
             [ bgroup "partA"
               [ bgroup "initial"
-                [ bench "simple" $ nf part5A d5s
-                , bench "larger" $ nf part5A d5l
+                [ bench "small" $ nf part5A d5s
+                , bench "large" $ nf part5A d5l
                 ]
               , bgroup "hashmap"
-                [ bench "simple" $ nf part5AHM d5s
-                , bench "larger" $ nf part5AHM d5l
+                [ bench "small" $ nf part5AHM d5s
+                , bench "large" $ nf part5AHM d5l
                 ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
-                [ bench "simple" $ nf part5B d5s
-                , bench "larger" $ nf part5B d5l
+                [ bench "small" $ nf part5B d5s
+                , bench "large" $ nf part5B d5l
                 ]
               , bgroup "hashmap"
-                [ bench "simple" $ nf part5BHM d5s
-                , bench "larger" $ nf part5BHM d5l
+                [ bench "small" $ nf part5BHM d5s
+                , bench "large" $ nf part5BHM d5l
                 ]
               ]
             ]
