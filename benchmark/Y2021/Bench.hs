@@ -14,17 +14,20 @@ import Y2021.D01
 import Y2021.D02
 import Y2021.D03
 import Y2021.D04
+import Y2021.D05
 
-getInput :: IO (Text, Text, Text, (Text, Text))
+getInput :: IO (Text, Text, Text, (Text, Text), (Text, Text))
 getInput =
-  (,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
-        <*> TIO.readFile "dist/resources/2021/day2.txt"
-        <*> TIO.readFile "dist/resources/2021/day3.txt"
-        <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
-                 <*> TIO.readFile "dist/resources/2021/day4.txt")
+  (,,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
+         <*> TIO.readFile "dist/resources/2021/day2.txt"
+         <*> TIO.readFile "dist/resources/2021/day3.txt"
+         <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
+                  <*> TIO.readFile "dist/resources/2021/day4.txt")
+         <*> ((,) <$> TIO.readFile "dist/resources/2021/day5_sample.txt"
+                  <*> TIO.readFile "dist/resources/2021/day5.txt")
 
 benchmarks :: Benchmark
-benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
+benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
     bgroup "Y2021"
         [ bgroup "Day 1"
             [ bgroup "partA"
@@ -91,6 +94,20 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
               [ bgroup "initial"
                 [ bench "simple" $ nf part4B d4s
                 , bench "larger" $ nf part4B d4l
+                ]
+              ]
+            ]
+        , bgroup "Day 5"
+            [ bgroup "partA"
+              [ bgroup "initial"
+                [ bench "simple" $ nf part5A d5s
+                , bench "larger" $ nf part5A d5l
+                ]
+              ]
+            , bgroup "partB"
+              [ bgroup "initial"
+                [ bench "simple" $ nf part5B d5s
+                , bench "larger" $ nf part5B d5l
                 ]
               ]
             ]

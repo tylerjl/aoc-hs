@@ -20,3 +20,4 @@ import Y2021.D01 as X
 import Y2021.D02 as X
 import Y2021.D03 as X
 import Y2021.D04 as X
+import Y2021.D05 as X

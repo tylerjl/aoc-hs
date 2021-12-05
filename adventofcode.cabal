@@ -77,6 +77,7 @@ library
                      , Y2021.D02
                      , Y2021.D03
                      , Y2021.D04
+                     , Y2021.D05
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
@@ -87,6 +88,7 @@ library
                      , lens
                      , matrix
                      , memoize
+                     , MissingH
                      , parsec
                      , repa
                      , safe
@@ -140,6 +142,7 @@ test-suite adventofcode-test
                      , Y2021.D02Spec
                      , Y2021.D03Spec
                      , Y2021.D04Spec
+                     , Y2021.D05Spec
   build-depends:       base
                      , adventofcode
                      , bytestring
