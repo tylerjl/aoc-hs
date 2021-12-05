@@ -76,6 +76,7 @@ library
                      , Y2021.D01
                      , Y2021.D02
                      , Y2021.D03
+                     , Y2021.D04
   build-depends:       aeson
                      , base >= 4.7 && < 5
                      , base16-bytestring
@@ -138,6 +139,7 @@ test-suite adventofcode-test
                      , Y2021.D01Spec
                      , Y2021.D02Spec
                      , Y2021.D03Spec
+                     , Y2021.D04Spec
   build-depends:       base
                      , adventofcode
                      , bytestring

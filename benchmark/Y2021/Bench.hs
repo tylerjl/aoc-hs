@@ -13,15 +13,18 @@ import Witch
 import Y2021.D01
 import Y2021.D02
 import Y2021.D03
+import Y2021.D04
 
-getInput :: IO (Text, Text, Text)
+getInput :: IO (Text, Text, Text, (Text, Text))
 getInput =
-  (,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
-       <*> TIO.readFile "dist/resources/2021/day2.txt"
-       <*> TIO.readFile "dist/resources/2021/day3.txt"
+  (,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
+        <*> TIO.readFile "dist/resources/2021/day2.txt"
+        <*> TIO.readFile "dist/resources/2021/day3.txt"
+        <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
+                 <*> TIO.readFile "dist/resources/2021/day4.txt")
 
 benchmarks :: Benchmark
-benchmarks = env getInput $ \ ~(d1, d2, d3) ->
+benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
     bgroup "Y2021"
         [ bgroup "Day 1"
             [ bgroup "partA"
@@ -74,6 +77,14 @@ benchmarks = env getInput $ \ ~(d1, d2, d3) ->
               [ bgroup "naive"
                 [ bench "simple" $ nf part3B d3sample
                 , bench "larger" $ nf part3B d3
+                ]
+              ]
+            ]
+        , bgroup "Day 4"
+            [ bgroup "partA"
+              [ bgroup "initial"
+                [ bench "simple" $ nf part4A d4s
+                , bench "larger" $ nf part4A d4l
                 ]
               ]
             ]
