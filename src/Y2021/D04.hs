@@ -11,9 +11,15 @@ module Y2021.D04 where
 import Data.Text (Text)
 import Text.Parsec
 import Text.Parsec.Text
-import Y2015.Util (intParser', regularParse', (<||>))
-import Data.List (transpose)
+import Y2015.Util (intParser', regularParse')
+import Data.List (transpose, partition)
 
+data Bingo a
+  = Ended (Int, a)
+  | Playing a
+instance Functor Bingo where
+  fmap f (Ended (i, c)) = Ended (i, f c)
+  fmap f (Playing a) = Playing (f a)
 type Card = [[Square]]
 data Square = Marked | Unmarked Int deriving Show
 
@@ -21,43 +27,53 @@ part4A :: Text -> Int
 part4A (regularParse' bingoParser -> Right (ns, cs)) = solve4A ns cs
 part4A (regularParse' bingoParser -> Left (show -> err)) = error err
 
-solve4A :: [Int] -> [Card] -> Int
-solve4A x = tally . head . filter (winner . snd) . iterateMap x
+solve4A :: [Int] -> [Bingo Card] -> Int
+solve4A x = tally . head . iterateMap x
 
 part4B :: Text -> Int
 part4B = error "not implemented"
 
-tally :: (Int, Card) -> Int
-tally (n, card) =
-  n * (sum . map (\(Unmarked n') -> n') $ filter (not . marked) $ concat card)
+tally :: Bingo Card -> Int
+tally (Playing card)  = sumCard card
+tally (Ended (n, card)) = n * sumCard card
 
-iterateMap :: [Int] -> [Card] -> [(Int, Card)]
+sumCard :: [[Square]] -> Int
+sumCard = sum . map (\(Unmarked n') -> n') . filter (not . marked) . concat
+
+iterateMap :: [Int] -> [Bingo Card] -> [Bingo Card]
 iterateMap [] _ = []
-iterateMap (n:nums) cards = zip (repeat n) cards' ++ iterateMap nums cards'
-  where cards' = mark n cards
+iterateMap (n:nums) cards = needles ++ iterateMap nums haystacks
+  where (needles, haystacks) = partition hasEnded $ mark n cards
 
-mark :: Int -> [Card] -> [Card]
+mark :: Int -> [Bingo Card] -> [Bingo Card]
 mark num = map (markRows num)
 
-markRows :: Int -> Card -> Card
-markRows n = map (map (markRow n))
+markRows :: Int -> Bingo Card -> Bingo Card
+markRows n = gameEnd n . fmap (fmap $ map (markRow n))
   where
     markRow _ Marked = Marked
     markRow n' a@(Unmarked b) | b == n'   = Marked
                               | otherwise = a
 
-winner :: Card -> Bool
-winner = check <||> (check . transpose)
+hasEnded :: Bingo a -> Bool
+hasEnded (Playing _) = False
+hasEnded (Ended _) = True
+
+gameEnd :: Int -> Bingo Card -> Bingo Card
+gameEnd _ b@(Ended _) = b
+gameEnd n b@(Playing card)
+  | check card || (check . transpose) card = Ended (n, card)
+  | otherwise = b
   where check = any (all marked)
 
 marked :: Square -> Bool
 marked Marked       = True
 marked (Unmarked _) = False
 
-bingoParser :: Parser ([Int], [Card])
+bingoParser :: Parser ([Int], [Bingo Card])
 bingoParser = (,) <$> (lottoParser <* newline) <*> cardsParser <* eof
   where
     lottoParser = intParser' `sepBy1` char ',' <* newline
     rowParser   = (Unmarked <$> intParser') `sepBy1` many1 (char ' ')
-    cardParser  = count 5 (optional (many space) *> rowParser <* endOfLine)
+    cardParser  = Playing <$> count 5 (optional (many space) *> rowParser <* endOfLine)
     cardsParser = cardParser `sepBy1` newline
