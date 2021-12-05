@@ -54,13 +54,13 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
             ]
         , bgroup "Day 2"
             [ bgroup "partA"
-              [ bgroup "naive"
+              [ bgroup "initial"
                 [ bench "simple" $ nf part2A d2sample
                 , bench "larger" $ nf part2A d2
                 ]
               ]
             , bgroup "partB"
-              [ bgroup "naive"
+              [ bgroup "initial"
                 [ bench "simple" $ nf part2B d2sample
                 , bench "larger" $ nf part2B d2
                 ]
@@ -68,13 +68,13 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
             ]
         , bgroup "Day 3"
             [ bgroup "partA"
-              [ bgroup "naive"
+              [ bgroup "initial"
                 [ bench "simple" $ nf part3A d3sample
                 , bench "larger" $ nf part3A d3
                 ]
               ]
             , bgroup "partB"
-              [ bgroup "naive"
+              [ bgroup "initial"
                 [ bench "simple" $ nf part3B d3sample
                 , bench "larger" $ nf part3B d3
                 ]
@@ -85,6 +85,12 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l)) ->
               [ bgroup "initial"
                 [ bench "simple" $ nf part4A d4s
                 , bench "larger" $ nf part4A d4l
+                ]
+              ]
+            , bgroup "partB"
+              [ bgroup "initial"
+                [ bench "simple" $ nf part4B d4s
+                , bench "larger" $ nf part4B d4l
                 ]
               ]
             ]
