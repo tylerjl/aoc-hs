@@ -80,6 +80,10 @@ span.spaces    { background: white }
 <span class="lineno">   61 </span>-- |Unsafe-ish `Text` traversal to transform into a list of `Int`s.
 <span class="lineno">   62 </span>asInts :: Text -&gt; [Int]
 <span class="lineno">   63 </span><span class="decl"><span class="istickedoff">asInts = map (read . into @String) . T.lines</span></span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>d1sample :: Text
+<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">d1sample = T.unlines $ map (into @Text . show)</span>
+<span class="lineno">   67 </span><span class="spaces">  </span><span class="istickedoff">([199, 200, 208, 210, 200, 207, 240, 269, 260, 263] :: [Int])</span></span>
 
 </pre>
 </body>
