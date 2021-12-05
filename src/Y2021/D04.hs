@@ -53,15 +53,19 @@ tally (Ended (n, card)) = n * sumCard card
 sumCard :: Card -> Int
 sumCard = sum . map (\(Unmarked n') -> n') . filter (not . marked) . concat
 
--- |Our main recursive loop to walk through the "called" numbers.
+-- |Our main recursive loop to walk through the "called" numbers. We return a
+-- list solely of elements that meet the "ended" predicate.
 iterateMap :: [Int] -> [Bingo Card] -> [Bingo Card]
 iterateMap [] _ = []
 iterateMap (n:nums) cards = needles ++ iterateMap nums haystacks
   where (needles, haystacks) = partition hasEnded $ mark n cards
 
+-- |Accept a list of `Bingo Card`s and update each with the called number.
 mark :: Int -> [Bingo Card] -> [Bingo Card]
 mark num = map (markRows num)
 
+-- |Update a `Card` - we make the determination to "end" a game here, so as soon
+-- as its "won" the type swaps over to the ended value.
 markRows :: Int -> Bingo Card -> Bingo Card
 markRows n = gameEnd n . fmap (fmap $ map (markRow n))
   where
@@ -69,10 +73,13 @@ markRows n = gameEnd n . fmap (fmap $ map (markRow n))
     markRow n' a@(Unmarked b) | b == n'   = Marked
                               | otherwise = a
 
+-- |Small helper predicate to tell is when a `Bingo` type is over or not.
 hasEnded :: Bingo a -> Bool
 hasEnded (Playing _) = False
 hasEnded (Ended _) = True
 
+-- |Important function to determine if a card is a winning card. If so it
+-- changes its type.
 gameEnd :: Int -> Bingo Card -> Bingo Card
 gameEnd _ b@(Ended _) = b
 gameEnd n b@(Playing card)
@@ -80,10 +87,13 @@ gameEnd n b@(Playing card)
   | otherwise = b
   where check = any (all marked)
 
+-- |Another little helper to tell us if a spot has been marked or not.
 marked :: Square -> Bool
 marked Marked       = True
 marked (Unmarked _) = False
 
+-- |This is a sort of hairy, but all-in-one, parser for the problem set input. 5
+-- is a magic number for board size.
 bingoParser :: Parser ([Int], [Bingo Card])
 bingoParser = (,) <$> (lottoParser <* newline) <*> cardsParser <* eof
   where

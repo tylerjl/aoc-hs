@@ -10,6 +10,8 @@ Each day is broken up into an individual module with accompaying spec tests
 and (possibly?) benchmarks.
 Each day's module exports are re-exported here for convenience when importing
 'Y2021' et. al.
+
+This year I leaned a little bit more into making things very "Haskell"-ly by relying more on laziness, centralizing solutions around data types, etc.
 -}
 
 module Y2021 (module X) where

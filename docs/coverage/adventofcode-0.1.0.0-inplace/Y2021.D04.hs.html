@@ -72,44 +72,54 @@ span.spaces    { background: white }
 <span class="lineno">   53 </span>sumCard :: Card -&gt; Int
 <span class="lineno">   54 </span><span class="decl"><span class="istickedoff">sumCard = sum . map (\(Unmarked n') -&gt; n') . filter (not . marked) . concat</span></span>
 <span class="lineno">   55 </span>
-<span class="lineno">   56 </span>-- |Our main recursive loop to walk through the &quot;called&quot; numbers.
-<span class="lineno">   57 </span>iterateMap :: [Int] -&gt; [Bingo Card] -&gt; [Bingo Card]
-<span class="lineno">   58 </span><span class="decl"><span class="istickedoff">iterateMap [] _ = []</span>
-<span class="lineno">   59 </span><span class="spaces"></span><span class="istickedoff">iterateMap (n:nums) cards = needles ++ iterateMap nums haystacks</span>
-<span class="lineno">   60 </span><span class="spaces">  </span><span class="istickedoff">where (needles, haystacks) = partition hasEnded $ mark n cards</span></span>
-<span class="lineno">   61 </span>
-<span class="lineno">   62 </span>mark :: Int -&gt; [Bingo Card] -&gt; [Bingo Card]
-<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">mark num = map (markRows num)</span></span>
-<span class="lineno">   64 </span>
-<span class="lineno">   65 </span>markRows :: Int -&gt; Bingo Card -&gt; Bingo Card
-<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">markRows n = gameEnd n . fmap (fmap $ map (markRow n))</span>
-<span class="lineno">   67 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   68 </span><span class="spaces">    </span><span class="istickedoff">markRow _ Marked = Marked</span>
-<span class="lineno">   69 </span><span class="spaces">    </span><span class="istickedoff">markRow n' a@(Unmarked b) | b == n'   = Marked</span>
-<span class="lineno">   70 </span><span class="spaces">                              </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = a</span></span>
-<span class="lineno">   71 </span>
-<span class="lineno">   72 </span>hasEnded :: Bingo a -&gt; Bool
-<span class="lineno">   73 </span><span class="decl"><span class="istickedoff">hasEnded (Playing _) = False</span>
-<span class="lineno">   74 </span><span class="spaces"></span><span class="istickedoff">hasEnded (Ended _) = True</span></span>
+<span class="lineno">   56 </span>-- |Our main recursive loop to walk through the &quot;called&quot; numbers. We return a
+<span class="lineno">   57 </span>-- list solely of elements that meet the &quot;ended&quot; predicate.
+<span class="lineno">   58 </span>iterateMap :: [Int] -&gt; [Bingo Card] -&gt; [Bingo Card]
+<span class="lineno">   59 </span><span class="decl"><span class="istickedoff">iterateMap [] _ = []</span>
+<span class="lineno">   60 </span><span class="spaces"></span><span class="istickedoff">iterateMap (n:nums) cards = needles ++ iterateMap nums haystacks</span>
+<span class="lineno">   61 </span><span class="spaces">  </span><span class="istickedoff">where (needles, haystacks) = partition hasEnded $ mark n cards</span></span>
+<span class="lineno">   62 </span>
+<span class="lineno">   63 </span>-- |Accept a list of `Bingo Card`s and update each with the called number.
+<span class="lineno">   64 </span>mark :: Int -&gt; [Bingo Card] -&gt; [Bingo Card]
+<span class="lineno">   65 </span><span class="decl"><span class="istickedoff">mark num = map (markRows num)</span></span>
+<span class="lineno">   66 </span>
+<span class="lineno">   67 </span>-- |Update a `Card` - we make the determination to &quot;end&quot; a game here, so as soon
+<span class="lineno">   68 </span>-- as its &quot;won&quot; the type swaps over to the ended value.
+<span class="lineno">   69 </span>markRows :: Int -&gt; Bingo Card -&gt; Bingo Card
+<span class="lineno">   70 </span><span class="decl"><span class="istickedoff">markRows n = gameEnd n . fmap (fmap $ map (markRow n))</span>
+<span class="lineno">   71 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   72 </span><span class="spaces">    </span><span class="istickedoff">markRow _ Marked = Marked</span>
+<span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">markRow n' a@(Unmarked b) | b == n'   = Marked</span>
+<span class="lineno">   74 </span><span class="spaces">                              </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = a</span></span>
 <span class="lineno">   75 </span>
-<span class="lineno">   76 </span>gameEnd :: Int -&gt; Bingo Card -&gt; Bingo Card
-<span class="lineno">   77 </span><span class="decl"><span class="istickedoff">gameEnd _ b@(Ended _) = <span class="nottickedoff">b</span></span>
-<span class="lineno">   78 </span><span class="spaces"></span><span class="istickedoff">gameEnd n b@(Playing card)</span>
-<span class="lineno">   79 </span><span class="spaces">  </span><span class="istickedoff">| check card || (check . transpose) card = Ended (n, card)</span>
-<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = b</span>
-<span class="lineno">   81 </span><span class="spaces">  </span><span class="istickedoff">where check = any (all marked)</span></span>
-<span class="lineno">   82 </span>
-<span class="lineno">   83 </span>marked :: Square -&gt; Bool
-<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">marked Marked       = True</span>
-<span class="lineno">   85 </span><span class="spaces"></span><span class="istickedoff">marked (Unmarked _) = False</span></span>
-<span class="lineno">   86 </span>
-<span class="lineno">   87 </span>bingoParser :: Parser ([Int], [Bingo Card])
-<span class="lineno">   88 </span><span class="decl"><span class="istickedoff">bingoParser = (,) &lt;$&gt; (lottoParser &lt;* newline) &lt;*&gt; cardsParser &lt;* eof</span>
-<span class="lineno">   89 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   90 </span><span class="spaces">    </span><span class="istickedoff">lottoParser = intParser' `sepBy1` char ',' &lt;* newline</span>
-<span class="lineno">   91 </span><span class="spaces">    </span><span class="istickedoff">rowParser   = (Unmarked &lt;$&gt; intParser') `sepBy1` many1 (char ' ')</span>
-<span class="lineno">   92 </span><span class="spaces">    </span><span class="istickedoff">cardParser  = Playing &lt;$&gt; count 5 (optional (many space) *&gt; rowParser &lt;* endOfLine)</span>
-<span class="lineno">   93 </span><span class="spaces">    </span><span class="istickedoff">cardsParser = cardParser `sepBy1` newline</span></span>
+<span class="lineno">   76 </span>-- |Small helper predicate to tell is when a `Bingo` type is over or not.
+<span class="lineno">   77 </span>hasEnded :: Bingo a -&gt; Bool
+<span class="lineno">   78 </span><span class="decl"><span class="istickedoff">hasEnded (Playing _) = False</span>
+<span class="lineno">   79 </span><span class="spaces"></span><span class="istickedoff">hasEnded (Ended _) = True</span></span>
+<span class="lineno">   80 </span>
+<span class="lineno">   81 </span>-- |Important function to determine if a card is a winning card. If so it
+<span class="lineno">   82 </span>-- changes its type.
+<span class="lineno">   83 </span>gameEnd :: Int -&gt; Bingo Card -&gt; Bingo Card
+<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">gameEnd _ b@(Ended _) = <span class="nottickedoff">b</span></span>
+<span class="lineno">   85 </span><span class="spaces"></span><span class="istickedoff">gameEnd n b@(Playing card)</span>
+<span class="lineno">   86 </span><span class="spaces">  </span><span class="istickedoff">| check card || (check . transpose) card = Ended (n, card)</span>
+<span class="lineno">   87 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = b</span>
+<span class="lineno">   88 </span><span class="spaces">  </span><span class="istickedoff">where check = any (all marked)</span></span>
+<span class="lineno">   89 </span>
+<span class="lineno">   90 </span>-- |Another little helper to tell us if a spot has been marked or not.
+<span class="lineno">   91 </span>marked :: Square -&gt; Bool
+<span class="lineno">   92 </span><span class="decl"><span class="istickedoff">marked Marked       = True</span>
+<span class="lineno">   93 </span><span class="spaces"></span><span class="istickedoff">marked (Unmarked _) = False</span></span>
+<span class="lineno">   94 </span>
+<span class="lineno">   95 </span>-- |This is a sort of hairy, but all-in-one, parser for the problem set input. 5
+<span class="lineno">   96 </span>-- is a magic number for board size.
+<span class="lineno">   97 </span>bingoParser :: Parser ([Int], [Bingo Card])
+<span class="lineno">   98 </span><span class="decl"><span class="istickedoff">bingoParser = (,) &lt;$&gt; (lottoParser &lt;* newline) &lt;*&gt; cardsParser &lt;* eof</span>
+<span class="lineno">   99 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  100 </span><span class="spaces">    </span><span class="istickedoff">lottoParser = intParser' `sepBy1` char ',' &lt;* newline</span>
+<span class="lineno">  101 </span><span class="spaces">    </span><span class="istickedoff">rowParser   = (Unmarked &lt;$&gt; intParser') `sepBy1` many1 (char ' ')</span>
+<span class="lineno">  102 </span><span class="spaces">    </span><span class="istickedoff">cardParser  = Playing &lt;$&gt; count 5 (optional (many space) *&gt; rowParser &lt;* endOfLine)</span>
+<span class="lineno">  103 </span><span class="spaces">    </span><span class="istickedoff">cardsParser = cardParser `sepBy1` newline</span></span>
 
 </pre>
 </body>
