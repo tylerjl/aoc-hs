@@ -86,14 +86,22 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
         , bgroup "D04"
             [ bgroup "partA"
               [ bgroup "initial"
-                [ bench "small" $ nf part4A d4s
-                , bench "large" $ nf part4A d4l
+                [ bench "small" $ whnf part4A d4s
+                , bench "large" $ whnf part4A d4l
+                ]
+              , bgroup "set"
+                [ bench "small" $ whnf part4ASet d4s
+                , bench "large" $ whnf part4ASet d4l
                 ]
               ]
             , bgroup "partB"
               [ bgroup "initial"
-                [ bench "small" $ nf part4B d4s
-                , bench "large" $ nf part4B d4l
+                [ bench "small" $ whnf part4B d4s
+                , bench "large" $ whnf part4B d4l
+                ]
+              , bgroup "set"
+                [ bench "small" $ whnf part4BSet d4s
+                , bench "large" $ whnf part4BSet d4l
                 ]
               ]
             ]
