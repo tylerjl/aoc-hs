@@ -6,28 +6,27 @@ import Criterion (Benchmark, bench, bgroup, nf, whnf)
 import Criterion.Main (env)
 import Data.Function ((&))
 import Data.Text (Text)
-import qualified Data.Text    as T
-import qualified Data.Text.IO as TIO
 import Witch
 
-import Y2021.D01
-import Y2021.D02
-import Y2021.D03
-import Y2021.D04
-import Y2021.D05
+import qualified Data.Text    as T
+import qualified Data.Text.IO as TIO
 
-getInput :: IO (Text, Text, Text, (Text, Text), (Text, Text))
+import Y2021
+
+getInput :: IO (Text, Text, Text, (Text, Text), (Text, Text), (Text, Text))
 getInput =
-  (,,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
-         <*> TIO.readFile "dist/resources/2021/day2.txt"
-         <*> TIO.readFile "dist/resources/2021/day3.txt"
-         <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
-                  <*> TIO.readFile "dist/resources/2021/day4.txt")
-         <*> ((,) <$> TIO.readFile "dist/resources/2021/day5_sample.txt"
-                  <*> TIO.readFile "dist/resources/2021/day5.txt")
+  (,,,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
+          <*> TIO.readFile "dist/resources/2021/day2.txt"
+          <*> TIO.readFile "dist/resources/2021/day3.txt"
+          <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
+                   <*> TIO.readFile "dist/resources/2021/day4.txt")
+          <*> ((,) <$> TIO.readFile "dist/resources/2021/day5_sample.txt"
+                   <*> TIO.readFile "dist/resources/2021/day5.txt")
+          <*> ((,) <$> TIO.readFile "dist/resources/2021/day6_sample.txt"
+                   <*> TIO.readFile "dist/resources/2021/day6.txt")
 
 benchmarks :: Benchmark
-benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
+benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l)) ->
     bgroup "Y2021"
         [ bgroup "D01"
             [ bgroup "partA"
@@ -124,6 +123,28 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l)) ->
               , bgroup "hashmap"
                 [ bench "small" $ nf part5BHM d5s
                 , bench "large" $ nf part5BHM d5l
+                ]
+              ]
+            ]
+        , bgroup "D06"
+            [ bgroup "partA"
+              [ bgroup "initial"
+                [ bench "small" $ nf part6A d6s
+                , bench "large" $ nf part6A d6l
+                ]
+              , bgroup "vectors"
+                [ bench "small" $ nf part6AMV d6s
+                , bench "large" $ nf part6AMV d6l
+                ]
+              ]
+            , bgroup "partB"
+              [ bgroup "initial"
+                [ bench "small" $ nf part6B d6s
+                , bench "large" $ nf part6B d6l
+                ]
+              , bgroup "vectors"
+                [ bench "small" $ nf part6BMV d6s
+                , bench "large" $ nf part6BMV d6l
                 ]
               ]
             ]
