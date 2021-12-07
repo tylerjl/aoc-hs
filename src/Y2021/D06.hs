@@ -104,5 +104,5 @@ parseFish' = map (read . into @String) . T.splitOn ","
 
 -- |Parse puzzle input into a list of `Int`s but do so with a dumb parser.
 parseFish'' :: Text -> [Int]
-parseFish'' = fromRight . AP.eitherResult . AP.parse parser
+parseFish'' = fromRight . AP.parseOnly parser
   where parser = AP.decimal `AP.sepBy` AP.char ',' <* AP.endOfLine

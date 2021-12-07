@@ -8,14 +8,12 @@ Solutions to the 2021 day 04 set of problems for <adventofcode.com>.
 -}
 module Y2021.D04 where
 
+import Data.Attoparsec.Text
 import Data.List (transpose)
 import Data.Maybe (isNothing, catMaybes)
 import Data.Monoid (Sum (Sum), getSum)
 import Data.Set (Set)
 import Data.Text (Text)
-import Text.Parsec
-import Text.Parsec.Text
-import Y2015.Util (intParser', regularParse')
 import qualified Data.Set as S
 
 -- |Fancy data type to represent _game_ state, not just a card
@@ -26,6 +24,7 @@ instance Functor Bingo where
 -- |Represents a game board state
 data Card = CardArr [[Square]]
           | CardSet RowSet ColSet
+          deriving Show
 -- |Alternative game board representation
 type ColSet = Set (Set (Sum Int))
 type RowSet = Set (Set (Sum Int))
@@ -34,23 +33,25 @@ type Square = Maybe (Sum Int)
 
 -- |Solve part A
 part4A :: Text -> Int
-part4A (regularParse' bingoParser -> Right (ns, cs)) = solve4 head ns cs
-part4A (regularParse' bingoParser -> Left (show -> err)) = error err
+part4A (bingoParser -> Right (ns, cs)) = solve4 head ns cs
+part4A (bingoParser -> Left err) = error err
 
 -- |Solve part A - with sets!
 part4ASet :: Text -> Int
-part4ASet (regularParse' bingoParser -> Right (ns, map (fmap intoSet) -> cs)) = solve4 head ns cs
-part4ASet (regularParse' bingoParser -> Left (show -> err)) = error err
+part4ASet (bingoParser -> Right (ns, map (fmap intoSet) -> cs)) =
+  solve4 head ns cs
+part4ASet (bingoParser -> Left err) = error err
 
 -- |Solve part B
 part4B :: Text -> Int
-part4B (regularParse' bingoParser -> Right (ns, cs)) = solve4 last ns cs
-part4B (regularParse' bingoParser -> Left (show -> err)) = error err
+part4B (bingoParser -> Right (ns, cs)) = solve4 last ns cs
+part4B (bingoParser -> Left err) = error err
 
 -- |Solve part B - with sets!
 part4BSet :: Text -> Int
-part4BSet (regularParse' bingoParser -> Right (ns, map (fmap intoSet) -> cs)) = solve4 last ns cs
-part4BSet (regularParse' bingoParser -> Left (show -> err)) = error err
+part4BSet (bingoParser -> Right (ns, map (fmap intoSet) -> cs)) =
+  solve4 last ns cs
+part4BSet (bingoParser -> Left err) = error err
 
 -- |Transform a bingo game from multidimensional-array based to a set-based
 -- game.
@@ -115,10 +116,12 @@ gameEnd (Bingo (CardSet rows cols))
 
 -- |This is a sort of hairy, but all-in-one, parser for the problem set input. 5
 -- is a magic number for board size.
-bingoParser :: Parser ([Int], [Bingo Card])
-bingoParser = (,) <$> (lottoParser <* newline) <*> cardsParser <* eof
+bingoParser :: Text -> Either String ([Int], [Bingo Card])
+bingoParser = parseOnly parser
   where
-    lottoParser = intParser' `sepBy1` char ',' <* newline
-    rowParser   = (Just . Sum <$> intParser') `sepBy1` many1 (char ' ')
-    cardParser  = Bingo . CardArr <$> count 5 (optional (many space) *> rowParser <* endOfLine)
-    cardsParser = cardParser `sepBy1` newline
+    parser = (,) <$> (lottoParser <* endOfLine) <*> cardsParser <* atEnd
+    lottoParser = decimal `sepBy1` char ',' <* endOfLine
+    rowParser   = (Just . Sum <$> decimal) `sepBy1` many1 (char ' ')
+    cardParser  = Bingo . CardArr <$>
+      count 5 (many' space *> rowParser <* endOfLine)
+    cardsParser = cardParser `sepBy1` endOfLine

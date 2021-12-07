@@ -11,12 +11,11 @@ module Y2021.D05 where
 
 import Data.Either.Utils (fromRight)
 import Data.Text (Text)
-import Text.Parsec
-import Y2015.Util (intParser', regularParse')
 
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Map.Strict as M
 import Data.Monoid
+import Data.Attoparsec.Text
 
 -- |Makes some signatures easier to read
 type Point = (Int, Int)
@@ -72,7 +71,7 @@ a ~~ b | a <= b    = [a .. b]
 
 -- |Parse puzzle input into simple pairs of pairs of points.
 parseVents :: Text -> Ray
-parseVents = fromRight . regularParse' (line `endBy1` newline <* eof)
+parseVents = fromRight . parseOnly (line `manyTill` endOfLine <* atEnd)
   where
     line  = (,) <$> point <* string " -> " <*> point
-    point = (,) <$> intParser' <* char ',' <*> intParser'
+    point = (,) <$> decimal <* char ',' <*> decimal
