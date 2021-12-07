@@ -71,7 +71,8 @@ a ~~ b | a <= b    = [a .. b]
 
 -- |Parse puzzle input into simple pairs of pairs of points.
 parseVents :: Text -> Ray
-parseVents = fromRight . parseOnly (line `manyTill` endOfLine <* atEnd)
+parseVents = fromRight . parseOnly parser
   where
+    parser = line `sepBy1` endOfLine <* atEnd
     line  = (,) <$> point <* string " -> " <*> point
     point = (,) <$> decimal <* char ',' <*> decimal
