@@ -29,35 +29,30 @@ span.spaces    { background: white }
 <span class="lineno">   10 </span>
 <span class="lineno">   11 </span>import Data.Attoparsec.Text hiding (take)
 <span class="lineno">   12 </span>import Data.Either.Utils (fromRight)
-<span class="lineno">   13 </span>import Data.Function.Memoize (memoize)
-<span class="lineno">   14 </span>import Data.Text (Text)
-<span class="lineno">   15 </span>
-<span class="lineno">   16 </span>-- |Solve part A
-<span class="lineno">   17 </span>part7A :: Text -&gt; Int
-<span class="lineno">   18 </span><span class="decl"><span class="istickedoff">part7A = solve7 id . parseCrabs</span></span>
-<span class="lineno">   19 </span>
-<span class="lineno">   20 </span>-- |Solve part B
-<span class="lineno">   21 </span>part7B :: Text -&gt; Int
-<span class="lineno">   22 </span><span class="decl"><span class="istickedoff">part7B = solve7 crabCost . parseCrabs</span></span>
-<span class="lineno">   23 </span>
-<span class="lineno">   24 </span>-- |Solve part B using a memoization strategy
-<span class="lineno">   25 </span>part7BM :: Text -&gt; Int
-<span class="lineno">   26 </span><span class="decl"><span class="nottickedoff">part7BM = solve7 (memoize crabCost) . parseCrabs</span></span>
+<span class="lineno">   13 </span>import Data.Text (Text)
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>-- |Solve part A
+<span class="lineno">   16 </span>part7A :: Text -&gt; Int
+<span class="lineno">   17 </span><span class="decl"><span class="istickedoff">part7A = solve7 id . parseCrabs</span></span>
+<span class="lineno">   18 </span>
+<span class="lineno">   19 </span>-- |Solve part B
+<span class="lineno">   20 </span>part7B :: Text -&gt; Int
+<span class="lineno">   21 </span><span class="decl"><span class="istickedoff">part7B = solve7 crabCost . parseCrabs</span></span>
+<span class="lineno">   22 </span>
+<span class="lineno">   23 </span>-- |Function to accept a given `Int` and return the sum of an origin point to
+<span class="lineno">   24 </span>-- the given `Int`. Suitable for memoization... I think?
+<span class="lineno">   25 </span>crabCost :: Int -&gt; Int
+<span class="lineno">   26 </span><span class="decl"><span class="istickedoff">crabCost n = (n * (n + 1)) `div` 2</span></span>
 <span class="lineno">   27 </span>
-<span class="lineno">   28 </span>-- |Function to accept a given `Int` and return the sum of an origin point to
-<span class="lineno">   29 </span>-- the given `Int`. Suitable for memoization... I think?
-<span class="lineno">   30 </span>crabCost :: Int -&gt; Int
-<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">crabCost = sum . flip take (iterate succ 1)</span></span>
+<span class="lineno">   28 </span>-- |Higher-order function to find the lowest fuel cost.
+<span class="lineno">   29 </span>solve7 :: (Ord a, Ord b, Enum b, Num a, Num b) =&gt; (b -&gt; a) -&gt; [b] -&gt; a
+<span class="lineno">   30 </span><span class="decl"><span class="istickedoff">solve7 f crabs = minimum $ map costTo [0..maximum crabs]</span>
+<span class="lineno">   31 </span><span class="spaces">  </span><span class="istickedoff">where costTo crab = sum [ (f . abs) (crab - dest) | dest &lt;- crabs ]</span></span>
 <span class="lineno">   32 </span>
-<span class="lineno">   33 </span>-- |Higher-order function to find the lowest fuel cost.
-<span class="lineno">   34 </span>solve7 :: (Ord a, Ord b, Enum b, Num a, Num b) =&gt; (b -&gt; a) -&gt; [b] -&gt; a
-<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">solve7 f crabs = minimum $ map costTo [0..maximum crabs]</span>
-<span class="lineno">   36 </span><span class="spaces">  </span><span class="istickedoff">where costTo crab = sum [ (f . abs) (crab - dest) | dest &lt;- crabs ]</span></span>
-<span class="lineno">   37 </span>
-<span class="lineno">   38 </span>-- |Parse puzzle input into a list of `Int`s with faster attoparsec.
-<span class="lineno">   39 </span>parseCrabs :: Text -&gt; [Int]
-<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">parseCrabs = fromRight . parseOnly parser</span>
-<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">where parser = decimal `sepBy` char ',' &lt;* endOfLine</span></span>
+<span class="lineno">   33 </span>-- |Parse puzzle input into a list of `Int`s with faster attoparsec.
+<span class="lineno">   34 </span>parseCrabs :: Text -&gt; [Int]
+<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">parseCrabs = fromRight . parseOnly parser</span>
+<span class="lineno">   36 </span><span class="spaces">  </span><span class="istickedoff">where parser = decimal `sepBy` char ',' &lt;* endOfLine</span></span>
 
 </pre>
 </body>

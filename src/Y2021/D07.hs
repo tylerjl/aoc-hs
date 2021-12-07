@@ -10,7 +10,6 @@ module Y2021.D07 where
 
 import Data.Attoparsec.Text hiding (take)
 import Data.Either.Utils (fromRight)
-import Data.Function.Memoize (memoize)
 import Data.Text (Text)
 
 -- |Solve part A
@@ -20,10 +19,6 @@ part7A = solve7 id . parseCrabs
 -- |Solve part B
 part7B :: Text -> Int
 part7B = solve7 crabCost . parseCrabs
-
--- |Solve part B using a memoization strategy
-part7BM :: Text -> Int
-part7BM = solve7 (memoize crabCost) . parseCrabs
 
 -- |Function to accept a given `Int` and return the sum of an origin point to
 -- the given `Int`. Suitable for memoization... I think?

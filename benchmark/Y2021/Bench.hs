@@ -196,10 +196,6 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l), 
                 [ bench "small" $ whnf part7B d7s
                 , bench "large" $ whnf part7B d7l
                 ]
-              , bgroup "memoized"
-                [ bench "small" $ whnf part7BM d7s
-                , bench "large" $ whnf part7BM d7l
-                ]
               ]
             ]
         ]
