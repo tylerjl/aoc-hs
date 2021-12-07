@@ -30,67 +30,101 @@ span.spaces    { background: white }
 <span class="lineno">   11 </span>
 <span class="lineno">   12 </span>import Data.Either.Utils (fromRight)
 <span class="lineno">   13 </span>import Data.Text (Text)
-<span class="lineno">   14 </span>import Text.Parsec
-<span class="lineno">   15 </span>import Y2015.Util (regularParse', intParser')
-<span class="lineno">   16 </span>
-<span class="lineno">   17 </span>import qualified Data.IntMap.Strict as M
-<span class="lineno">   18 </span>import qualified Data.Vector.Unboxed.Mutable as V
-<span class="lineno">   19 </span>import Control.Monad (forM_, replicateM_)
-<span class="lineno">   20 </span>import Control.Monad.ST (runST)
-<span class="lineno">   21 </span>
-<span class="lineno">   22 </span>-- |Solve part A
-<span class="lineno">   23 </span>part6A :: Text -&gt; Int
-<span class="lineno">   24 </span><span class="decl"><span class="istickedoff">part6A = solve6 80 . parseFish</span></span>
-<span class="lineno">   25 </span>
-<span class="lineno">   26 </span>-- |Solve part A, with unboxed mutable vectors
-<span class="lineno">   27 </span>part6AMV :: Text -&gt; Int
-<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">part6AMV = solve6MV 80 . parseFish</span></span>
-<span class="lineno">   29 </span>
-<span class="lineno">   30 </span>-- |Solve part B
-<span class="lineno">   31 </span>part6B :: Text -&gt; Int
-<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">part6B = solve6 256 . parseFish</span></span>
-<span class="lineno">   33 </span>
-<span class="lineno">   34 </span>-- |Solve part B, with unboxed mutable vectors
-<span class="lineno">   35 </span>part6BMV :: Text -&gt; Int
-<span class="lineno">   36 </span><span class="decl"><span class="istickedoff">part6BMV = solve6MV 256 . parseFish</span></span>
-<span class="lineno">   37 </span>
-<span class="lineno">   38 </span>-- |Solution algorithm using super aggressive mutable unboxed vectors.
-<span class="lineno">   39 </span>solve6MV :: Int -&gt; [Int] -&gt; Int
-<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">solve6MV days fish = runST $ do</span>
-<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">vec &lt;- V.replicate 9 0</span>
-<span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">forM_ fish $ \fish' -&gt; do</span>
-<span class="lineno">   43 </span><span class="spaces">    </span><span class="istickedoff">V.modify vec (+ 1) fish'</span>
-<span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">replicateM_ days $ do</span>
-<span class="lineno">   45 </span><span class="spaces">    </span><span class="istickedoff">newFish &lt;- V.read vec 0</span>
-<span class="lineno">   46 </span><span class="spaces">    </span><span class="istickedoff">V.move (V.slice 0 8 vec) (V.slice 1 8 vec)</span>
-<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">V.write vec 8 newFish</span>
-<span class="lineno">   48 </span><span class="spaces">    </span><span class="istickedoff">V.modify vec (+ newFish) 6</span>
-<span class="lineno">   49 </span><span class="spaces">  </span><span class="istickedoff">V.foldl' (+) 0 vec</span></span>
-<span class="lineno">   50 </span>
-<span class="lineno">   51 </span>-- |Iterate for a given number of days given a starting value and return the
-<span class="lineno">   52 </span>-- total.
-<span class="lineno">   53 </span>solve6 :: Int -&gt; [Int] -&gt; Int
-<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">solve6 n</span>
-<span class="lineno">   55 </span><span class="spaces">  </span><span class="istickedoff">= M.foldl' (+) 0</span>
-<span class="lineno">   56 </span><span class="spaces">  </span><span class="istickedoff">. flip (!!) n</span>
-<span class="lineno">   57 </span><span class="spaces">  </span><span class="istickedoff">. iterate breed</span>
-<span class="lineno">   58 </span><span class="spaces">  </span><span class="istickedoff">. M.fromListWith (+)</span>
-<span class="lineno">   59 </span><span class="spaces">  </span><span class="istickedoff">. flip zip (repeat 1)</span></span>
-<span class="lineno">   60 </span>
-<span class="lineno">   61 </span>-- |Simulate one day passing for the collection of fish.
-<span class="lineno">   62 </span>breed :: Num a =&gt; M.IntMap a -&gt; M.IntMap a
-<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">breed fish =</span>
-<span class="lineno">   64 </span><span class="spaces">  </span><span class="istickedoff">M.insert 8 newFish $</span>
-<span class="lineno">   65 </span><span class="spaces">  </span><span class="istickedoff">M.mapKeysWith (+) step fish</span>
-<span class="lineno">   66 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   67 </span><span class="spaces">    </span><span class="istickedoff">step (pred -&gt; age) | age &lt; 0   = 6</span>
-<span class="lineno">   68 </span><span class="spaces">                       </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = age</span>
-<span class="lineno">   69 </span><span class="spaces">    </span><span class="istickedoff">newFish = M.findWithDefault 0 0 fish</span></span>
-<span class="lineno">   70 </span>
-<span class="lineno">   71 </span>-- -- |Parse puzzle input into a list of `Int`s.
-<span class="lineno">   72 </span>parseFish :: Text -&gt; [Int]
-<span class="lineno">   73 </span><span class="decl"><span class="istickedoff">parseFish = fromRight . regularParse' fishParser</span>
-<span class="lineno">   74 </span><span class="spaces">  </span><span class="istickedoff">where fishParser = intParser' `sepBy1` char ',' &lt;* newline &lt;* eof</span></span>
+<span class="lineno">   14 </span>import qualified Data.Text as T
+<span class="lineno">   15 </span>import Text.Parsec hiding (Empty)
+<span class="lineno">   16 </span>import Y2015.Util (regularParse', intParser')
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>import qualified Data.IntMap.Strict as M
+<span class="lineno">   19 </span>import qualified Data.Vector.Unboxed.Mutable as V
+<span class="lineno">   20 </span>import Control.Monad (forM_, replicateM_)
+<span class="lineno">   21 </span>import Control.Monad.ST (runST)
+<span class="lineno">   22 </span>import qualified Data.Sequence as Seq
+<span class="lineno">   23 </span>import Data.Sequence (Seq(..))
+<span class="lineno">   24 </span>import Data.List (elemIndices)
+<span class="lineno">   25 </span>import Witch
+<span class="lineno">   26 </span>import qualified Data.Attoparsec.Text as AP
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>-- |Solve part A
+<span class="lineno">   29 </span>part6A :: Text -&gt; Int
+<span class="lineno">   30 </span><span class="decl"><span class="istickedoff">part6A = solve6 80 . parseFish</span></span>
+<span class="lineno">   31 </span>
+<span class="lineno">   32 </span>-- |Solve part A, with unboxed mutable vectors
+<span class="lineno">   33 </span>part6AMV :: Text -&gt; Int
+<span class="lineno">   34 </span><span class="decl"><span class="istickedoff">part6AMV = solve6MV 80 . parseFish</span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>-- |Solve part A, with sequences
+<span class="lineno">   37 </span>part6ASeq :: Text -&gt; Int
+<span class="lineno">   38 </span><span class="decl"><span class="nottickedoff">part6ASeq = solve6Seq 80 . Seq.fromFunction 9 . build . parseFish</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="nottickedoff">where build fish n = length $ elemIndices n fish</span></span>
+<span class="lineno">   40 </span>
+<span class="lineno">   41 </span>-- |Solve part B
+<span class="lineno">   42 </span>part6B :: Text -&gt; Int
+<span class="lineno">   43 </span><span class="decl"><span class="istickedoff">part6B = solve6 256 . parseFish</span></span>
+<span class="lineno">   44 </span>
+<span class="lineno">   45 </span>-- |Solve part B, with unboxed mutable vectors
+<span class="lineno">   46 </span>part6BMV :: Text -&gt; Int
+<span class="lineno">   47 </span><span class="decl"><span class="istickedoff">part6BMV = solve6MV 256 . parseFish</span></span>
+<span class="lineno">   48 </span>
+<span class="lineno">   49 </span>-- |Solve part B, with sequences
+<span class="lineno">   50 </span>part6BSeq :: Text -&gt; Int
+<span class="lineno">   51 </span><span class="decl"><span class="nottickedoff">part6BSeq = solve6Seq 256 . Seq.fromFunction 9 . build . parseFish</span>
+<span class="lineno">   52 </span><span class="spaces">  </span><span class="nottickedoff">where build fish n = length $ elemIndices n fish</span></span>
+<span class="lineno">   53 </span>
+<span class="lineno">   54 </span>solve6Seq :: Int -&gt; Seq Int -&gt; Int
+<span class="lineno">   55 </span><span class="decl"><span class="nottickedoff">solve6Seq n fish = Seq.foldlWithIndex sum' 0 $ iterate solve6Seq' fish !! n</span>
+<span class="lineno">   56 </span><span class="spaces">  </span><span class="nottickedoff">where sum' acc _ el = acc + el</span></span>
+<span class="lineno">   57 </span>
+<span class="lineno">   58 </span>solve6Seq' :: Seq Int -&gt; Seq Int
+<span class="lineno">   59 </span><span class="decl"><span class="nottickedoff">solve6Seq' (a:&lt;|b:&lt;|c:&lt;|d:&lt;|e:&lt;|f:&lt;|g:&lt;|h:&lt;|i:&lt;|Empty)=</span>
+<span class="lineno">   60 </span><span class="spaces">  </span><span class="nottickedoff">b:&lt;|c:&lt;|d:&lt;|e:&lt;|f:&lt;|g:&lt;|h+a:&lt;|i:&lt;|a:&lt;|Empty</span>
+<span class="lineno">   61 </span><span class="spaces"></span><span class="nottickedoff">solve6Seq' _ = error &quot;unexpected fish sequence size&quot;</span></span>
+<span class="lineno">   62 </span>
+<span class="lineno">   63 </span>-- |Solution algorithm using super aggressive mutable unboxed vectors.
+<span class="lineno">   64 </span>solve6MV :: Int -&gt; [Int] -&gt; Int
+<span class="lineno">   65 </span><span class="decl"><span class="istickedoff">solve6MV days fish = runST $ do</span>
+<span class="lineno">   66 </span><span class="spaces">  </span><span class="istickedoff">vec &lt;- V.replicate 9 0</span>
+<span class="lineno">   67 </span><span class="spaces">  </span><span class="istickedoff">forM_ fish $ \fish' -&gt; do</span>
+<span class="lineno">   68 </span><span class="spaces">    </span><span class="istickedoff">V.modify vec (+ 1) fish'</span>
+<span class="lineno">   69 </span><span class="spaces">  </span><span class="istickedoff">replicateM_ days $ do</span>
+<span class="lineno">   70 </span><span class="spaces">    </span><span class="istickedoff">newFish &lt;- V.read vec 0</span>
+<span class="lineno">   71 </span><span class="spaces">    </span><span class="istickedoff">V.move (V.slice 0 8 vec) (V.slice 1 8 vec)</span>
+<span class="lineno">   72 </span><span class="spaces">    </span><span class="istickedoff">V.write vec 8 newFish</span>
+<span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">V.modify vec (+ newFish) 6</span>
+<span class="lineno">   74 </span><span class="spaces">  </span><span class="istickedoff">V.foldl' (+) 0 vec</span></span>
+<span class="lineno">   75 </span>
+<span class="lineno">   76 </span>-- |Iterate for a given number of days given a starting value and return the
+<span class="lineno">   77 </span>-- total.
+<span class="lineno">   78 </span>solve6 :: Int -&gt; [Int] -&gt; Int
+<span class="lineno">   79 </span><span class="decl"><span class="istickedoff">solve6 n</span>
+<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">= M.foldl' (+) 0</span>
+<span class="lineno">   81 </span><span class="spaces">  </span><span class="istickedoff">. flip (!!) n</span>
+<span class="lineno">   82 </span><span class="spaces">  </span><span class="istickedoff">. iterate breed</span>
+<span class="lineno">   83 </span><span class="spaces">  </span><span class="istickedoff">. M.fromListWith (+)</span>
+<span class="lineno">   84 </span><span class="spaces">  </span><span class="istickedoff">. flip zip (repeat 1)</span></span>
+<span class="lineno">   85 </span>
+<span class="lineno">   86 </span>-- |Simulate one day passing for the collection of fish.
+<span class="lineno">   87 </span>breed :: Num a =&gt; M.IntMap a -&gt; M.IntMap a
+<span class="lineno">   88 </span><span class="decl"><span class="istickedoff">breed fish =</span>
+<span class="lineno">   89 </span><span class="spaces">  </span><span class="istickedoff">M.insert 8 newFish $</span>
+<span class="lineno">   90 </span><span class="spaces">  </span><span class="istickedoff">M.mapKeysWith (+) step fish</span>
+<span class="lineno">   91 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   92 </span><span class="spaces">    </span><span class="istickedoff">step (pred -&gt; age) | age &lt; 0   = 6</span>
+<span class="lineno">   93 </span><span class="spaces">                       </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = age</span>
+<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">newFish = M.findWithDefault 0 0 fish</span></span>
+<span class="lineno">   95 </span>
+<span class="lineno">   96 </span>-- |Parse puzzle input into a list of `Int`s.
+<span class="lineno">   97 </span>parseFish :: Text -&gt; [Int]
+<span class="lineno">   98 </span><span class="decl"><span class="istickedoff">parseFish = fromRight . regularParse' fishParser</span>
+<span class="lineno">   99 </span><span class="spaces">  </span><span class="istickedoff">where fishParser = intParser' `sepBy1` char ',' &lt;* newline &lt;* eof</span></span>
+<span class="lineno">  100 </span>
+<span class="lineno">  101 </span>-- |Parse puzzle input into a list of `Int`s but do so with a dumb parser.
+<span class="lineno">  102 </span>parseFish' :: Text -&gt; [Int]
+<span class="lineno">  103 </span><span class="decl"><span class="nottickedoff">parseFish' = map (read . into @String) . T.splitOn &quot;,&quot;</span></span>
+<span class="lineno">  104 </span>
+<span class="lineno">  105 </span>-- |Parse puzzle input into a list of `Int`s but do so with a dumb parser.
+<span class="lineno">  106 </span>parseFish'' :: Text -&gt; [Int]
+<span class="lineno">  107 </span><span class="decl"><span class="nottickedoff">parseFish'' = fromRight . AP.parseOnly parser</span>
+<span class="lineno">  108 </span><span class="spaces">  </span><span class="nottickedoff">where parser = AP.decimal `AP.sepBy` AP.char ',' &lt;* AP.endOfLine</span></span>
 
 </pre>
 </body>

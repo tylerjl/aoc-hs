@@ -14,20 +14,29 @@ import qualified Data.Text.IO as TIO
 
 import Y2021
 
-getInput :: IO (Text, Text, Text, (Text, Text), (Text, Text), (Text, Text))
+getInput ::
+     IO ( Text
+        , Text
+        , Text
+        , (Text, Text)
+        , (Text, Text)
+        , (Text, Text)
+        , (Text, Text))
 getInput =
-  (,,,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
-          <*> TIO.readFile "dist/resources/2021/day2.txt"
-          <*> TIO.readFile "dist/resources/2021/day3.txt"
-          <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
-                   <*> TIO.readFile "dist/resources/2021/day4.txt")
-          <*> ((,) <$> TIO.readFile "dist/resources/2021/day5_sample.txt"
-                   <*> TIO.readFile "dist/resources/2021/day5.txt")
-          <*> ((,) <$> TIO.readFile "dist/resources/2021/day6_sample.txt"
-                   <*> TIO.readFile "dist/resources/2021/day6.txt")
+  (,,,,,,) <$> TIO.readFile "dist/resources/2021/day1.txt"
+           <*> TIO.readFile "dist/resources/2021/day2.txt"
+           <*> TIO.readFile "dist/resources/2021/day3.txt"
+           <*> ((,) <$> TIO.readFile "dist/resources/2021/day4_sample.txt"
+                    <*> TIO.readFile "dist/resources/2021/day4.txt")
+           <*> ((,) <$> TIO.readFile "dist/resources/2021/day5_sample.txt"
+                    <*> TIO.readFile "dist/resources/2021/day5.txt")
+           <*> ((,) <$> TIO.readFile "dist/resources/2021/day6_sample.txt"
+                    <*> TIO.readFile "dist/resources/2021/day6.txt")
+           <*> ((,) <$> TIO.readFile "dist/resources/2021/day7_sample.txt"
+                    <*> TIO.readFile "dist/resources/2021/day7.txt")
 
 benchmarks :: Benchmark
-benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l)) ->
+benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l), (d7s, d7l)) ->
     bgroup "Y2021"
         [ bgroup "D01"
             [ bgroup "partA"
@@ -172,6 +181,24 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l)) 
               , bgroup "seq"
                 [ bench "small" $ nf part6BSeq d6s
                 , bench "large" $ nf part6BSeq d6l
+                ]
+              ]
+            ]
+        , bgroup "D07"
+            [ bgroup "partA"
+              [ bgroup "initial"
+                [ bench "small" $ whnf part7A d7s
+                , bench "large" $ whnf part7A d7l
+                ]
+              ]
+            , bgroup "partB"
+              [ bgroup "initial"
+                [ bench "small" $ whnf part7B d7s
+                , bench "large" $ whnf part7B d7l
+                ]
+              , bgroup "memoized"
+                [ bench "small" $ whnf part7BM d7s
+                , bench "large" $ whnf part7BM d7l
                 ]
               ]
             ]

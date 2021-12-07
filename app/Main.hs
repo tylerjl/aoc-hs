@@ -161,5 +161,8 @@ solver 2021 5 'b' (part5B . into @Text -> solution) = show solution
 solver 2021 6 'a' (part6AMV . into @Text -> solution) = show solution
 solver 2021 6 'b' (part6BMV . into @Text -> solution) = show solution
 
+solver 2021 7 'a' (part7A . into @Text -> solution) = show solution
+solver 2021 7 'b' (part7B . into @Text -> solution) = show solution
+
 solver y d p _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p
