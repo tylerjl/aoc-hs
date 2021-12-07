@@ -80,6 +80,7 @@ library
                      , Y2021.D05
                      , Y2021.D06
   build-depends:       aeson
+                     , attoparsec
                      , base >= 4.7 && < 5
                      , base16-bytestring
                      , bytestring

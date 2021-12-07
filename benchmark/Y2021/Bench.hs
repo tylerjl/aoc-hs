@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BlockArguments #-}
 
 module Y2021.Bench where
 
@@ -127,14 +128,36 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l)) 
               ]
             ]
         , bgroup "D06"
-            [ bgroup "partA"
+            [ bgroup "parser"
+              [ bgroup "parsec"
+                [ bench "small" $ nf parseFish d6s
+                , bench "large" $ nf parseFish d6l
+                ]
+              , bgroup "attoparsec"
+                [ bench "small" $ nf parseFish'' d6s
+                , bench "large" $ nf parseFish'' d6l
+                ]
+              , bgroup "read"
+                [ bench "small" $ nf parseFish' d6s
+                , bench "large" $ nf parseFish' d6l
+                ]
+              ]
+            , bgroup "partA"
               [ bgroup "initial"
                 [ bench "small" $ nf part6A d6s
                 , bench "large" $ nf part6A d6l
                 ]
               , bgroup "vectors"
                 [ bench "small" $ nf part6AMV d6s
-                , bench "large" $ nf part6AMV d6l
+                , bgroup "large"
+                  [ bench "unparsed" $ nf part6AMV d6l
+                  , env (pure $ parseFish d6l)
+                    $ bench "pre-parsed" . nf (solve6MV 80)
+                  ]
+                ]
+              , bgroup "seq"
+                [ bench "small" $ nf part6ASeq d6s
+                , bench "large" $ nf part6ASeq d6l
                 ]
               ]
             , bgroup "partB"
@@ -145,6 +168,10 @@ benchmarks = env getInput $ \ ~(d1, d2, d3, (d4s, d4l), (d5s, d5l), (d6s, d6l)) 
               , bgroup "vectors"
                 [ bench "small" $ nf part6BMV d6s
                 , bench "large" $ nf part6BMV d6l
+                ]
+              , bgroup "seq"
+                [ bench "small" $ nf part6BSeq d6s
+                , bench "large" $ nf part6BSeq d6l
                 ]
               ]
             ]

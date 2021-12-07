@@ -11,13 +11,19 @@ module Y2021.D06 where
 
 import Data.Either.Utils (fromRight)
 import Data.Text (Text)
-import Text.Parsec
+import qualified Data.Text as T
+import Text.Parsec hiding (Empty)
 import Y2015.Util (regularParse', intParser')
 
 import qualified Data.IntMap.Strict as M
 import qualified Data.Vector.Unboxed.Mutable as V
 import Control.Monad (forM_, replicateM_)
 import Control.Monad.ST (runST)
+import qualified Data.Sequence as Seq
+import Data.Sequence (Seq(..))
+import Data.List (elemIndices)
+import Witch
+import qualified Data.Attoparsec.Text as AP
 
 -- |Solve part A
 part6A :: Text -> Int
@@ -27,6 +33,11 @@ part6A = solve6 80 . parseFish
 part6AMV :: Text -> Int
 part6AMV = solve6MV 80 . parseFish
 
+-- |Solve part A, with sequences
+part6ASeq :: Text -> Int
+part6ASeq = solve6Seq 80 . Seq.fromFunction 9 . build . parseFish
+  where build fish n = length $ elemIndices n fish
+
 -- |Solve part B
 part6B :: Text -> Int
 part6B = solve6 256 . parseFish
@@ -34,6 +45,20 @@ part6B = solve6 256 . parseFish
 -- |Solve part B, with unboxed mutable vectors
 part6BMV :: Text -> Int
 part6BMV = solve6MV 256 . parseFish
+
+-- |Solve part B, with sequences
+part6BSeq :: Text -> Int
+part6BSeq = solve6Seq 256 . Seq.fromFunction 9 . build . parseFish
+  where build fish n = length $ elemIndices n fish
+
+solve6Seq :: Int -> Seq Int -> Int
+solve6Seq n fish = Seq.foldlWithIndex sum' 0 $ iterate solve6Seq' fish !! n
+  where sum' acc _ el = acc + el
+
+solve6Seq' :: Seq Int -> Seq Int
+solve6Seq' (a:<|b:<|c:<|d:<|e:<|f:<|g:<|h:<|i:<|Empty)=
+  b:<|c:<|d:<|e:<|f:<|g:<|h+a:<|i:<|a:<|Empty
+solve6Seq' _ = error "unexpected fish sequence size"
 
 -- |Solution algorithm using super aggressive mutable unboxed vectors.
 solve6MV :: Int -> [Int] -> Int
@@ -68,7 +93,16 @@ breed fish =
                        | otherwise = age
     newFish = M.findWithDefault 0 0 fish
 
--- -- |Parse puzzle input into a list of `Int`s.
+-- |Parse puzzle input into a list of `Int`s.
 parseFish :: Text -> [Int]
 parseFish = fromRight . regularParse' fishParser
   where fishParser = intParser' `sepBy1` char ',' <* newline <* eof
+
+-- |Parse puzzle input into a list of `Int`s but do so with a dumb parser.
+parseFish' :: Text -> [Int]
+parseFish' = map (read . into @String) . T.splitOn ","
+
+-- |Parse puzzle input into a list of `Int`s but do so with a dumb parser.
+parseFish'' :: Text -> [Int]
+parseFish'' = fromRight . AP.eitherResult . AP.parse parser
+  where parser = AP.decimal `AP.sepBy` AP.char ',' <* AP.endOfLine
