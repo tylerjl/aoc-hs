@@ -28,7 +28,7 @@ part7BM = solve7 (memoize crabCost) . parseCrabs
 -- |Function to accept a given `Int` and return the sum of an origin point to
 -- the given `Int`. Suitable for memoization... I think?
 crabCost :: Int -> Int
-crabCost = sum . flip take (iterate succ 1)
+crabCost n = (n * (n + 1)) `div` 2
 
 -- |Higher-order function to find the lowest fuel cost.
 solve7 :: (Ord a, Ord b, Enum b, Num a, Num b) => (b -> a) -> [b] -> a
