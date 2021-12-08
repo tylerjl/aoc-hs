@@ -143,8 +143,8 @@ solver 2018 4 'b' (laziestMinute -> solution) = show solution
 solver 2018 5 'a' (react . rstrip -> solution) = show solution
 solver 2018 5 'b' (reactBest . rstrip -> solution) = show solution
 
-solver 2021 1 'a' (partA . into @Text -> solution) = show solution
-solver 2021 1 'b' (partB . into @Text -> solution) = show solution
+solver 2021 1 'a' (part1A . into @Text -> solution) = show solution
+solver 2021 1 'b' (part1B . into @Text -> solution) = show solution
 
 solver 2021 2 'a' (part2A . into @Text -> solution) = show solution
 solver 2021 2 'b' (part2B . into @Text -> solution) = show solution

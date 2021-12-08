@@ -3,6 +3,7 @@ module Y2021.D01Spec (spec) where
 import Data.Function
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import Witch
 import Y2021
 
@@ -10,18 +11,19 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-        describe "partA" $ do
-          it "solves the example case" $
-            partA d1sample `shouldBe` 7
-        describe "partAZip" $ do
-          it "solves the example case" $
-            partAZip d1sample `shouldBe` 7
-        describe "partARecur" $ do
-          it "solves the example case" $
-            partARecur d1sample `shouldBe` 7
-        describe "partB" $ do
-          it "solves the example case" $
-            partB d1sample `shouldBe` 5
-        describe "partBZip" $ do
-          it "solves the example case" $
-            partBZip d1sample `shouldBe` 5
+        before (TIO.readFile "dist/resources/2021/day1_sample.txt") $ do
+          describe "part1A" $ do
+            it "solves the example case" $ \input -> do
+              part1A input `shouldBe` 7
+          describe "part1AZip" $ do
+            it "solves the example case" $ \input -> do
+              part1AZip input `shouldBe` 7
+          describe "part1ARecur" $ do
+            it "solves the example case" $ \input -> do
+              part1ARecur input `shouldBe` 7
+          describe "part1B" $ do
+            it "solves the example case" $ \input -> do
+              part1B input `shouldBe` 5
+          describe "part1BZip" $ do
+            it "solves the example case" $ \input -> do
+              part1BZip input `shouldBe` 5

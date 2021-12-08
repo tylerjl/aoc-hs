@@ -8,33 +8,32 @@ Solutions to the 2021 day 01 set of problems for <adventofcode.com>.
 -}
 module Y2021.D01 where
 
+import Data.Attoparsec.Text
+import Data.Either.Utils (fromRight)
 import Data.Foldable (foldl')
 import Data.Text (Text)
-import Witch
-
-import qualified Data.Text as T
 
 -- |First attempt at part a, not optimized.
-partA :: Text -> Int
-partA = stepwise . asInts
+part1A :: Text -> Int
+part1A = stepwise . asInts
 
 -- |Part a using high-level zip operations.
-partAZip :: Text -> Int
-partAZip = length . compareAdj . asInts
+part1AZip :: Text -> Int
+part1AZip = length . compareAdj . asInts
 
 -- |Part a using simple recursion (maybe smaller big-O?)
-partARecur :: Text -> Int
-partARecur = go . asInts
+part1ARecur :: Text -> Int
+part1ARecur = go . asInts
   where go (x:y:zs) = (if x < y then 1 else 0) + go (y:zs)
         go _ = 0
 
 -- |Part b first attempt, simple approach
-partB :: Text -> Int
-partB = stepwise . toWindows . asInts
+part1B :: Text -> Int
+part1B = stepwise . toWindows . asInts
 
 -- |Part b using highl-elevel zips
-partBZip :: Text -> Int
-partBZip = length . compareAdj . map trisum . (zip3 <*> tail <*> tail . tail) . asInts
+part1BZip :: Text -> Int
+part1BZip = length . compareAdj . map trisum . (zip3 <*> tail <*> tail . tail) . asInts
 
 -- |Utility to transform a list into tuples of adjacent values.
 compareAdj :: [Int] -> [(Int, Int)]
@@ -60,8 +59,6 @@ toWindows _ = []
 
 -- |Unsafe-ish `Text` traversal to transform into a list of `Int`s.
 asInts :: Text -> [Int]
-asInts = map (read . into @String) . T.lines
-
-d1sample :: Text
-d1sample = T.unlines $ map (into @Text . show)
-  ([199, 200, 208, 210, 200, 207, 240, 269, 260, 263] :: [Int])
+asInts = fromRight . parseOnly parser
+  where
+    parser = decimal `sepBy1` endOfLine
