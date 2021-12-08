@@ -132,4 +132,18 @@ benchmarks =
               [ bench "large" $ whnf part7B sample ]
             ]
           ]
+    , env (getProblem "8") \sample -> do
+        bgroup "D08"
+          [ bgroup "A"
+            [ bgroup "initial"
+              [ env (pure $ parseSevSeg sample)
+                  $ bench "pre-parsed" . whnf solve8A
+              , bench "large" $ whnf part8A sample
+              ]
+            ]
+          , bgroup "B"
+            [ bgroup "initial"
+              [ bench "large" $ whnf part8B sample ]
+            ]
+          ]
     ]

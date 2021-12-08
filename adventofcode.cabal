@@ -80,6 +80,7 @@ library
                      , Y2021.D05
                      , Y2021.D06
                      , Y2021.D07
+                     , Y2021.D08
   build-depends:       aeson
                      , attoparsec
                      , base >= 4.7 && < 5
@@ -87,7 +88,9 @@ library
                      , bytestring
                      , containers
                      , cryptohash
+                     , deepseq
                      , extra
+                     , hashable
                      , lens
                      , matrix
                      , memoize
@@ -148,6 +151,7 @@ test-suite adventofcode-test
                      , Y2021.D05Spec
                      , Y2021.D06Spec
                      , Y2021.D07Spec
+                     , Y2021.D08Spec
   build-depends:       base
                      , adventofcode
                      , bytestring

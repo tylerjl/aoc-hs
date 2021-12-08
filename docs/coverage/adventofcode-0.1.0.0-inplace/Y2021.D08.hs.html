@@ -1,0 +1,136 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-# LANGUAGE DeriveAnyClass #-}
+<span class="lineno">    2 </span>{-# LANGUAGE DeriveGeneric #-}
+<span class="lineno">    3 </span>{-|
+<span class="lineno">    4 </span>Module:      Y2021.D08
+<span class="lineno">    5 </span>Description: Advent of Code 2021 Day 08 Solutions.
+<span class="lineno">    6 </span>License:     MIT
+<span class="lineno">    7 </span>Maintainer:  @tylerjl
+<span class="lineno">    8 </span>
+<span class="lineno">    9 </span>Solutions to the 2021 day 08 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">   10 </span>-}
+<span class="lineno">   11 </span>module Y2021.D08 where
+<span class="lineno">   12 </span>
+<span class="lineno">   13 </span>import Control.Applicative
+<span class="lineno">   14 </span>import Control.DeepSeq (NFData)
+<span class="lineno">   15 </span>import Data.Attoparsec.Text hiding (take)
+<span class="lineno">   16 </span>import Data.Either.Utils (fromRight)
+<span class="lineno">   17 </span>import Data.HashMap.Strict (HashMap)
+<span class="lineno">   18 </span>import Data.Hashable (Hashable)
+<span class="lineno">   19 </span>import Data.List (permutations, find)
+<span class="lineno">   20 </span>import Data.Maybe (mapMaybe)
+<span class="lineno">   21 </span>import Data.Monoid
+<span class="lineno">   22 </span>import Data.Set (Set)
+<span class="lineno">   23 </span>import Data.Text (Text)
+<span class="lineno">   24 </span>import GHC.Generics (Generic)
+<span class="lineno">   25 </span>
+<span class="lineno">   26 </span>import qualified Data.HashMap.Strict as M
+<span class="lineno">   27 </span>import qualified Data.Set as S
+<span class="lineno">   28 </span>
+<span class="lineno">   29 </span>-- |Guess I'll use a sum type for this
+<span class="lineno">   30 </span>data Signal = SigA | SigB | SigC | SigD | SigE | SigF | SigG
+<span class="lineno">   31 </span>  deriving (<span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Bounded</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span>, Generic, Hashable, <span class="decl"><span class="istickedoff">Eq</span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff">Ord</span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>, NFData)
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>-- |These are just for readability
+<span class="lineno">   34 </span>type SignalSequence = [Signal]
+<span class="lineno">   35 </span>type SignalSet = Set Signal
+<span class="lineno">   36 </span>type SignalEntries = [([SignalSequence], [SignalSequence])]
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>-- |Another sum type for &quot;display&quot;
+<span class="lineno">   39 </span>data Display = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9
+<span class="lineno">   40 </span>  deriving (<span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Bounded</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
+<span class="lineno">   41 </span>
+<span class="lineno">   42 </span>-- |Solve part A
+<span class="lineno">   43 </span>part8A :: Text -&gt; Int
+<span class="lineno">   44 </span><span class="decl"><span class="istickedoff">part8A = solve8A . parseSevSeg</span></span>
+<span class="lineno">   45 </span>
+<span class="lineno">   46 </span>-- |This one is for benching apart from the parsing overhead.
+<span class="lineno">   47 </span>solve8A :: [(a, [SignalSequence])] -&gt; Int
+<span class="lineno">   48 </span><span class="decl"><span class="istickedoff">solve8A = length . filter part8APredicate . concatMap snd</span></span>
+<span class="lineno">   49 </span>
+<span class="lineno">   50 </span>-- |Our simple predicate for part A per the instructions.
+<span class="lineno">   51 </span>part8APredicate :: SignalSequence -&gt; Bool
+<span class="lineno">   52 </span><span class="decl"><span class="istickedoff">part8APredicate (length -&gt; size)</span>
+<span class="lineno">   53 </span><span class="spaces">  </span><span class="istickedoff">= size == 2 || size == 4 || size == 3 || size == 7</span></span>
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>-- |Solve part B
+<span class="lineno">   56 </span>part8B :: Text -&gt; Int
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">part8B = getSum . mconcat . map (uncurry decode) . parseSevSeg</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>-- |Brute-force the input to decode the output.
+<span class="lineno">   60 </span>decode :: [SignalSequence] -&gt; [SignalSequence] -&gt; Sum Int
+<span class="lineno">   61 </span><span class="decl"><span class="istickedoff">decode (untangle -&gt; Just decoded) =</span>
+<span class="lineno">   62 </span><span class="spaces">  </span><span class="istickedoff">mconcat . zipWith pow ([0..] :: [Int]) . reverse . mapMaybe decode'</span>
+<span class="lineno">   63 </span><span class="spaces">  </span><span class="istickedoff">where decode' (S.fromList . map tr -&gt; signals) =</span>
+<span class="lineno">   64 </span><span class="spaces">          </span><span class="istickedoff">fromEnum &lt;$&gt; M.lookup signals sigMap</span>
+<span class="lineno">   65 </span><span class="spaces">        </span><span class="istickedoff">tr sig = M.findWithDefault <span class="nottickedoff">sig</span> sig decoded</span>
+<span class="lineno">   66 </span><span class="spaces">        </span><span class="istickedoff">pow n int = Sum $ (10 ^ n) * int</span>
+<span class="lineno">   67 </span><span class="spaces"></span><span class="istickedoff">decode (untangle -&gt; Nothing) = <span class="nottickedoff">error . mappend &quot;could not decode&quot; . show</span></span></span>
+<span class="lineno">   68 </span>
+<span class="lineno">   69 </span>-- Come up with the right mapping between scrambled signals and their true outputs.
+<span class="lineno">   70 </span>untangle :: [SignalSequence] -&gt; Maybe (HashMap Signal Signal)
+<span class="lineno">   71 </span><span class="decl"><span class="istickedoff">untangle (S.fromList . map S.fromList -&gt; coded) = find mapping all'</span>
+<span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">all' = map (M.fromList . zip [ minBound .. maxBound ])</span>
+<span class="lineno">   74 </span><span class="spaces">      </span><span class="istickedoff">$ permutations [ minBound .. maxBound ]</span>
+<span class="lineno">   75 </span><span class="spaces">    </span><span class="istickedoff">mapping t = S.map (S.map $ replace t) coded == correctSet</span>
+<span class="lineno">   76 </span><span class="spaces">    </span><span class="istickedoff">replace test entry = M.findWithDefault <span class="nottickedoff">entry</span> entry test</span></span>
+<span class="lineno">   77 </span>
+<span class="lineno">   78 </span>-- |Compile the mappings for the golden input.
+<span class="lineno">   79 </span>correctSet :: Set SignalSet
+<span class="lineno">   80 </span><span class="decl"><span class="istickedoff">correctSet = S.fromList $ map (S.fromList . dMap') [minBound .. maxBound]</span></span>
+<span class="lineno">   81 </span>
+<span class="lineno">   82 </span>-- |Mappings from the right signals to their associated displays.
+<span class="lineno">   83 </span>sigMap :: HashMap SignalSet Display
+<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">sigMap = M.fromList $ zip (map (S.fromList . dMap') displays) displays</span>
+<span class="lineno">   85 </span><span class="spaces">  </span><span class="istickedoff">where displays = [ minBound .. maxBound ]</span></span>
+<span class="lineno">   86 </span>
+<span class="lineno">   87 </span>-- |From `Display` -&gt; the right sequence.
+<span class="lineno">   88 </span>dMap' :: Display -&gt; SignalSequence
+<span class="lineno">   89 </span><span class="decl"><span class="istickedoff">dMap' D0 = [SigA, SigB, SigC, SigE, SigF, SigG]</span>
+<span class="lineno">   90 </span><span class="spaces"></span><span class="istickedoff">dMap' D1 = [SigC, SigF]</span>
+<span class="lineno">   91 </span><span class="spaces"></span><span class="istickedoff">dMap' D2 = [SigA, SigC, SigD, SigE, SigG]</span>
+<span class="lineno">   92 </span><span class="spaces"></span><span class="istickedoff">dMap' D3 = [SigA, SigC, SigD, SigF, SigG]</span>
+<span class="lineno">   93 </span><span class="spaces"></span><span class="istickedoff">dMap' D4 = [SigB, SigC, SigD, SigF]</span>
+<span class="lineno">   94 </span><span class="spaces"></span><span class="istickedoff">dMap' D5 = [SigA, SigB, SigD, SigF, SigG]</span>
+<span class="lineno">   95 </span><span class="spaces"></span><span class="istickedoff">dMap' D6 = [SigA, SigB, SigD, SigE, SigF, SigG]</span>
+<span class="lineno">   96 </span><span class="spaces"></span><span class="istickedoff">dMap' D7 = [SigA, SigC, SigF]</span>
+<span class="lineno">   97 </span><span class="spaces"></span><span class="istickedoff">dMap' D8 = [SigA, SigB, SigC, SigD, SigE, SigF, SigG]</span>
+<span class="lineno">   98 </span><span class="spaces"></span><span class="istickedoff">dMap' D9 = [SigA, SigB, SigC, SigD, SigF, SigG]</span></span>
+<span class="lineno">   99 </span>
+<span class="lineno">  100 </span>-- |Parse puzzle input into a list of `Int`s with faster attoparsec.
+<span class="lineno">  101 </span>parseSevSeg :: Text -&gt; SignalEntries
+<span class="lineno">  102 </span><span class="decl"><span class="istickedoff">parseSevSeg = fromRight . parseOnly parser</span>
+<span class="lineno">  103 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  104 </span><span class="spaces">    </span><span class="istickedoff">parser = entry `sepBy1` endOfLine &lt;* endOfLine</span>
+<span class="lineno">  105 </span><span class="spaces">    </span><span class="istickedoff">entry = (,) &lt;$&gt; pattern' &lt;* string &quot; | &quot; &lt;*&gt; pattern'</span>
+<span class="lineno">  106 </span><span class="spaces">    </span><span class="istickedoff">pattern' = many1 signal `sepBy1` satisfy isHorizontalSpace</span>
+<span class="lineno">  107 </span><span class="spaces">    </span><span class="istickedoff">signal = SigA &lt;$ char 'a'</span>
+<span class="lineno">  108 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigB &lt;$ char 'b'</span>
+<span class="lineno">  109 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigC &lt;$ char 'c'</span>
+<span class="lineno">  110 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigD &lt;$ char 'd'</span>
+<span class="lineno">  111 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigE &lt;$ char 'e'</span>
+<span class="lineno">  112 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigF &lt;$ char 'f'</span>
+<span class="lineno">  113 </span><span class="spaces">             </span><span class="istickedoff">&lt;|&gt; SigG &lt;$ char 'g'</span></span>
+
+</pre>
+</body>
+</html>

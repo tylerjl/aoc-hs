@@ -27,63 +27,60 @@ span.spaces    { background: white }
 <span class="lineno">    8 </span>-}
 <span class="lineno">    9 </span>module Y2021.D01 where
 <span class="lineno">   10 </span>
-<span class="lineno">   11 </span>import Data.Foldable (foldl')
-<span class="lineno">   12 </span>import Data.Text (Text)
-<span class="lineno">   13 </span>import Witch
-<span class="lineno">   14 </span>
-<span class="lineno">   15 </span>import qualified Data.Text as T
-<span class="lineno">   16 </span>
-<span class="lineno">   17 </span>-- |First attempt at part a, not optimized.
-<span class="lineno">   18 </span>partA :: Text -&gt; Int
-<span class="lineno">   19 </span><span class="decl"><span class="istickedoff">partA = stepwise . asInts</span></span>
-<span class="lineno">   20 </span>
-<span class="lineno">   21 </span>-- |Part a using high-level zip operations.
-<span class="lineno">   22 </span>partAZip :: Text -&gt; Int
-<span class="lineno">   23 </span><span class="decl"><span class="istickedoff">partAZip = length . compareAdj . asInts</span></span>
-<span class="lineno">   24 </span>
-<span class="lineno">   25 </span>-- |Part a using simple recursion (maybe smaller big-O?)
-<span class="lineno">   26 </span>partARecur :: Text -&gt; Int
-<span class="lineno">   27 </span><span class="decl"><span class="istickedoff">partARecur = go . asInts</span>
-<span class="lineno">   28 </span><span class="spaces">  </span><span class="istickedoff">where go (x:y:zs) = (if x &lt; y then 1 else 0) + go (y:zs)</span>
-<span class="lineno">   29 </span><span class="spaces">        </span><span class="istickedoff">go _ = 0</span></span>
-<span class="lineno">   30 </span>
-<span class="lineno">   31 </span>-- |Part b first attempt, simple approach
-<span class="lineno">   32 </span>partB :: Text -&gt; Int
-<span class="lineno">   33 </span><span class="decl"><span class="istickedoff">partB = stepwise . toWindows . asInts</span></span>
-<span class="lineno">   34 </span>
-<span class="lineno">   35 </span>-- |Part b using highl-elevel zips
-<span class="lineno">   36 </span>partBZip :: Text -&gt; Int
-<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">partBZip = length . compareAdj . map trisum . (zip3 &lt;*&gt; tail &lt;*&gt; tail . tail) . asInts</span></span>
-<span class="lineno">   38 </span>
-<span class="lineno">   39 </span>-- |Utility to transform a list into tuples of adjacent values.
-<span class="lineno">   40 </span>compareAdj :: [Int] -&gt; [(Int, Int)]
-<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">compareAdj = filter (uncurry (&lt;)) . (zip &lt;*&gt; tail)</span></span>
-<span class="lineno">   42 </span>
-<span class="lineno">   43 </span>-- |Sum all values of a three-tuple
-<span class="lineno">   44 </span>trisum :: Num a =&gt; (a, a, a) -&gt; a
-<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">trisum (a, b, c) = a + b + c</span></span>
-<span class="lineno">   46 </span>
-<span class="lineno">   47 </span>-- |A fold sum of the structure for parsed values.
-<span class="lineno">   48 </span>stepwise :: [Int] -&gt; Int
-<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">stepwise = snd . foldl' steps (Nothing, 0)</span>
-<span class="lineno">   50 </span><span class="spaces">  </span><span class="istickedoff">where steps :: (Maybe Int, Int) -&gt; Int -&gt; (Maybe Int, Int)</span>
-<span class="lineno">   51 </span><span class="spaces">        </span><span class="istickedoff">steps (Nothing,   acc) n = (Just n, acc)</span>
-<span class="lineno">   52 </span><span class="spaces">        </span><span class="istickedoff">steps (Just prev, acc) n</span>
-<span class="lineno">   53 </span><span class="spaces">          </span><span class="istickedoff">| prev &lt; n  = (Just n, succ acc)</span>
-<span class="lineno">   54 </span><span class="spaces">          </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = (Just n, acc)</span></span>
-<span class="lineno">   55 </span>
-<span class="lineno">   56 </span>-- |Consolidate a list into a summed, shifting window.
-<span class="lineno">   57 </span>toWindows :: [Int] -&gt; [Int]
-<span class="lineno">   58 </span><span class="decl"><span class="istickedoff">toWindows (w:x:y:zs) = (w+x+y) : toWindows (x:y:zs)</span>
-<span class="lineno">   59 </span><span class="spaces"></span><span class="istickedoff">toWindows _ = []</span></span>
-<span class="lineno">   60 </span>
-<span class="lineno">   61 </span>-- |Unsafe-ish `Text` traversal to transform into a list of `Int`s.
-<span class="lineno">   62 </span>asInts :: Text -&gt; [Int]
-<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">asInts = map (read . into @String) . T.lines</span></span>
-<span class="lineno">   64 </span>
-<span class="lineno">   65 </span>d1sample :: Text
-<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">d1sample = T.unlines $ map (into @Text . show)</span>
-<span class="lineno">   67 </span><span class="spaces">  </span><span class="istickedoff">([199, 200, 208, 210, 200, 207, 240, 269, 260, 263] :: [Int])</span></span>
+<span class="lineno">   11 </span>import Data.Attoparsec.Text
+<span class="lineno">   12 </span>import Data.Either.Utils (fromRight)
+<span class="lineno">   13 </span>import Data.Foldable (foldl')
+<span class="lineno">   14 </span>import Data.Text (Text)
+<span class="lineno">   15 </span>
+<span class="lineno">   16 </span>-- |First attempt at part a, not optimized.
+<span class="lineno">   17 </span>part1A :: Text -&gt; Int
+<span class="lineno">   18 </span><span class="decl"><span class="istickedoff">part1A = stepwise . asInts</span></span>
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>-- |Part a using high-level zip operations.
+<span class="lineno">   21 </span>part1AZip :: Text -&gt; Int
+<span class="lineno">   22 </span><span class="decl"><span class="istickedoff">part1AZip = length . compareAdj . asInts</span></span>
+<span class="lineno">   23 </span>
+<span class="lineno">   24 </span>-- |Part a using simple recursion (maybe smaller big-O?)
+<span class="lineno">   25 </span>part1ARecur :: Text -&gt; Int
+<span class="lineno">   26 </span><span class="decl"><span class="istickedoff">part1ARecur = go . asInts</span>
+<span class="lineno">   27 </span><span class="spaces">  </span><span class="istickedoff">where go (x:y:zs) = (if x &lt; y then 1 else 0) + go (y:zs)</span>
+<span class="lineno">   28 </span><span class="spaces">        </span><span class="istickedoff">go _ = 0</span></span>
+<span class="lineno">   29 </span>
+<span class="lineno">   30 </span>-- |Part b first attempt, simple approach
+<span class="lineno">   31 </span>part1B :: Text -&gt; Int
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">part1B = stepwise . toWindows . asInts</span></span>
+<span class="lineno">   33 </span>
+<span class="lineno">   34 </span>-- |Part b using highl-elevel zips
+<span class="lineno">   35 </span>part1BZip :: Text -&gt; Int
+<span class="lineno">   36 </span><span class="decl"><span class="istickedoff">part1BZip = length . compareAdj . map trisum . (zip3 &lt;*&gt; tail &lt;*&gt; tail . tail) . asInts</span></span>
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>-- |Utility to transform a list into tuples of adjacent values.
+<span class="lineno">   39 </span>compareAdj :: [Int] -&gt; [(Int, Int)]
+<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">compareAdj = filter (uncurry (&lt;)) . (zip &lt;*&gt; tail)</span></span>
+<span class="lineno">   41 </span>
+<span class="lineno">   42 </span>-- |Sum all values of a three-tuple
+<span class="lineno">   43 </span>trisum :: Num a =&gt; (a, a, a) -&gt; a
+<span class="lineno">   44 </span><span class="decl"><span class="istickedoff">trisum (a, b, c) = a + b + c</span></span>
+<span class="lineno">   45 </span>
+<span class="lineno">   46 </span>-- |A fold sum of the structure for parsed values.
+<span class="lineno">   47 </span>stepwise :: [Int] -&gt; Int
+<span class="lineno">   48 </span><span class="decl"><span class="istickedoff">stepwise = snd . foldl' steps (Nothing, 0)</span>
+<span class="lineno">   49 </span><span class="spaces">  </span><span class="istickedoff">where steps :: (Maybe Int, Int) -&gt; Int -&gt; (Maybe Int, Int)</span>
+<span class="lineno">   50 </span><span class="spaces">        </span><span class="istickedoff">steps (Nothing,   acc) n = (Just n, acc)</span>
+<span class="lineno">   51 </span><span class="spaces">        </span><span class="istickedoff">steps (Just prev, acc) n</span>
+<span class="lineno">   52 </span><span class="spaces">          </span><span class="istickedoff">| prev &lt; n  = (Just n, succ acc)</span>
+<span class="lineno">   53 </span><span class="spaces">          </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = (Just n, acc)</span></span>
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>-- |Consolidate a list into a summed, shifting window.
+<span class="lineno">   56 </span>toWindows :: [Int] -&gt; [Int]
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">toWindows (w:x:y:zs) = (w+x+y) : toWindows (x:y:zs)</span>
+<span class="lineno">   58 </span><span class="spaces"></span><span class="istickedoff">toWindows _ = []</span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>-- |Unsafe-ish `Text` traversal to transform into a list of `Int`s.
+<span class="lineno">   61 </span>asInts :: Text -&gt; [Int]
+<span class="lineno">   62 </span><span class="decl"><span class="istickedoff">asInts = fromRight . parseOnly parser</span>
+<span class="lineno">   63 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   64 </span><span class="spaces">    </span><span class="istickedoff">parser = decimal `sepBy1` endOfLine</span></span>
 
 </pre>
 </body>
