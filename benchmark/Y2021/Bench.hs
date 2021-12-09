@@ -136,7 +136,7 @@ benchmarks =
         bgroup "D08"
           [ bgroup "A"
             [ bgroup "initial"
-              [ env (pure $ parseSevSeg sample)
+              [ env (pure $ parse8 sample)
                   $ bench "pre-parsed" . whnf solve8A
               , bench "large" $ whnf part8A sample
               ]
