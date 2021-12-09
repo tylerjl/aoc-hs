@@ -179,6 +179,18 @@ benchmark criterion
                     , witch
   type:               exitcode-stdio-1.0
 
+benchmark space
+  default-language:   Haskell2010
+  default-extensions: BlockArguments
+                    , TypeApplications
+  hs-source-dirs:     benchmark
+  main-is:            Space.hs
+  build-depends:      base
+                    , adventofcode
+                    , text
+                    , weigh
+  type:               exitcode-stdio-1.0
+
 source-repository head
   type:     git
   location: https://github.com/tylerjl/aoc-hs

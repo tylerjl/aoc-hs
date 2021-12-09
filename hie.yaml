@@ -14,3 +14,6 @@ cradle:
 
     - path: "benchmark"
       component: "adventofcode:bench:criterion"
+
+    - path: "benchmark/Space.hs"
+      component: "adventofcode:bench:space"
