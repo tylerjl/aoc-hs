@@ -14,63 +14,64 @@ module Y2021.D09
   where
 
 import Data.Attoparsec.Text hiding (take)
-import Data.Matrix
-import Data.Text (Text)
 import Data.Either.Utils (fromRight)
-import Data.Maybe (mapMaybe, fromMaybe, catMaybes)
-import Data.Monoid
-import Data.Foldable (foldl')
+import Data.List (group, sort, sortOn)
+import Data.List.Extra (nubOrdOn)
+import Data.Maybe (catMaybes)
+import Data.Ord (Down(Down))
+import Data.Text (Text)
+import Math.Geometry.Grid
+import Math.Geometry.Grid.Square
+import Math.Geometry.GridMap hiding (map)
+import Math.Geometry.GridMap.Lazy (lazyGridMap, LGridMap)
+
+-- |Type alias for better readability.
+type Point = (Int, Int)
+-- |Type alias for better readability.
+type SeaFloor = LGridMap RectSquareGrid Int
+-- |Type alias for better readability.
+type Basins = LGridMap RectSquareGrid (Maybe (Point, Int))
 
 -- |Solve part A
 part9A :: Text -> Int
-part9A (parse9 -> m) =
-  getSum . maybe' . foldMap (fmap (Sum . succ)) $
-  mapPos (solve9 m) m
-
-solve9 :: Matrix Int -> (Int, Int) -> Int -> Maybe Int
-solve9 matrix' (a, b) n
-  | isBasin matrix' (a, b) n = Just n
-  | otherwise = Nothing
-
-maybe' :: Maybe a -> a
-maybe' = fromMaybe (error "bad matrix")
-
-isBasin :: Ord a => Matrix a -> (Int, Int) -> a -> Bool
-isBasin matrix' (a, b) n = all (n <) (neighbors matrix' a b)
-
-neighbors :: Matrix b -> Int -> Int -> [b]
-neighbors matrix' x y = mapMaybe neighbor (adjacent x y)
-  where
-    neighbor (x', y') = safeGet x' y' matrix'
-
-adjacent :: (Num a1, Num a2) => a1 -> a2 -> [(a1, a2)]
-adjacent x y = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+part9A = sum . map (succ . snd) . nubOrdOn fst . findBasins . parse9
 
 -- |Solve part B
 part9B :: Text -> Int
-part9B (parse9 -> m) =
-  foldl' (*) 1 $ take 3 $ reverse $ catMaybes $ toList $ mapPos (solve9B m) m
+part9B =
+  product .
+  take 3 .
+  sortOn Down . map length . group . sort . map fst . findBasins . parse9
 
-solve9B :: Matrix Int -> (Int, Int) -> Int -> Maybe Int
-solve9B matrix' p@(x, y) n
-  | isBasin matrix' (x, y) n =
-    Just . length $ basin matrix' [p] $ basinNeighbors matrix' x y
-  | otherwise = Nothing
-  where
-    basin m' trail (n'@(x', y'):ns)
-      | n' `elem` trail = basin m' trail ns
-      | otherwise       = basin m' (n':trail) $ basinNeighbors m' x' y' ++ ns
-    basin _ trail [] = trail
+-- |Some common glue between our mapping function and extracting the values
+-- we're interested in.
+findBasins :: SeaFloor -> [(Point, Int)]
+findBasins = catMaybes . elems . basins
 
-basinNeighbors :: (Eq a, Num a) => Matrix a -> Int -> Int -> [(Int, Int)]
-basinNeighbors matrix' x y = filter sameBasin $ adjacent x y
+-- |Recursive map over `SeaFloor` that turns each grid point into a possible
+-- representation of the basin this point flows to. `Grid` takes the brunt of
+-- the boilterplate here with `neighbours` and `mapWithKey`.
+basins :: SeaFloor -> Basins
+basins g = mapWithKey toBasins g
   where
-    sameBasin (\(x', y') -> safeGet x' y' matrix' -> Just peer) = peer /= 9
-    sameBasin _ = False
+    -- Although `basins` is the top-level map, toBasins is what we'll
+    -- recursively call when we find a point that has to map to a low point
+    -- somewhere.
+    toBasins point value
+      | value == 9      = Nothing
+      | []  <- adjacent = Just (point, value)
+      | otherwise       = minimum (map (uncurry toBasins) adjacent)
+      where
+        adjacent = [(x, g ! x) | x <- neighbours g point, g ! x < value]
 
--- |Parse puzzle input into a list of `Int`s with faster attoparsec.
-parse9 :: Text -> Matrix Int
-parse9 = fromLists . fromRight . parseOnly parser
+-- |Parse puzzle input into a `Grid`. I could probably do the conversion from
+-- `[[Int]]` to `Grid outside of the parser, but it's nice to go directly to the
+-- main data structure for the problem.
+parse9 :: Text -> SeaFloor
+parse9 = fromRight . parseOnly (grid <$> parser)
   where
+    grid [] = error "empty input"
+    grid rows@(row:_) =
+      lazyGridMap (rectSquareGrid (length row) (length rows)) (concat rows)
     parser = line `sepBy1` endOfLine <* atEnd
     line = many1 (read . (: []) <$> digit)

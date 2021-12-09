@@ -91,6 +91,7 @@ library
                      , cryptohash
                      , deepseq
                      , extra
+                     , grid
                      , hashable
                      , lens
                      , matrix
