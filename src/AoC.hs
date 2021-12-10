@@ -18,12 +18,12 @@ import qualified Data.ByteString.Lazy as L
  glue between the outside world Main call and the solver functions.
 -}
 solve :: Int -> Int -> Char -> String -> String
-solve 2015 1 'a' (level    -> solution) = show solution
-solve 2015 1 'b' (basement -> solution) = show solution
+solve 2015 1 'a' (level . into @Text -> solution) = show solution
+solve 2015 1 'b' (basement . into @Text -> solution) = show solution
 
-solve 2015 2 'a' (fmap surfaceArea  . parsePresents -> Just solution) = show solution
-solve 2015 2 'b' (fmap ribbonLength . parsePresents -> Just solution) = show solution
-solve 2015 2  _  (parsePresents -> Nothing) = error "could not parse file"
+solve 2015 2 'a' (fmap surfaceArea  . parsePresents . into @Text -> Just solution) = show solution
+solve 2015 2 'b' (fmap ribbonLength . parsePresents . into @Text -> Just solution) = show solution
+solve 2015 2  _  (parsePresents . into @Text -> Nothing) = error "could not parse file"
 
 solve 2015 3 'a' (santaRun . filter (/= '\n') -> solution) = show solution
 solve 2015 3 'b' (roboRun  . filter (/= '\n') -> solution) = show solution

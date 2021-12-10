@@ -11,8 +11,6 @@ module Main where
 import Data.Text       (Text)
 import Options.Generic (unwrapRecord)
 
-import qualified Data.ByteString.Lazy as L
-
 import AoC
 import Options
 
@@ -26,4 +24,4 @@ usage = "Advent of Code solutions in Haskell"
 main :: IO ()
 main = do
   (Options year day part path) <- unwrapRecord usage
-  readFile path >>= putStrLn . solver year day part
+  readFile path >>= putStrLn . solve year day part

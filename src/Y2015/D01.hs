@@ -11,25 +11,28 @@ module Y2015.D01
   , basement
   ) where
 
+import Data.Attoparsec.Text
 import Data.List (foldl')
+import Data.Text (Text)
+import Data.Either.Utils
 
-move :: Char -> Int
-move c
-  | c == '(' = 1
-  | c == ')' = -1
-  | otherwise = 0
+-- |Parse day 1's input.
+parse1 :: Text -> [Int]
+parse1 = fromRight . parseOnly parser
+  where
+    parser = many1 (read . (: []) <$> digit) <* endOfLine <* atEnd
 
 -- |Find final level from list of elevator movements
 level
-  :: String -- ^ List of input open/close parens
-  -> Int -- ^ Final elevator level
-level = foldl' (+) 0 . map move
+  :: Text -- ^ List of input open/close parens
+  -> Int  -- ^ Final elevator level
+level = foldl' (+) 0 . parse1
 
 -- |Find position that arrives at level 0
 basement
-  :: String -- ^ List of input open/close parens
+  :: Text      -- ^ List of input open/close parens
   -> Maybe Int -- ^ Possible position in string that arrives at zero
-basement = find 0 1 . map move
+basement = find 0 1 . parse1
   where
     find current idx (x:xs)
       | current + x < 0 = Just idx

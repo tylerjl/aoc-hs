@@ -7,16 +7,20 @@ import Criterion.Main (env)
 import Control.Monad
 import Data.ByteString (pack)
 import Data.ByteString.Char8 (unpack)
+import Data.Text (Text)
 import Data.Word (Word8)
 import System.Random.MWC
+import Witch
+
+import qualified Data.Text as T
 
 import Y2015
 
-entropy :: IO String
+entropy :: IO Text
 entropy = do
     rand <- withSystemRandom .  asGenIO $ \ gen ->
         replicateM 1000 $ uniformR (c '(', c ')') gen
-    return $ unpack $ pack rand
+    return $ into @Text . unpack $ pack rand
     where c :: Char -> Word8
           c = fromIntegral . fromEnum
 
@@ -27,7 +31,7 @@ benchmarks =
             [ bgroup "D01"
               [ bgroup "partA"
                 [ bench "small" $ nf level "()((()(())))(((((((())))))))(()))))))"
-                , bench "large"  $ nf level (Prelude.take 100 levels)
+                , bench "large"  $ nf level (T.take 100 levels)
                 , bench "huge"   $ nf level levels
                 ]
               ]

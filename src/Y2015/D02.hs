@@ -13,12 +13,9 @@ module Y2015.D02
   , ribbonLength
   ) where
 
+import Data.Attoparsec.Text hiding (take)
 import Data.List (foldl', sort)
-import qualified Text.Parsec as P
-import Text.Parsec.Char (char, endOfLine)
-import Text.Parsec.String (Parser)
-
-import Y2015.Util (regularParse, intParser)
+import Data.Text (Text)
 
 -- |Represents a present in three dimensions
 data Present =
@@ -28,18 +25,18 @@ data Present =
   deriving (Eq, Show)
 
 presentsParser :: Parser [Present]
-presentsParser = P.many1 (presentParser <* P.optional endOfLine)
+presentsParser = many1 (presentParser <* endOfLine)
 
 presentParser :: Parser Present
 presentParser =
-  Present <$> (intParser <* char 'x') <*> (intParser <* char 'x') <*> intParser
+  Present <$> (decimal <* char 'x') <*> (decimal <* char 'x') <*> decimal
 
 -- |Parse presents from an input string
 parsePresents
-  :: String -- ^ Raw input of present dimensions
+  :: Text -- ^ Raw input of present dimensions
   -> Maybe [Present] -- ^ Possible list of 'Present's
 parsePresents s =
-  case regularParse presentsParser s of
+  case parseOnly presentsParser s of
     Right ps -> Just ps
     Left _ -> Nothing
 
