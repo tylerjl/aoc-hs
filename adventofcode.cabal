@@ -36,7 +36,8 @@ library
                      , TypeApplications
                      , ViewPatterns
   ghc-options:         -Wall -Werror
-  exposed-modules:     Y2015
+  exposed-modules:     AoC
+                     , Y2015
                      , Y2016
                      , Y2018
                      , Y2021
@@ -106,7 +107,7 @@ library
                      , unordered-containers
                      , vector
                      , witch
-  default-language:    Haskell2010
+  default-language:  Haskell2010
 
 test-suite adventofcode-test
   type:                exitcode-stdio-1.0
