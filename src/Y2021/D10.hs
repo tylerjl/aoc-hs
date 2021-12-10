@@ -16,16 +16,14 @@ import Control.Monad     (foldM)
 import Data.Either.Extra (lefts, rights)
 import Data.Foldable     (foldl')
 import Data.List         (sort)
-import Data.Sequence     (Seq(..), (|>))
 import Data.Text         (Text)
 import Witch
 
-import qualified Data.Text     as T
-import qualified Data.Sequence as S
+import qualified Data.Text as T
 
 -- |Solve part A
 part10A :: Text -> Int
-part10A = sum . map errorTable . lefts . map (parse10 . S.fromList . into @String) . T.lines
+part10A = sum . map errorTable . lefts . map (parse10 . into @String) . T.lines
 
 -- |Character lookup table for part A
 errorTable :: Char -> Int
@@ -41,21 +39,21 @@ part10B
   -- Then convert them to scores, custom score, and get the median
   = median . sort . map (foldl' score 0 . fmap syntaxPoints)
   -- Get all valid unterminated syntaxes
-  . rights . map (parse10 . into @(Seq Char) . into @String) . T.lines
+  . rights . map (parse10 . into @String) . T.lines
 
--- |Manual parser for a given input string. Relying on `Seq` here to be a
--- rear-looking stack.
-parse10 :: Seq Char -> Either Char (Seq Char)
-parse10 = fmap (fmap pair' . S.reverse) . foldM go S.empty
+-- |Manual parser for a given input string. I tried a `Seq` intially, just a
+-- stock `List`s as a stack works just as well.
+parse10 :: [Char] -> Either Char [Char]
+parse10 = fmap (map pair') . foldM go []
   where
-    go Empty c
-      | opener c = pure (S.singleton c)
+    go [] c
+      | opener c = pure [c]
       | otherwise = Left c
-    go acc c | opener c = pure (acc|>c)
-    go (acc:|>'(') ')' = pure acc
-    go (acc:|>'{') '}' = pure acc
-    go (acc:|>'[') ']' = pure acc
-    go (acc:|>'<') '>' = pure acc
+    go acc c | opener c = pure (c:acc)
+    go ('(':acc) ')' = pure acc
+    go ('{':acc) '}' = pure acc
+    go ('[':acc) ']' = pure acc
+    go ('<':acc) '>' = pure acc
     go _ c = Left c
     opener c = c == '(' || c == '[' || c == '{' || c == '<'
 
