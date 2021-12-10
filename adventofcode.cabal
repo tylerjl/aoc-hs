@@ -99,6 +99,7 @@ library
                      , matrix
                      , memoize
                      , MissingH
+                     , multiset
                      , parsec
                      , repa
                      , safe

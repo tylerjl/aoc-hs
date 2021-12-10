@@ -81,12 +81,16 @@ benchmarks =
               [ bench "large" $ nf part5A sample ]
             , bgroup "hashmap"
               [ bench "large" $ nf part5AHM sample ]
+            , bgroup "multiset"
+              [ bench "large" $ nf part5AMS sample ]
             ]
           , bgroup "B"
             [ bgroup "initial"
               [ bench "large" $ nf part5B sample ]
             , bgroup "hashmap"
               [ bench "large" $ nf part5BHM sample ]
+            , bgroup "multiset"
+              [ bench "large" $ nf part5BMS sample ]
             ]
           ]
     , env (getProblem "6") \sample -> do
