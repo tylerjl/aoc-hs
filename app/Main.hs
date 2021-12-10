@@ -11,6 +11,8 @@ module Main where
 import Data.Text       (Text)
 import Options.Generic (unwrapRecord)
 
+import qualified Data.Text.IO as TIO
+
 import AoC
 import Options
 
@@ -24,4 +26,4 @@ usage = "Advent of Code solutions in Haskell"
 main :: IO ()
 main = do
   (Options year day part path) <- unwrapRecord usage
-  readFile path >>= putStrLn . solve year day part
+  TIO.readFile path >>= putStrLn . solve year day part

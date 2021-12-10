@@ -15,12 +15,15 @@ import Data.Attoparsec.Text
 import Data.List (foldl')
 import Data.Text (Text)
 import Data.Either.Utils
+import Control.Applicative ((<|>))
 
 -- |Parse day 1's input.
 parse1 :: Text -> [Int]
 parse1 = fromRight . parseOnly parser
   where
-    parser = many1 (read . (: []) <$> digit) <* endOfLine <* atEnd
+    parser = many1 levels <* skipMany endOfLine <* atEnd
+    levels = 1  <$ char '('
+       <|> (-1) <$ char ')'
 
 -- |Find final level from list of elevator movements
 level

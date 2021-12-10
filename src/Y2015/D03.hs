@@ -11,8 +11,12 @@ module Y2015.D03
   , roboRun
   ) where
 
-import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set  (Set)
+import Data.Text (Text)
+import Witch
+
+import qualified Data.Set  as Set
+import qualified Data.Text as T
 
 type Point = (Int, Int)
 
@@ -24,6 +28,11 @@ direction c
   | c == '<' = (-1, 0)
   | otherwise = (0, 0)
 
+mapDirection :: Text -> [Point]
+mapDirection = T.foldl' dir []
+  where
+    dir l c = direction c : l
+
 start :: Set Point
 start = Set.singleton (0, 0)
 
@@ -32,15 +41,15 @@ move (dx, dy) (x, y) = (x + dx, y + dy)
 
 -- |Find number of deliverables for santa's route
 santaRun
-  :: String -- ^ Route input
-  -> Int -- ^ Number of stops
-santaRun = Set.size . deliver start . map direction
+  :: Text -- ^ Route input
+  -> Int  -- ^ Number of stops
+santaRun = Set.size . deliver start . mapDirection
 
 -- |Find number of deliverables for the robot's route
 roboRun
-  :: String -- ^ Route input
-  -> Int -- ^ Number of stops
-roboRun = Set.size . teamDelivery . tMap direction . divideWork
+  :: Text -- ^ Route input
+  ->  Int -- ^ Number of stops
+roboRun = Set.size . teamDelivery . tMap direction . divideWork . into @String
   where
     teamDelivery = uncurry (deliver . deliver start)
 

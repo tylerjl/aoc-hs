@@ -25,7 +25,7 @@ data Present =
   deriving (Eq, Show)
 
 presentsParser :: Parser [Present]
-presentsParser = many1 (presentParser <* endOfLine)
+presentsParser = many1 (presentParser <* skipMany endOfLine)
 
 presentParser :: Parser Present
 presentParser =
