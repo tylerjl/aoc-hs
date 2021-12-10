@@ -30,58 +30,67 @@ span.spaces    { background: white }
 <span class="lineno">   11 </span>  , roboRun
 <span class="lineno">   12 </span>  ) where
 <span class="lineno">   13 </span>
-<span class="lineno">   14 </span>import Data.Set (Set)
-<span class="lineno">   15 </span>import qualified Data.Set as Set
-<span class="lineno">   16 </span>
-<span class="lineno">   17 </span>type Point = (Int, Int)
-<span class="lineno">   18 </span>
-<span class="lineno">   19 </span>direction :: Char -&gt; Point
-<span class="lineno">   20 </span><span class="decl"><span class="istickedoff">direction c</span>
-<span class="lineno">   21 </span><span class="spaces">  </span><span class="istickedoff">| c == '^' = (0, 1)</span>
-<span class="lineno">   22 </span><span class="spaces">  </span><span class="istickedoff">| c == 'v' = (0, -1)</span>
-<span class="lineno">   23 </span><span class="spaces">  </span><span class="istickedoff">| c == '&gt;' = (1, 0)</span>
-<span class="lineno">   24 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">c == '&lt;'</span> = (-1, 0)</span>
-<span class="lineno">   25 </span><span class="spaces">  </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span> = <span class="nottickedoff">(0, 0)</span></span></span>
-<span class="lineno">   26 </span>
-<span class="lineno">   27 </span>start :: Set Point
-<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">start = Set.singleton (0, 0)</span></span>
-<span class="lineno">   29 </span>
-<span class="lineno">   30 </span>move :: Point -&gt; Point -&gt; Point
-<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">move (dx, dy) (x, y) = (x + dx, y + dy)</span></span>
-<span class="lineno">   32 </span>
-<span class="lineno">   33 </span>-- |Find number of deliverables for santa's route
-<span class="lineno">   34 </span>santaRun
-<span class="lineno">   35 </span>  :: String -- ^ Route input
-<span class="lineno">   36 </span>  -&gt; Int -- ^ Number of stops
-<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">santaRun = Set.size . deliver start . map direction</span></span>
+<span class="lineno">   14 </span>import Data.Set  (Set)
+<span class="lineno">   15 </span>import Data.Text (Text)
+<span class="lineno">   16 </span>import Witch
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>import qualified Data.Set  as Set
+<span class="lineno">   19 </span>import qualified Data.Text as T
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>type Point = (Int, Int)
+<span class="lineno">   22 </span>
+<span class="lineno">   23 </span>direction :: Char -&gt; Point
+<span class="lineno">   24 </span><span class="decl"><span class="istickedoff">direction c</span>
+<span class="lineno">   25 </span><span class="spaces">  </span><span class="istickedoff">| c == '^' = (0, 1)</span>
+<span class="lineno">   26 </span><span class="spaces">  </span><span class="istickedoff">| c == 'v' = (0, -1)</span>
+<span class="lineno">   27 </span><span class="spaces">  </span><span class="istickedoff">| c == '&gt;' = (1, 0)</span>
+<span class="lineno">   28 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">c == '&lt;'</span> = (-1, 0)</span>
+<span class="lineno">   29 </span><span class="spaces">  </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span> = <span class="nottickedoff">(0, 0)</span></span></span>
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>mapDirection :: Text -&gt; [Point]
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">mapDirection = T.foldl' dir []</span>
+<span class="lineno">   33 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   34 </span><span class="spaces">    </span><span class="istickedoff">dir l c = direction c : l</span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>start :: Set Point
+<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">start = Set.singleton (0, 0)</span></span>
 <span class="lineno">   38 </span>
-<span class="lineno">   39 </span>-- |Find number of deliverables for the robot's route
-<span class="lineno">   40 </span>roboRun
-<span class="lineno">   41 </span>  :: String -- ^ Route input
-<span class="lineno">   42 </span>  -&gt; Int -- ^ Number of stops
-<span class="lineno">   43 </span><span class="decl"><span class="istickedoff">roboRun = Set.size . teamDelivery . tMap direction . divideWork</span>
-<span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   45 </span><span class="spaces">    </span><span class="istickedoff">teamDelivery = uncurry (deliver . deliver start)</span></span>
-<span class="lineno">   46 </span>
-<span class="lineno">   47 </span>tMap :: (a -&gt; b) -&gt; ([a], [a]) -&gt; ([b], [b])
-<span class="lineno">   48 </span><span class="decl"><span class="istickedoff">tMap f (a1, a2) = (map f a1, map f a2)</span></span>
-<span class="lineno">   49 </span>
-<span class="lineno">   50 </span>divideWork :: String -&gt; (String, String)
-<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">divideWork [] = ([], [])</span>
-<span class="lineno">   52 </span><span class="spaces"></span><span class="istickedoff">divideWork [x] = <span class="nottickedoff">([x], [])</span></span>
-<span class="lineno">   53 </span><span class="spaces"></span><span class="istickedoff">divideWork (x:y:zs) = (x : xp, y : yp)</span>
-<span class="lineno">   54 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   55 </span><span class="spaces">    </span><span class="istickedoff">(xp, yp) = divideWork zs</span></span>
-<span class="lineno">   56 </span>
-<span class="lineno">   57 </span>deliver :: Set Point -&gt; [Point] -&gt; Set Point
-<span class="lineno">   58 </span><span class="decl"><span class="istickedoff">deliver = navigate (0, 0)</span></span>
-<span class="lineno">   59 </span>
-<span class="lineno">   60 </span>navigate :: Point -&gt; Set Point -&gt; [Point] -&gt; Set Point
-<span class="lineno">   61 </span><span class="decl"><span class="istickedoff">navigate _ history [] = history</span>
-<span class="lineno">   62 </span><span class="spaces"></span><span class="istickedoff">navigate origin history (dir:plans) =</span>
-<span class="lineno">   63 </span><span class="spaces">  </span><span class="istickedoff">let newPoint = move dir origin</span>
-<span class="lineno">   64 </span><span class="spaces">      </span><span class="istickedoff">step = Set.insert newPoint history</span>
-<span class="lineno">   65 </span><span class="spaces">  </span><span class="istickedoff">in navigate newPoint step plans</span></span>
+<span class="lineno">   39 </span>move :: Point -&gt; Point -&gt; Point
+<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">move (dx, dy) (x, y) = (x + dx, y + dy)</span></span>
+<span class="lineno">   41 </span>
+<span class="lineno">   42 </span>-- |Find number of deliverables for santa's route
+<span class="lineno">   43 </span>santaRun
+<span class="lineno">   44 </span>  :: Text -- ^ Route input
+<span class="lineno">   45 </span>  -&gt; Int  -- ^ Number of stops
+<span class="lineno">   46 </span><span class="decl"><span class="istickedoff">santaRun = Set.size . deliver start . mapDirection</span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>-- |Find number of deliverables for the robot's route
+<span class="lineno">   49 </span>roboRun
+<span class="lineno">   50 </span>  :: Text -- ^ Route input
+<span class="lineno">   51 </span>  -&gt;  Int -- ^ Number of stops
+<span class="lineno">   52 </span><span class="decl"><span class="istickedoff">roboRun = Set.size . teamDelivery . tMap direction . divideWork . into @String</span>
+<span class="lineno">   53 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   54 </span><span class="spaces">    </span><span class="istickedoff">teamDelivery = uncurry (deliver . deliver start)</span></span>
+<span class="lineno">   55 </span>
+<span class="lineno">   56 </span>tMap :: (a -&gt; b) -&gt; ([a], [a]) -&gt; ([b], [b])
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">tMap f (a1, a2) = (map f a1, map f a2)</span></span>
+<span class="lineno">   58 </span>
+<span class="lineno">   59 </span>divideWork :: String -&gt; (String, String)
+<span class="lineno">   60 </span><span class="decl"><span class="istickedoff">divideWork [] = ([], [])</span>
+<span class="lineno">   61 </span><span class="spaces"></span><span class="istickedoff">divideWork [x] = <span class="nottickedoff">([x], [])</span></span>
+<span class="lineno">   62 </span><span class="spaces"></span><span class="istickedoff">divideWork (x:y:zs) = (x : xp, y : yp)</span>
+<span class="lineno">   63 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   64 </span><span class="spaces">    </span><span class="istickedoff">(xp, yp) = divideWork zs</span></span>
+<span class="lineno">   65 </span>
+<span class="lineno">   66 </span>deliver :: Set Point -&gt; [Point] -&gt; Set Point
+<span class="lineno">   67 </span><span class="decl"><span class="istickedoff">deliver = navigate (0, 0)</span></span>
+<span class="lineno">   68 </span>
+<span class="lineno">   69 </span>navigate :: Point -&gt; Set Point -&gt; [Point] -&gt; Set Point
+<span class="lineno">   70 </span><span class="decl"><span class="istickedoff">navigate _ history [] = history</span>
+<span class="lineno">   71 </span><span class="spaces"></span><span class="istickedoff">navigate origin history (dir:plans) =</span>
+<span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">let newPoint = move dir origin</span>
+<span class="lineno">   73 </span><span class="spaces">      </span><span class="istickedoff">step = Set.insert newPoint history</span>
+<span class="lineno">   74 </span><span class="spaces">  </span><span class="istickedoff">in navigate newPoint step plans</span></span>
 
 </pre>
 </body>

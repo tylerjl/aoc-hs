@@ -30,30 +30,36 @@ span.spaces    { background: white }
 <span class="lineno">   11 </span>  , basement
 <span class="lineno">   12 </span>  ) where
 <span class="lineno">   13 </span>
-<span class="lineno">   14 </span>import Data.List (foldl')
-<span class="lineno">   15 </span>
-<span class="lineno">   16 </span>move :: Char -&gt; Int
-<span class="lineno">   17 </span><span class="decl"><span class="istickedoff">move c</span>
-<span class="lineno">   18 </span><span class="spaces">  </span><span class="istickedoff">| c == '(' = 1</span>
-<span class="lineno">   19 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">c == ')'</span> = -1</span>
-<span class="lineno">   20 </span><span class="spaces">  </span><span class="istickedoff">| <span class="nottickedoff">otherwise</span> = <span class="nottickedoff">0</span></span></span>
-<span class="lineno">   21 </span>
-<span class="lineno">   22 </span>-- |Find final level from list of elevator movements
-<span class="lineno">   23 </span>level
-<span class="lineno">   24 </span>  :: String -- ^ List of input open/close parens
-<span class="lineno">   25 </span>  -&gt; Int -- ^ Final elevator level
-<span class="lineno">   26 </span><span class="decl"><span class="istickedoff">level = foldl' (+) 0 . map move</span></span>
+<span class="lineno">   14 </span>import Data.Attoparsec.Text
+<span class="lineno">   15 </span>import Data.List (foldl')
+<span class="lineno">   16 </span>import Data.Text (Text)
+<span class="lineno">   17 </span>import Data.Either.Utils
+<span class="lineno">   18 </span>import Control.Applicative ((&lt;|&gt;))
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>-- |Parse day 1's input.
+<span class="lineno">   21 </span>parse1 :: Text -&gt; [Int]
+<span class="lineno">   22 </span><span class="decl"><span class="istickedoff">parse1 = fromRight . parseOnly parser</span>
+<span class="lineno">   23 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   24 </span><span class="spaces">    </span><span class="istickedoff">parser = many1 levels &lt;* skipMany endOfLine &lt;* atEnd</span>
+<span class="lineno">   25 </span><span class="spaces">    </span><span class="istickedoff">levels = 1  &lt;$ char '('</span>
+<span class="lineno">   26 </span><span class="spaces">       </span><span class="istickedoff">&lt;|&gt; (-1) &lt;$ char ')'</span></span>
 <span class="lineno">   27 </span>
-<span class="lineno">   28 </span>-- |Find position that arrives at level 0
-<span class="lineno">   29 </span>basement
-<span class="lineno">   30 </span>  :: String -- ^ List of input open/close parens
-<span class="lineno">   31 </span>  -&gt; Maybe Int -- ^ Possible position in string that arrives at zero
-<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">basement = find 0 1 . map move</span>
-<span class="lineno">   33 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   34 </span><span class="spaces">    </span><span class="istickedoff">find current idx (x:xs)</span>
-<span class="lineno">   35 </span><span class="spaces">      </span><span class="istickedoff">| current + x &lt; 0 = Just idx</span>
-<span class="lineno">   36 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = find (current + x) (idx + 1) xs</span>
-<span class="lineno">   37 </span><span class="spaces">    </span><span class="istickedoff">find _ _ [] = <span class="nottickedoff">Nothing</span></span></span>
+<span class="lineno">   28 </span>-- |Find final level from list of elevator movements
+<span class="lineno">   29 </span>level
+<span class="lineno">   30 </span>  :: Text -- ^ List of input open/close parens
+<span class="lineno">   31 </span>  -&gt; Int  -- ^ Final elevator level
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">level = foldl' (+) 0 . parse1</span></span>
+<span class="lineno">   33 </span>
+<span class="lineno">   34 </span>-- |Find position that arrives at level 0
+<span class="lineno">   35 </span>basement
+<span class="lineno">   36 </span>  :: Text      -- ^ List of input open/close parens
+<span class="lineno">   37 </span>  -&gt; Maybe Int -- ^ Possible position in string that arrives at zero
+<span class="lineno">   38 </span><span class="decl"><span class="istickedoff">basement = find 0 1 . parse1</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   40 </span><span class="spaces">    </span><span class="istickedoff">find current idx (x:xs)</span>
+<span class="lineno">   41 </span><span class="spaces">      </span><span class="istickedoff">| current + x &lt; 0 = Just idx</span>
+<span class="lineno">   42 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = find (current + x) (idx + 1) xs</span>
+<span class="lineno">   43 </span><span class="spaces">    </span><span class="istickedoff">find _ _ [] = <span class="nottickedoff">Nothing</span></span></span>
 
 </pre>
 </body>
