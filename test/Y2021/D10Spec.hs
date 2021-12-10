@@ -13,7 +13,7 @@ spec = parallel $ do
         before (TIO.readFile "dist/resources/2021/day10_sample.txt") $ do
           describe "part10A" $ do
             it "solves the example case" $ \input -> do
-              part10A input `shouldBe` 15
+              part10A input `shouldBe` 26397
           describe "part10B" $ do
             it "solves the example case" $ \input -> do
-              part10B input `shouldBe` 1134
+              part10B input `shouldBe` 288957
