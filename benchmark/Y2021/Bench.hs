@@ -157,4 +157,15 @@ benchmarks =
               [ bench "large" $ whnf part9B sample ]
             ]
           ]
+    , env (getProblem "10") \sample -> do
+        bgroup "D10"
+          [ bgroup "A"
+            [ bgroup "initial"
+              [ bench "large" $ whnf part10A sample ]
+            ]
+          , bgroup "B"
+            [ bgroup "initial"
+              [ bench "large" $ whnf part10B sample ]
+            ]
+          ]
     ]
