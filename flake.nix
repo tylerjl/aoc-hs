@@ -33,6 +33,7 @@
                 cabal-install
                 cachix
                 haskellPackages.hspec-discover
+                lz4
               ];
             };
         })

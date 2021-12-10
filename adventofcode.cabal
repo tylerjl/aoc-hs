@@ -189,12 +189,15 @@ benchmark space
   default-language:   Haskell2010
   default-extensions: BlockArguments
                     , TypeApplications
+                    , RecordWildCards
   hs-source-dirs:     benchmark
   main-is:            Space.hs
   build-depends:      base
                     , adventofcode
                     , text
+                    , chart-svg
                     , weigh
+                    , witch
   type:               exitcode-stdio-1.0
 
 source-repository head
