@@ -30,100 +30,59 @@ span.spaces    { background: white }
 <span class="lineno">   11 </span>
 <span class="lineno">   12 </span>import Data.Attoparsec.Text
 <span class="lineno">   13 </span>import Data.Either.Utils (fromRight)
-<span class="lineno">   14 </span>import Data.Monoid
-<span class="lineno">   15 </span>import Data.Text (Text)
-<span class="lineno">   16 </span>
-<span class="lineno">   17 </span>import qualified Data.HashMap.Strict as HM
-<span class="lineno">   18 </span>import qualified Data.Map.Strict as M
-<span class="lineno">   19 </span>import qualified Data.MultiSet as MS
-<span class="lineno">   20 </span>import Data.Foldable (foldl')
-<span class="lineno">   21 </span>
+<span class="lineno">   14 </span>import Data.HashMap.Strict (HashMap)
+<span class="lineno">   15 </span>import Data.Monoid
+<span class="lineno">   16 </span>import Data.Text         (Text)
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>import qualified Data.HashMap.Strict as M
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>-- |Makes some signatures easier to read
+<span class="lineno">   21 </span>type Point = (Int, Int)
 <span class="lineno">   22 </span>-- |Makes some signatures easier to read
-<span class="lineno">   23 </span>type Point = (Int, Int)
+<span class="lineno">   23 </span>type Line = (Point, Point)
 <span class="lineno">   24 </span>-- |Makes some signatures easier to read
-<span class="lineno">   25 </span>type Ray = [(Point, Point)]
+<span class="lineno">   25 </span>type Points = HashMap Point (Sum Int)
 <span class="lineno">   26 </span>
 <span class="lineno">   27 </span>-- |Solve part A
 <span class="lineno">   28 </span>part5A :: Text -&gt; Int
 <span class="lineno">   29 </span><span class="decl"><span class="istickedoff">part5A = solve5 (filter part5APredicate)</span></span>
 <span class="lineno">   30 </span>
-<span class="lineno">   31 </span>-- |Solve part A, but with a HashMap
-<span class="lineno">   32 </span>part5AHM :: Text -&gt; Int
-<span class="lineno">   33 </span><span class="decl"><span class="nottickedoff">part5AHM = solve5HM (filter part5APredicate)</span></span>
+<span class="lineno">   31 </span>part5APredicate :: Line -&gt; Bool
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">part5APredicate ((x1, y1), (x2, y2))</span>
+<span class="lineno">   33 </span><span class="spaces">  </span><span class="istickedoff">= x1 == x2 || y1 == y2</span></span>
 <span class="lineno">   34 </span>
-<span class="lineno">   35 </span>-- |Solve part A, but with a MultiSet
-<span class="lineno">   36 </span>part5AMS :: Text -&gt; Int
-<span class="lineno">   37 </span><span class="decl"><span class="nottickedoff">part5AMS = solve5MS (filter part5APredicate)</span></span>
+<span class="lineno">   35 </span>-- |Solve part B
+<span class="lineno">   36 </span>part5B :: Text -&gt; Int
+<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">part5B = solve5 id</span></span>
 <span class="lineno">   38 </span>
-<span class="lineno">   39 </span>part5APredicate :: (Eq a1, Eq a2) =&gt; ((a1, a2), (a1, a2)) -&gt; Bool
-<span class="lineno">   40 </span><span class="decl"><span class="istickedoff">part5APredicate ((x1, y1), (x2, y2))</span>
-<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">= x1 == x2 || y1 == y2</span></span>
-<span class="lineno">   42 </span>
-<span class="lineno">   43 </span>-- |Solve part B
-<span class="lineno">   44 </span>part5B :: Text -&gt; Int
-<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">part5B = solve5 id</span></span>
-<span class="lineno">   46 </span>
-<span class="lineno">   47 </span>-- |Solve part B, but with a HashMap
-<span class="lineno">   48 </span>part5BHM :: Text -&gt; Int
-<span class="lineno">   49 </span><span class="decl"><span class="nottickedoff">part5BHM = solve5HM id</span></span>
-<span class="lineno">   50 </span>
-<span class="lineno">   51 </span>-- |Solve part B, but with a MultiSet
-<span class="lineno">   52 </span>part5BMS :: Text -&gt; Int
-<span class="lineno">   53 </span><span class="decl"><span class="nottickedoff">part5BMS =</span>
-<span class="lineno">   54 </span><span class="spaces">  </span><span class="nottickedoff">length . filter ((&gt; 1) . snd) . MS.toOccurList . fromRight . parseOnly parser</span>
-<span class="lineno">   55 </span><span class="spaces">  </span><span class="nottickedoff">where</span>
-<span class="lineno">   56 </span><span class="spaces">    </span><span class="nottickedoff">parser = foldl' MS.union MS.empty &lt;$&gt; lines'</span>
-<span class="lineno">   57 </span><span class="spaces">    </span><span class="nottickedoff">lines' = line `sepBy1` endOfLine &lt;* atEnd</span>
-<span class="lineno">   58 </span><span class="spaces">    </span><span class="nottickedoff">line = MS.fromList . uncurry lineTo' &lt;$&gt; toFrom</span>
-<span class="lineno">   59 </span><span class="spaces">    </span><span class="nottickedoff">toFrom  = (,) &lt;$&gt; point &lt;* string &quot; -&gt; &quot; &lt;*&gt; point</span>
-<span class="lineno">   60 </span><span class="spaces">    </span><span class="nottickedoff">point = (,) &lt;$&gt; decimal &lt;* char ',' &lt;*&gt; decimal</span></span>
-<span class="lineno">   61 </span>
-<span class="lineno">   62 </span>-- |Higher-order function solution to share parts A and B.
-<span class="lineno">   63 </span>solve5 :: (Ray -&gt; Ray) -&gt; Text -&gt; Int
-<span class="lineno">   64 </span><span class="decl"><span class="istickedoff">solve5 f =</span>
-<span class="lineno">   65 </span><span class="spaces">  </span><span class="istickedoff">M.size . M.filter (&gt; 1) . M.fromListWith mappend .</span>
-<span class="lineno">   66 </span><span class="spaces">  </span><span class="istickedoff">concatMap (uncurry lineTo) . f . parseVents</span></span>
-<span class="lineno">   67 </span>
-<span class="lineno">   68 </span>-- |Same as `solve5`, but using HashMap.
-<span class="lineno">   69 </span>solve5HM :: (Ray -&gt; Ray) -&gt; Text -&gt; Int
-<span class="lineno">   70 </span><span class="decl"><span class="nottickedoff">solve5HM f =</span>
-<span class="lineno">   71 </span><span class="spaces">  </span><span class="nottickedoff">HM.size . HM.filter (&gt; 1) . HM.fromListWith mappend .</span>
-<span class="lineno">   72 </span><span class="spaces">  </span><span class="nottickedoff">concatMap (uncurry lineTo) . f . parseVents</span></span>
-<span class="lineno">   73 </span>
-<span class="lineno">   74 </span>-- |Same as `solve5`, but using MultiSet
-<span class="lineno">   75 </span>solve5MS :: (Ray -&gt; Ray) -&gt; Text -&gt; Int
-<span class="lineno">   76 </span><span class="decl"><span class="nottickedoff">solve5MS f =</span>
-<span class="lineno">   77 </span><span class="spaces">  </span><span class="nottickedoff">length . filter ((&gt; 1) . snd) . MS.toOccurList . MS.fromList .</span>
-<span class="lineno">   78 </span><span class="spaces">  </span><span class="nottickedoff">concatMap (uncurry lineTo') . f . parseVents</span></span>
-<span class="lineno">   79 </span>
-<span class="lineno">   80 </span>-- |Accept a start and end point and return a list of points that draw a line to
-<span class="lineno">   81 </span>-- the endpoint. Note that this doesn't work for anything other than vertical,
-<span class="lineno">   82 </span>-- horizontal, and 45deg.
-<span class="lineno">   83 </span>lineTo :: Point -&gt; Point -&gt; [(Point, Sum Int)]
-<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">lineTo (x1, y1) (x2, y2) = zipWith (curry (, Sum 1)) (range x1 x2) (range y1 y2)</span>
-<span class="lineno">   85 </span><span class="spaces">  </span><span class="istickedoff">where range p1 p2 | p1 == p2  = repeat p1</span>
-<span class="lineno">   86 </span><span class="spaces">                    </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = p1 ~~ p2</span></span>
-<span class="lineno">   87 </span>
-<span class="lineno">   88 </span>-- |Same as `lineTo` but without the overhead for a MultiSet
-<span class="lineno">   89 </span>lineTo' :: Point -&gt; Point -&gt; [Point]
-<span class="lineno">   90 </span><span class="decl"><span class="nottickedoff">lineTo' (x1, y1) (x2, y2) = zip (range x1 x2) (range y1 y2)</span>
-<span class="lineno">   91 </span><span class="spaces">  </span><span class="nottickedoff">where range p1 p2 | p1 == p2  = repeat p1</span>
-<span class="lineno">   92 </span><span class="spaces">                    </span><span class="nottickedoff">| otherwise = p1 ~~ p2</span></span>
-<span class="lineno">   93 </span>
-<span class="lineno">   94 </span>-- |Messing around with a custom operator for ranges that can handle both up-to
-<span class="lineno">   95 </span>-- and down-to.
-<span class="lineno">   96 </span>infixl 5 ~~
-<span class="lineno">   97 </span>(~~) :: Int -&gt; Int -&gt; [Int]
-<span class="lineno">   98 </span><span class="decl"><span class="istickedoff">a ~~ b | a &lt;= b    = [a .. b]</span>
-<span class="lineno">   99 </span><span class="spaces">       </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = reverse $ b ~~ a</span></span>
-<span class="lineno">  100 </span>
-<span class="lineno">  101 </span>-- |Parse puzzle input into simple pairs of pairs of points.
-<span class="lineno">  102 </span>parseVents :: Text -&gt; Ray
-<span class="lineno">  103 </span><span class="decl"><span class="istickedoff">parseVents = fromRight . parseOnly parser</span>
-<span class="lineno">  104 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">  105 </span><span class="spaces">    </span><span class="istickedoff">parser = line `sepBy1` endOfLine &lt;* atEnd</span>
-<span class="lineno">  106 </span><span class="spaces">    </span><span class="istickedoff">line  = (,) &lt;$&gt; point &lt;* string &quot; -&gt; &quot; &lt;*&gt; point</span>
-<span class="lineno">  107 </span><span class="spaces">    </span><span class="istickedoff">point = (,) &lt;$&gt; decimal &lt;* char ',' &lt;*&gt; decimal</span></span>
+<span class="lineno">   39 </span>-- |Higher-order function solution to share parts A and B.
+<span class="lineno">   40 </span>solve5 :: ([Line] -&gt; [Line]) -&gt; Text -&gt; Int
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">solve5 f =</span>
+<span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">M.size .</span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">M.filter (&gt; 1) . M.fromListWith mappend . concatMap lineTo . f . parseVents</span></span>
+<span class="lineno">   44 </span>
+<span class="lineno">   45 </span>-- |Accept a start and end point and return a list of points that draw a line to
+<span class="lineno">   46 </span>-- the endpoint. Note that this doesn't work for anything other than vertical,
+<span class="lineno">   47 </span>-- horizontal, and 45deg.
+<span class="lineno">   48 </span>lineTo :: Line -&gt; [(Point, Sum Int)]
+<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">lineTo ((x1, y1), (x2, y2)) = zipWith (curry (, Sum 1)) (range x1 x2) (range y1 y2)</span>
+<span class="lineno">   50 </span><span class="spaces">  </span><span class="istickedoff">where range p1 p2 | p1 == p2  = repeat p1</span>
+<span class="lineno">   51 </span><span class="spaces">                    </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = p1 ~~ p2</span></span>
+<span class="lineno">   52 </span>
+<span class="lineno">   53 </span>-- |Messing around with a custom operator for ranges that can handle both up-to
+<span class="lineno">   54 </span>-- and down-to.
+<span class="lineno">   55 </span>infixl 5 ~~
+<span class="lineno">   56 </span>(~~) :: Int -&gt; Int -&gt; [Int]
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">a ~~ b | a &lt;= b    = [a .. b]</span>
+<span class="lineno">   58 </span><span class="spaces">       </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = reverse $ b ~~ a</span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>-- |Parse puzzle input into simple pairs of pairs of points.
+<span class="lineno">   61 </span>parseVents :: Text -&gt; [Line]
+<span class="lineno">   62 </span><span class="decl"><span class="istickedoff">parseVents = fromRight . parseOnly parser</span>
+<span class="lineno">   63 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   64 </span><span class="spaces">    </span><span class="istickedoff">parser = line `sepBy1` endOfLine &lt;* atEnd</span>
+<span class="lineno">   65 </span><span class="spaces">    </span><span class="istickedoff">line  = (,) &lt;$&gt; point &lt;* string &quot; -&gt; &quot; &lt;*&gt; point</span>
+<span class="lineno">   66 </span><span class="spaces">    </span><span class="istickedoff">point = (,) &lt;$&gt; decimal &lt;* char ',' &lt;*&gt; decimal</span></span>
 
 </pre>
 </body>

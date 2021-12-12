@@ -77,20 +77,12 @@ benchmarks =
     , env (getProblem "5") $ \sample -> do
         bgroup "D05"
           [ bgroup "A"
-            [ bgroup "initial"
-              [ bench "large" $ nf part5A sample ]
-            , bgroup "hashmap"
-              [ bench "large" $ nf part5AHM sample ]
-            , bgroup "multiset"
-              [ bench "large" $ nf part5AMS sample ]
+            [ bgroup "hashmap"
+              [ bench "large" $ whnf part5A sample ]
             ]
           , bgroup "B"
-            [ bgroup "initial"
-              [ bench "large" $ nf part5B sample ]
-            , bgroup "hashmap"
-              [ bench "large" $ nf part5BHM sample ]
-            , bgroup "multiset"
-              [ bench "large" $ nf part5BMS sample ]
+            [ bgroup "hashmap"
+              [ bench "large" $ whnf part5B sample ]
             ]
           ]
     , env (getProblem "6") \sample -> do
