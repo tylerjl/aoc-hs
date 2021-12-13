@@ -153,5 +153,8 @@ solve 2021 10 'b' (part10B -> solution) = show solution
 solve 2021 11 'a' (part11A -> solution) = show solution
 solve 2021 11 'b' (part11B -> solution) = show solution
 
+solve 2021 12 'a' (part12A -> solution) = show solution
+solve 2021 12 'b' (part12B -> solution) = show solution
+
 solve y d p _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p
