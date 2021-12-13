@@ -16,6 +16,7 @@ import Data.Monoid
 import Data.Text         (Text)
 
 import qualified Data.HashMap.Strict as M
+import AoC.Utils
 
 -- |Makes some signatures easier to read
 type Point = (Int, Int)
@@ -49,13 +50,6 @@ lineTo :: Line -> [(Point, Sum Int)]
 lineTo ((x1, y1), (x2, y2)) = zipWith (curry (, Sum 1)) (range x1 x2) (range y1 y2)
   where range p1 p2 | p1 == p2  = repeat p1
                     | otherwise = p1 ~~ p2
-
--- |Messing around with a custom operator for ranges that can handle both up-to
--- and down-to.
-infixl 5 ~~
-(~~) :: Int -> Int -> [Int]
-a ~~ b | a <= b    = [a .. b]
-       | otherwise = reverse $ b ~~ a
 
 -- |Parse puzzle input into simple pairs of pairs of points.
 parseVents :: Text -> [Line]

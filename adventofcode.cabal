@@ -37,6 +37,7 @@ library
                      , ViewPatterns
   ghc-options:         -Wall
   exposed-modules:     AoC
+                     , AoC.Utils
                      , Y2015
                      , Y2016
                      , Y2018
