@@ -18,15 +18,15 @@ import Data.Attoparsec.Text
 import Data.Bifunctor    (second)
 import Data.Either.Utils (fromRight)
 import Data.List         (nub)
-import Data.Map          (Map)
+import Data.Map.Strict   (Map)
 import Data.MultiSet     (MultiSet)
 import Data.Set          (Set)
 import Data.Text         (Text)
 import Witch
 import Y2015.Util        ((<&&>))
 
-import qualified Data.Map as M
-import qualified Data.Set as S
+import qualified Data.Map.Strict as M
+import qualified Data.Set      as S
 import qualified Data.MultiSet as MS
 
 -- |This GADT helps quite a bit when comparing vaules later on
