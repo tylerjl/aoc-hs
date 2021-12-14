@@ -17,15 +17,17 @@ import Control.Applicative
 import Data.Attoparsec.Text
 import Data.Bifunctor    (second)
 import Data.Either.Utils (fromRight)
-import Data.List         (find, nub)
+import Data.List         (nub)
 import Data.Map          (Map)
-import Data.Maybe        (isJust)
+import Data.MultiSet     (MultiSet)
 import Data.Set          (Set)
 import Data.Text         (Text)
 import Witch
+import Y2015.Util        ((<&&>))
 
 import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified Data.MultiSet as MS
 
 -- |This GADT helps quite a bit when comparing vaules later on
 data Room = Start | BigCave Text | SmallCave Text | End
@@ -33,7 +35,7 @@ data Room = Start | BigCave Text | SmallCave Text | End
 -- |Type alias for better readability.
 type Caves = Map Room (Set Room)
 -- |Type alias for better readability.
-type Journey = [Room]
+type Journey = (MultiSet Room)
 
 -- |Solution to part A
 part12A :: Text -> Int
@@ -48,7 +50,7 @@ explore allowed caves journey room
   | room == End = [visited]
   | otherwise = foldMap (concatMap (explore allowed caves visited)) rooms
   where
-    visited = room : journey
+    visited = MS.insert room journey
     rooms = S.filter (allowed visited) <$> M.lookup room caves
 
 -- |The predicate we use for part A, which is essentially "don't visit small
@@ -72,21 +74,17 @@ smallTwice :: Journey -> Room -> Bool
 smallTwice _ (BigCave _) = True
 smallTwice _ Start = False
 smallTwice _ End = True
-smallTwice (filter isSmall -> j) r
-  | isJust seenTwice = r `notElem` j
+smallTwice j r
+  | r `MS.notMember` j = True
+  | seenTwice = False
   | otherwise = True
   where
-    seenTwice = find ((==) 2 . flip occursInList j) j
+    seenTwice = any ((isSmall . fst) <&&> ((> 1) . snd)) $ MS.toOccurList j
 
 -- |Super small utility to find small caves.
 isSmall :: Room -> Bool
 isSmall (SmallCave _) = True
 isSmall _ = False
-
--- |Generic function to count occurrences in a list. This is probably pretty
--- inefficient.
-occursInList :: Eq a => a -> [a] -> Int
-occursInList x = length . filter (x ==)
 
 -- |An intermediate parsing function; once we get the raw room pairs we turn it
 -- into the structure we'll work with later.
