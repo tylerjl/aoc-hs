@@ -1,0 +1,119 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2021.D14
+<span class="lineno">    3 </span>Description: Advent of Code 2021 Day 14 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the 2021 day 14 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2021.D14
+<span class="lineno">   10 </span>  ( parse14
+<span class="lineno">   11 </span>  , part14A
+<span class="lineno">   12 </span>  , part14B
+<span class="lineno">   13 </span>  ) where
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>import Data.Attoparsec.Text
+<span class="lineno">   16 </span>import Data.Either.Utils (fromRight)
+<span class="lineno">   17 </span>import Data.Foldable     (foldl')
+<span class="lineno">   18 </span>import Data.Map.Strict   (Map)
+<span class="lineno">   19 </span>import Data.Monoid
+<span class="lineno">   20 </span>import Data.MultiSet     (MultiSet)
+<span class="lineno">   21 </span>import Data.Text         (Text)
+<span class="lineno">   22 </span>import Data.Tuple.Extra  ((&amp;&amp;&amp;))
+<span class="lineno">   23 </span>
+<span class="lineno">   24 </span>import qualified Data.Map.Strict as M
+<span class="lineno">   25 </span>import qualified Data.MultiSet   as S
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>type PolySubs = Map String Char
+<span class="lineno">   28 </span>type Polymer = Map String (Sum Int)
+<span class="lineno">   29 </span>
+<span class="lineno">   30 </span>-- |Solution to part A
+<span class="lineno">   31 </span>part14A :: Text -&gt; Int
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">part14A = uncurry (solve14 10) . parse14</span></span>
+<span class="lineno">   33 </span>
+<span class="lineno">   34 </span>-- |Solution to part B
+<span class="lineno">   35 </span>part14B :: Text -&gt; Int
+<span class="lineno">   36 </span><span class="decl"><span class="istickedoff">part14B = uncurry (solve14 40) . parse14</span></span>
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>-- |Day 14 solution applicable to either parts A or B. Most of the dirty work
+<span class="lineno">   39 </span>-- happens in `react`, but this does the output calculation logic.
+<span class="lineno">   40 </span>solve14 :: Int -&gt; Polymer -&gt; PolySubs -&gt; S.Occur
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">solve14 iterations polymer subs =</span>
+<span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">abs $</span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">uncurry subtract $</span>
+<span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">(minimum &amp;&amp;&amp; maximum) $</span>
+<span class="lineno">   45 </span><span class="spaces">  </span><span class="istickedoff">map (adjust . snd) $</span>
+<span class="lineno">   46 </span><span class="spaces">  </span><span class="istickedoff">S.toOccurList $ aggregate $ flip (!!) iterations $ iterate (react subs) polymer</span>
+<span class="lineno">   47 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   48 </span><span class="spaces">    </span><span class="istickedoff">adjust n</span>
+<span class="lineno">   49 </span><span class="spaces">      </span><span class="istickedoff">| even n = n `div` 2</span>
+<span class="lineno">   50 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = (n + 1) `div` 2</span></span>
+<span class="lineno">   51 </span>
+<span class="lineno">   52 </span>-- |Turn our map of tracked pairs into a `MultiSet` of characters. This number
+<span class="lineno">   53 </span>-- won't offer the solution (occurrences for each character) but just needs
+<span class="lineno">   54 </span>-- minor adjustments later to be accurate.
+<span class="lineno">   55 </span>aggregate :: Map [Char] (Sum S.Occur) -&gt; MultiSet Char
+<span class="lineno">   56 </span><span class="decl"><span class="istickedoff">aggregate (M.toList -&gt; chains) = foldl' summate S.empty chains</span>
+<span class="lineno">   57 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   58 </span><span class="spaces">    </span><span class="istickedoff">summate acc (chain, getSum -&gt; n) = foldl' addTo acc $ zip (repeat n) chain</span>
+<span class="lineno">   59 </span><span class="spaces">      </span><span class="istickedoff">where</span>
+<span class="lineno">   60 </span><span class="spaces">        </span><span class="istickedoff">addTo multiset (instances, sym) =</span>
+<span class="lineno">   61 </span><span class="spaces">          </span><span class="istickedoff">S.insertMany sym instances multiset</span></span>
+<span class="lineno">   62 </span>
+<span class="lineno">   63 </span>-- |Function that's suitable to be fed into `iterate`. It's probably fairly
+<span class="lineno">   64 </span>-- memory-hungry since it builds up some big structures recursively, but it does
+<span class="lineno">   65 </span>-- the job.
+<span class="lineno">   66 </span>react :: PolySubs -&gt; Polymer -&gt; Polymer
+<span class="lineno">   67 </span><span class="decl"><span class="istickedoff">react subs polymer = foldl' expand M.empty (M.toList polymer)</span>
+<span class="lineno">   68 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   69 </span><span class="spaces">    </span><span class="istickedoff">expand newPoly (chain@[a, b], n) =</span>
+<span class="lineno">   70 </span><span class="spaces">      </span><span class="istickedoff">case M.lookup chain subs of</span>
+<span class="lineno">   71 </span><span class="spaces">        </span><span class="istickedoff">Nothing -&gt; <span class="nottickedoff">addSum newPoly chain n</span></span>
+<span class="lineno">   72 </span><span class="spaces">        </span><span class="istickedoff">Just sub -&gt; foldl' (uncurry . addSum) newPoly chains</span>
+<span class="lineno">   73 </span><span class="spaces">          </span><span class="istickedoff">where chains = zip [[a, sub], [sub, b]] (repeat n)</span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="istickedoff">expand _ _ = <span class="nottickedoff">error &quot;unreachable&quot;</span></span></span>
+<span class="lineno">   75 </span>
+<span class="lineno">   76 </span>-- |Rearrange a few arguments to make inserting a running sum easier.
+<span class="lineno">   77 </span>addSum :: Polymer -&gt; String -&gt; Sum Int -&gt; Polymer
+<span class="lineno">   78 </span><span class="decl"><span class="istickedoff">addSum set k v = M.insertWith mappend k v set</span></span>
+<span class="lineno">   79 </span>
+<span class="lineno">   80 </span>-- |Pair up adjacent list elements into groups of two.
+<span class="lineno">   81 </span>twos :: [a] -&gt; [[a]]
+<span class="lineno">   82 </span><span class="decl"><span class="istickedoff">twos (a:b:xs) = [a, b] : twos (b : xs)</span>
+<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff">twos _ = []</span></span>
+<span class="lineno">   84 </span>
+<span class="lineno">   85 </span>-- |Parse out a sequence of chars followed by the reaction translations.
+<span class="lineno">   86 </span>parse14 :: Text -&gt; (Polymer, PolySubs)
+<span class="lineno">   87 </span><span class="decl"><span class="istickedoff">parse14 = fromRight . parseOnly (parser &lt;* endOfLine &lt;* endOfInput)</span>
+<span class="lineno">   88 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   89 </span><span class="spaces">    </span><span class="istickedoff">parser =</span>
+<span class="lineno">   90 </span><span class="spaces">      </span><span class="istickedoff">(,) &lt;$&gt; (template &lt;* endOfLine) &lt;*&gt;</span>
+<span class="lineno">   91 </span><span class="spaces">      </span><span class="istickedoff">(M.fromList &lt;$&gt; sub `sepBy1` endOfLine)</span>
+<span class="lineno">   92 </span><span class="spaces">    </span><span class="istickedoff">template =</span>
+<span class="lineno">   93 </span><span class="spaces">      </span><span class="istickedoff">M.fromList . flip zip (repeat (Sum 1)) . twos &lt;$&gt; many1 cap &lt;* endOfLine</span>
+<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">sub = (,) &lt;$&gt; caps &lt;* string &quot; -&gt; &quot; &lt;*&gt; cap</span>
+<span class="lineno">   95 </span><span class="spaces">    </span><span class="istickedoff">caps = many1 cap</span>
+<span class="lineno">   96 </span><span class="spaces">    </span><span class="istickedoff">cap = satisfy (`elem` ['A' .. 'Z'])</span></span>
+
+</pre>
+</body>
+</html>
