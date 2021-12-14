@@ -14,7 +14,3 @@ spec = parallel $ do
           before (TIO.readFile "dist/resources/2021/day13_sample.txt") $ do
             it "solves the small case" $ \input -> do
               part13A input `shouldBe` 17
-        describe "part13B" $ do
-          before (TIO.readFile "dist/resources/2021/day13_sample.txt") $ do
-            it "solves the small case" $ \input -> do
-              part13B input `shouldBe` Just "O"
