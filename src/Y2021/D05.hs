@@ -9,14 +9,14 @@ Solutions to the 2021 day 05 set of problems for <adventofcode.com>.
 -}
 module Y2021.D05 where
 
+import AoC.Utils
 import Data.Attoparsec.Text
-import Data.Either.Utils (fromRight)
+import Data.Either.Utils   (fromRight)
 import Data.HashMap.Strict (HashMap)
 import Data.Monoid
-import Data.Text         (Text)
+import Data.Text           (Text)
 
 import qualified Data.HashMap.Strict as M
-import AoC.Utils
 
 -- |Makes some signatures easier to read
 type Point = (Int, Int)
