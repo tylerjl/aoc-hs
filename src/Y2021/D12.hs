@@ -35,35 +35,42 @@ data Room = Start | BigCave Text | SmallCave Text | End
 -- |Type alias for better readability.
 type Caves = Map Room (Set Room)
 -- |Type alias for better readability.
-type Journey = (MultiSet Room)
+type TwiceVisit = Bool
+-- |Type alias for better readability.
+type Journey = (TwiceVisit, MultiSet Room)
 
 -- |Solution to part A
 part12A :: Text -> Int
 part12A (parse12' -> rooms)
-  = length $ explore smallOnce rooms mempty Start
+  = length $ explore smallOnce rooms (True, mempty) Start
 
 -- |This is the main recursive function that drives both A and B. The
 -- higher-order function argument is the main difference, bit otherwise we build
 -- up a list of all valid routes by traversing the overall `Map`.
 explore :: (Journey -> Room -> Bool) -> Caves -> Journey -> Room -> [Journey]
-explore allowed caves journey room
+explore allowed caves (twice', journey') room
   | room == End = [visited]
   | otherwise = foldMap (concatMap (explore allowed caves visited)) rooms
   where
-    visited = MS.insert room journey
+    journey = MS.insert room journey'
+    twice
+      | twice' = True
+      | otherwise =
+        any ((isSmall . fst) <&&> ((> 1) . snd)) $ MS.toOccurList journey
+    visited = (twice, journey)
     rooms = S.filter (allowed visited) <$> M.lookup room caves
 
 -- |The predicate we use for part A, which is essentially "don't visit small
 -- rooms twice"
 smallOnce :: Journey -> Room -> Bool
-smallOnce journey c@(SmallCave _) = c `notElem` journey
+smallOnce (_, journey) c@(SmallCave _) = c `notElem` journey
 smallOnce _ Start = False
 smallOnce _ _ = True
 
 -- |Solution to part B
 part12B :: Text -> Int
 part12B (parse12' -> rooms)
-  = length $ explore smallTwice rooms mempty Start
+  = length $ explore smallTwice rooms (False, mempty) Start
 
 -- |Given our journey through the caves so far and the room we'd like to proceed
 -- through, should we continue?
@@ -74,12 +81,10 @@ smallTwice :: Journey -> Room -> Bool
 smallTwice _ (BigCave _) = True
 smallTwice _ Start = False
 smallTwice _ End = True
-smallTwice j r
+smallTwice (seenTwice, j) r
   | r `MS.notMember` j = True
   | seenTwice = False
   | otherwise = True
-  where
-    seenTwice = any ((isSmall . fst) <&&> ((> 1) . snd)) $ MS.toOccurList j
 
 -- |Super small utility to find small caves.
 isSmall :: Room -> Bool
