@@ -12,6 +12,7 @@ main = do
   d8 <- TIO.readFile "dist/resources/2021/day8.txt"
   d9 <- TIO.readFile "dist/resources/2021/day9.txt"
   d11 <- TIO.readFile "dist/resources/2021/day11.txt"
+  d12 <- TIO.readFile "dist/resources/2021/day12.txt"
   (measurements, config) <- weighResults $ do
     wgroup "Y2021" do
       wgroup "D08" do
@@ -23,6 +24,9 @@ main = do
       wgroup "D011" do
         func "Y2021.D011.A" (solve 2021 11 'a') d11
         func "Y2021.D011.B" (solve 2021 11 'b') d11
+      wgroup "D012" do
+        func "Y2021.D012.A" (solve 2021 12 'a') d12
+        func "Y2021.D012.B" (solve 2021 12 'b') d12
 
   let (labels, allocs, gcs) = unzip3 $ flip concatMap measurements \(Grouped year days) -> concatMap sumData days
       points = zipWith Point allocs (map into gcs)
