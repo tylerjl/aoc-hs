@@ -89,6 +89,7 @@ library
                      , Y2021.D12
                      , Y2021.D13
                      , Y2021.D14
+                     , Y2021.D15
   build-depends:       advent-of-code-ocr
                      , aeson
                      , attoparsec
@@ -101,6 +102,7 @@ library
                      , extra
                      , grid
                      , hashable
+                     , heaps
                      , lens
                      , matrix
                      , memoize
@@ -170,6 +172,7 @@ test-suite adventofcode-test
                      , Y2021.D12Spec
                      , Y2021.D13Spec
                      , Y2021.D14Spec
+                     , Y2021.D15Spec
   build-depends:       base
                      , adventofcode
                      , bytestring

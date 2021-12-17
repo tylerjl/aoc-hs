@@ -37,15 +37,15 @@ span.spaces    { background: white }
 <span class="lineno">   18 </span>import Data.Bifunctor    (second)
 <span class="lineno">   19 </span>import Data.Either.Utils (fromRight)
 <span class="lineno">   20 </span>import Data.List         (nub)
-<span class="lineno">   21 </span>import Data.Map          (Map)
+<span class="lineno">   21 </span>import Data.Map.Strict   (Map)
 <span class="lineno">   22 </span>import Data.MultiSet     (MultiSet)
 <span class="lineno">   23 </span>import Data.Set          (Set)
 <span class="lineno">   24 </span>import Data.Text         (Text)
 <span class="lineno">   25 </span>import Witch
 <span class="lineno">   26 </span>import Y2015.Util        ((&lt;&amp;&amp;&gt;))
 <span class="lineno">   27 </span>
-<span class="lineno">   28 </span>import qualified Data.Map as M
-<span class="lineno">   29 </span>import qualified Data.Set as S
+<span class="lineno">   28 </span>import qualified Data.Map.Strict as M
+<span class="lineno">   29 </span>import qualified Data.Set      as S
 <span class="lineno">   30 </span>import qualified Data.MultiSet as MS
 <span class="lineno">   31 </span>
 <span class="lineno">   32 </span>-- |This GADT helps quite a bit when comparing vaules later on
@@ -54,77 +54,82 @@ span.spaces    { background: white }
 <span class="lineno">   35 </span>-- |Type alias for better readability.
 <span class="lineno">   36 </span>type Caves = Map Room (Set Room)
 <span class="lineno">   37 </span>-- |Type alias for better readability.
-<span class="lineno">   38 </span>type Journey = (MultiSet Room)
-<span class="lineno">   39 </span>
-<span class="lineno">   40 </span>-- |Solution to part A
-<span class="lineno">   41 </span>part12A :: Text -&gt; Int
-<span class="lineno">   42 </span><span class="decl"><span class="istickedoff">part12A (parse12' -&gt; rooms)</span>
-<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">= length $ explore smallOnce rooms mempty Start</span></span>
-<span class="lineno">   44 </span>
-<span class="lineno">   45 </span>-- |This is the main recursive function that drives both A and B. The
-<span class="lineno">   46 </span>-- higher-order function argument is the main difference, bit otherwise we build
-<span class="lineno">   47 </span>-- up a list of all valid routes by traversing the overall `Map`.
-<span class="lineno">   48 </span>explore :: (Journey -&gt; Room -&gt; Bool) -&gt; Caves -&gt; Journey -&gt; Room -&gt; [Journey]
-<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">explore allowed caves journey room</span>
-<span class="lineno">   50 </span><span class="spaces">  </span><span class="istickedoff">| room == End = [<span class="nottickedoff">visited</span>]</span>
-<span class="lineno">   51 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = foldMap (concatMap (explore allowed caves visited)) rooms</span>
-<span class="lineno">   52 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   53 </span><span class="spaces">    </span><span class="istickedoff">visited = MS.insert room journey</span>
-<span class="lineno">   54 </span><span class="spaces">    </span><span class="istickedoff">rooms = S.filter (allowed visited) &lt;$&gt; M.lookup room caves</span></span>
-<span class="lineno">   55 </span>
-<span class="lineno">   56 </span>-- |The predicate we use for part A, which is essentially &quot;don't visit small
-<span class="lineno">   57 </span>-- rooms twice&quot;
-<span class="lineno">   58 </span>smallOnce :: Journey -&gt; Room -&gt; Bool
-<span class="lineno">   59 </span><span class="decl"><span class="istickedoff">smallOnce journey c@(SmallCave _) = c `notElem` journey</span>
-<span class="lineno">   60 </span><span class="spaces"></span><span class="istickedoff">smallOnce _ Start = False</span>
-<span class="lineno">   61 </span><span class="spaces"></span><span class="istickedoff">smallOnce _ _ = True</span></span>
+<span class="lineno">   38 </span>type TwiceVisit = Bool
+<span class="lineno">   39 </span>-- |Type alias for better readability.
+<span class="lineno">   40 </span>type Journey = (TwiceVisit, MultiSet Room)
+<span class="lineno">   41 </span>
+<span class="lineno">   42 </span>-- |Solution to part A
+<span class="lineno">   43 </span>part12A :: Text -&gt; Int
+<span class="lineno">   44 </span><span class="decl"><span class="istickedoff">part12A (parse12' -&gt; rooms)</span>
+<span class="lineno">   45 </span><span class="spaces">  </span><span class="istickedoff">= length $ explore smallOnce rooms (<span class="nottickedoff">True</span>, mempty) Start</span></span>
+<span class="lineno">   46 </span>
+<span class="lineno">   47 </span>-- |This is the main recursive function that drives both A and B. The
+<span class="lineno">   48 </span>-- higher-order function argument is the main difference, bit otherwise we build
+<span class="lineno">   49 </span>-- up a list of all valid routes by traversing the overall `Map`.
+<span class="lineno">   50 </span>explore :: (Journey -&gt; Room -&gt; Bool) -&gt; Caves -&gt; Journey -&gt; Room -&gt; [Journey]
+<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">explore allowed caves (twice', journey') room</span>
+<span class="lineno">   52 </span><span class="spaces">  </span><span class="istickedoff">| room == End = [<span class="nottickedoff">visited</span>]</span>
+<span class="lineno">   53 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = foldMap (concatMap (explore allowed caves visited)) rooms</span>
+<span class="lineno">   54 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   55 </span><span class="spaces">    </span><span class="istickedoff">journey = MS.insert room journey'</span>
+<span class="lineno">   56 </span><span class="spaces">    </span><span class="istickedoff">twice</span>
+<span class="lineno">   57 </span><span class="spaces">      </span><span class="istickedoff">| twice' = True</span>
+<span class="lineno">   58 </span><span class="spaces">      </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> =</span>
+<span class="lineno">   59 </span><span class="spaces">        </span><span class="istickedoff">any ((isSmall . fst) &lt;&amp;&amp;&gt; ((&gt; 1) . snd)) $ MS.toOccurList journey</span>
+<span class="lineno">   60 </span><span class="spaces">    </span><span class="istickedoff">visited = (twice, journey)</span>
+<span class="lineno">   61 </span><span class="spaces">    </span><span class="istickedoff">rooms = S.filter (allowed visited) &lt;$&gt; M.lookup room caves</span></span>
 <span class="lineno">   62 </span>
-<span class="lineno">   63 </span>-- |Solution to part B
-<span class="lineno">   64 </span>part12B :: Text -&gt; Int
-<span class="lineno">   65 </span><span class="decl"><span class="istickedoff">part12B (parse12' -&gt; rooms)</span>
-<span class="lineno">   66 </span><span class="spaces">  </span><span class="istickedoff">= length $ explore smallTwice rooms mempty Start</span></span>
-<span class="lineno">   67 </span>
-<span class="lineno">   68 </span>-- |Given our journey through the caves so far and the room we'd like to proceed
-<span class="lineno">   69 </span>-- through, should we continue?
-<span class="lineno">   70 </span>--
-<span class="lineno">   71 </span>-- Part B requires a little more logic, which is primarily to visit any single
-<span class="lineno">   72 </span>-- small cave at most two times.
-<span class="lineno">   73 </span>smallTwice :: Journey -&gt; Room -&gt; Bool
-<span class="lineno">   74 </span><span class="decl"><span class="istickedoff">smallTwice _ (BigCave _) = True</span>
-<span class="lineno">   75 </span><span class="spaces"></span><span class="istickedoff">smallTwice _ Start = False</span>
-<span class="lineno">   76 </span><span class="spaces"></span><span class="istickedoff">smallTwice _ End = True</span>
-<span class="lineno">   77 </span><span class="spaces"></span><span class="istickedoff">smallTwice j r</span>
-<span class="lineno">   78 </span><span class="spaces">  </span><span class="istickedoff">| r `MS.notMember` j = True</span>
-<span class="lineno">   79 </span><span class="spaces">  </span><span class="istickedoff">| seenTwice = False</span>
-<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = True</span>
-<span class="lineno">   81 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   82 </span><span class="spaces">    </span><span class="istickedoff">seenTwice = any ((isSmall . fst) &lt;&amp;&amp;&gt; ((&gt; 1) . snd)) $ MS.toOccurList j</span></span>
-<span class="lineno">   83 </span>
-<span class="lineno">   84 </span>-- |Super small utility to find small caves.
-<span class="lineno">   85 </span>isSmall :: Room -&gt; Bool
-<span class="lineno">   86 </span><span class="decl"><span class="istickedoff">isSmall (SmallCave _) = True</span>
-<span class="lineno">   87 </span><span class="spaces"></span><span class="istickedoff">isSmall _ = False</span></span>
+<span class="lineno">   63 </span>-- |The predicate we use for part A, which is essentially &quot;don't visit small
+<span class="lineno">   64 </span>-- rooms twice&quot;
+<span class="lineno">   65 </span>smallOnce :: Journey -&gt; Room -&gt; Bool
+<span class="lineno">   66 </span><span class="decl"><span class="istickedoff">smallOnce (_, journey) c@(SmallCave _) = c `notElem` journey</span>
+<span class="lineno">   67 </span><span class="spaces"></span><span class="istickedoff">smallOnce _ Start = False</span>
+<span class="lineno">   68 </span><span class="spaces"></span><span class="istickedoff">smallOnce _ _ = True</span></span>
+<span class="lineno">   69 </span>
+<span class="lineno">   70 </span>-- |Solution to part B
+<span class="lineno">   71 </span>part12B :: Text -&gt; Int
+<span class="lineno">   72 </span><span class="decl"><span class="istickedoff">part12B (parse12' -&gt; rooms)</span>
+<span class="lineno">   73 </span><span class="spaces">  </span><span class="istickedoff">= length $ explore smallTwice rooms (False, mempty) Start</span></span>
+<span class="lineno">   74 </span>
+<span class="lineno">   75 </span>-- |Given our journey through the caves so far and the room we'd like to proceed
+<span class="lineno">   76 </span>-- through, should we continue?
+<span class="lineno">   77 </span>--
+<span class="lineno">   78 </span>-- Part B requires a little more logic, which is primarily to visit any single
+<span class="lineno">   79 </span>-- small cave at most two times.
+<span class="lineno">   80 </span>smallTwice :: Journey -&gt; Room -&gt; Bool
+<span class="lineno">   81 </span><span class="decl"><span class="istickedoff">smallTwice _ (BigCave _) = True</span>
+<span class="lineno">   82 </span><span class="spaces"></span><span class="istickedoff">smallTwice _ Start = False</span>
+<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff">smallTwice _ End = True</span>
+<span class="lineno">   84 </span><span class="spaces"></span><span class="istickedoff">smallTwice (seenTwice, j) r</span>
+<span class="lineno">   85 </span><span class="spaces">  </span><span class="istickedoff">| r `MS.notMember` j = True</span>
+<span class="lineno">   86 </span><span class="spaces">  </span><span class="istickedoff">| seenTwice = False</span>
+<span class="lineno">   87 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = True</span></span>
 <span class="lineno">   88 </span>
-<span class="lineno">   89 </span>-- |An intermediate parsing function; once we get the raw room pairs we turn it
-<span class="lineno">   90 </span>-- into the structure we'll work with later.
-<span class="lineno">   91 </span>parse12' :: Text -&gt; Map Room (Set Room)
-<span class="lineno">   92 </span><span class="decl"><span class="istickedoff">parse12' =</span>
-<span class="lineno">   93 </span><span class="spaces">  </span><span class="istickedoff">M.fromListWith S.union .</span>
-<span class="lineno">   94 </span><span class="spaces">  </span><span class="istickedoff">map (second S.singleton) . nub . concatMap backpath . parse12</span>
-<span class="lineno">   95 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   96 </span><span class="spaces">    </span><span class="istickedoff">backpath (a, b) = [(a, b), (b, a)]</span></span>
-<span class="lineno">   97 </span>
-<span class="lineno">   98 </span>-- |Pairs of cave &quot;rooms&quot;, which we parse very simply and postprocess later.
-<span class="lineno">   99 </span>parse12 :: Text -&gt; [(Room, Room)]
-<span class="lineno">  100 </span><span class="decl"><span class="istickedoff">parse12 = fromRight . parseOnly parser</span>
-<span class="lineno">  101 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">  102 </span><span class="spaces">    </span><span class="istickedoff">parser    = line `sepBy1` endOfLine &lt;* atEnd</span>
-<span class="lineno">  103 </span><span class="spaces">    </span><span class="istickedoff">line      = (,) &lt;$&gt; location &lt;* char '-' &lt;*&gt; location</span>
-<span class="lineno">  104 </span><span class="spaces">    </span><span class="istickedoff">location  = start' &lt;|&gt; end' &lt;|&gt; bigCave &lt;|&gt; smallCave</span>
-<span class="lineno">  105 </span><span class="spaces">    </span><span class="istickedoff">start'    = Start                  &lt;$  string &quot;start&quot;</span>
-<span class="lineno">  106 </span><span class="spaces">    </span><span class="istickedoff">bigCave   = BigCave   . into @Text &lt;$&gt; many1 (satisfy (`elem` ['A'..'Z']))</span>
-<span class="lineno">  107 </span><span class="spaces">    </span><span class="istickedoff">smallCave = SmallCave . into @Text &lt;$&gt; many1 (satisfy (`elem` ['a'..'z']))</span>
-<span class="lineno">  108 </span><span class="spaces">    </span><span class="istickedoff">end'      = End                    &lt;$  string &quot;end&quot;</span></span>
+<span class="lineno">   89 </span>-- |Super small utility to find small caves.
+<span class="lineno">   90 </span>isSmall :: Room -&gt; Bool
+<span class="lineno">   91 </span><span class="decl"><span class="istickedoff">isSmall (SmallCave _) = True</span>
+<span class="lineno">   92 </span><span class="spaces"></span><span class="istickedoff">isSmall _ = False</span></span>
+<span class="lineno">   93 </span>
+<span class="lineno">   94 </span>-- |An intermediate parsing function; once we get the raw room pairs we turn it
+<span class="lineno">   95 </span>-- into the structure we'll work with later.
+<span class="lineno">   96 </span>parse12' :: Text -&gt; Map Room (Set Room)
+<span class="lineno">   97 </span><span class="decl"><span class="istickedoff">parse12' =</span>
+<span class="lineno">   98 </span><span class="spaces">  </span><span class="istickedoff">M.fromListWith S.union .</span>
+<span class="lineno">   99 </span><span class="spaces">  </span><span class="istickedoff">map (second S.singleton) . nub . concatMap backpath . parse12</span>
+<span class="lineno">  100 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  101 </span><span class="spaces">    </span><span class="istickedoff">backpath (a, b) = [(a, b), (b, a)]</span></span>
+<span class="lineno">  102 </span>
+<span class="lineno">  103 </span>-- |Pairs of cave &quot;rooms&quot;, which we parse very simply and postprocess later.
+<span class="lineno">  104 </span>parse12 :: Text -&gt; [(Room, Room)]
+<span class="lineno">  105 </span><span class="decl"><span class="istickedoff">parse12 = fromRight . parseOnly parser</span>
+<span class="lineno">  106 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  107 </span><span class="spaces">    </span><span class="istickedoff">parser    = line `sepBy1` endOfLine &lt;* atEnd</span>
+<span class="lineno">  108 </span><span class="spaces">    </span><span class="istickedoff">line      = (,) &lt;$&gt; location &lt;* char '-' &lt;*&gt; location</span>
+<span class="lineno">  109 </span><span class="spaces">    </span><span class="istickedoff">location  = start' &lt;|&gt; end' &lt;|&gt; bigCave &lt;|&gt; smallCave</span>
+<span class="lineno">  110 </span><span class="spaces">    </span><span class="istickedoff">start'    = Start                  &lt;$  string &quot;start&quot;</span>
+<span class="lineno">  111 </span><span class="spaces">    </span><span class="istickedoff">bigCave   = BigCave   . into @Text &lt;$&gt; many1 (satisfy (`elem` ['A'..'Z']))</span>
+<span class="lineno">  112 </span><span class="spaces">    </span><span class="istickedoff">smallCave = SmallCave . into @Text &lt;$&gt; many1 (satisfy (`elem` ['a'..'z']))</span>
+<span class="lineno">  113 </span><span class="spaces">    </span><span class="istickedoff">end'      = End                    &lt;$  string &quot;end&quot;</span></span>
 
 </pre>
 </body>

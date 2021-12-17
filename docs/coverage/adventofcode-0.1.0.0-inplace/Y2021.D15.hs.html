@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-# LANGUAGE TypeFamilies #-}
+<span class="lineno">    2 </span>{-|
+<span class="lineno">    3 </span>Module:      Y2021.D15
+<span class="lineno">    4 </span>Description: Advent of Code 2021 Day 15 Solutions.
+<span class="lineno">    5 </span>License:     MIT
+<span class="lineno">    6 </span>Maintainer:  @tylerjl
+<span class="lineno">    7 </span>
+<span class="lineno">    8 </span>Solutions to the 2021 day 15 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    9 </span>-}
+<span class="lineno">   10 </span>module Y2021.D15
+<span class="lineno">   11 </span>  ( parse15
+<span class="lineno">   12 </span>  , part15A
+<span class="lineno">   13 </span>  , part15B
+<span class="lineno">   14 </span>  ) where
+<span class="lineno">   15 </span>
+<span class="lineno">   16 </span>import Control.Arrow
+<span class="lineno">   17 </span>import Data.Attoparsec.Text hiding  (take)
+<span class="lineno">   18 </span>import Data.Either.Utils            (fromRight)
+<span class="lineno">   19 </span>import Data.Foldable
+<span class="lineno">   20 </span>import Data.List.Extra              (transpose)
+<span class="lineno">   21 </span>import Data.Map.Strict              (Map)
+<span class="lineno">   22 </span>import Data.Text                    (Text)
+<span class="lineno">   23 </span>import Math.Geometry.Grid hiding    (distance)
+<span class="lineno">   24 </span>import Math.Geometry.Grid.Square
+<span class="lineno">   25 </span>import Math.Geometry.GridMap hiding (foldl', map, filter)
+<span class="lineno">   26 </span>import Math.Geometry.GridMap.Lazy
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>import qualified Data.Heap as H
+<span class="lineno">   29 </span>import qualified Data.Map.Strict as M
+<span class="lineno">   30 </span>import qualified Math.Geometry.GridMap as GM
+<span class="lineno">   31 </span>
+<span class="lineno">   32 </span>type Cavern = LGridMap RectSquareGrid Int
+<span class="lineno">   33 </span>data Distance a
+<span class="lineno">   34 </span>  = Infinite
+<span class="lineno">   35 </span>  | Distance a
+<span class="lineno">   36 </span>  deriving (<span class="decl"><span class="nottickedoff">Eq</span></span>, <span class="decl"><span class="nottickedoff">Show</span></span>)
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>instance Ord a =&gt; Ord (Distance a) where
+<span class="lineno">   39 </span>  <span class="decl"><span class="istickedoff">Infinite     `compare` Infinite     = <span class="nottickedoff">EQ</span></span>
+<span class="lineno">   40 </span><span class="spaces">  </span><span class="istickedoff">(Distance _) `compare` Infinite     = LT</span>
+<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">(Distance a) `compare` (Distance b) = a `compare` b</span>
+<span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">Infinite     `compare` (Distance _) = <span class="nottickedoff">GT</span></span></span>
+<span class="lineno">   43 </span>
+<span class="lineno">   44 </span>type Paths = Map (Int, Int) (Distance Int)
+<span class="lineno">   45 </span>
+<span class="lineno">   46 </span>-- |Solution to part A
+<span class="lineno">   47 </span>part15A :: Text -&gt; Int
+<span class="lineno">   48 </span><span class="decl"><span class="istickedoff">part15A (parse15 -&gt; grid) =</span>
+<span class="lineno">   49 </span><span class="spaces">  </span><span class="istickedoff">case flip (M.!) (endPosition grid) $ cheapestPath grid of</span>
+<span class="lineno">   50 </span><span class="spaces">    </span><span class="istickedoff">Distance d -&gt; d</span>
+<span class="lineno">   51 </span><span class="spaces">    </span><span class="istickedoff">Infinite -&gt; <span class="nottickedoff">error &quot;can't reach goal&quot;</span></span></span>
+<span class="lineno">   52 </span>
+<span class="lineno">   53 </span>cheapestPath :: Cavern -&gt; Paths
+<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">cheapestPath grid = go (H.singleton (H.Entry (Distance 0) (0, 0))) nodes</span>
+<span class="lineno">   55 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   56 </span><span class="spaces">    </span><span class="istickedoff">go (H.viewMin -&gt; Nothing) paths = paths</span>
+<span class="lineno">   57 </span><span class="spaces">    </span><span class="istickedoff">go (H.viewMin -&gt; Just (H.Entry dist point, q)) paths</span>
+<span class="lineno">   58 </span><span class="spaces">      </span><span class="istickedoff">= go q' paths'</span>
+<span class="lineno">   59 </span><span class="spaces">      </span><span class="istickedoff">where</span>
+<span class="lineno">   60 </span><span class="spaces">        </span><span class="istickedoff">(q', paths') = foldl' measure (q, paths)</span>
+<span class="lineno">   61 </span><span class="spaces">            </span><span class="istickedoff">[(n, grid ! n) | n &lt;- neighbours grid point]</span>
+<span class="lineno">   62 </span><span class="spaces">        </span><span class="istickedoff">measure (heap, costs) (neigh, cost)</span>
+<span class="lineno">   63 </span><span class="spaces">          </span><span class="istickedoff">| alt &lt; toNeigh = ( H.insert (H.Entry alt neigh) heap</span>
+<span class="lineno">   64 </span><span class="spaces">                            </span><span class="istickedoff">, M.insert neigh alt costs</span>
+<span class="lineno">   65 </span><span class="spaces">                            </span><span class="istickedoff">)</span>
+<span class="lineno">   66 </span><span class="spaces">          </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = (heap, costs)</span>
+<span class="lineno">   67 </span><span class="spaces">          </span><span class="istickedoff">where</span>
+<span class="lineno">   68 </span><span class="spaces">            </span><span class="istickedoff">alt = dist `addDist` Distance cost</span>
+<span class="lineno">   69 </span><span class="spaces">            </span><span class="istickedoff">toNeigh = costs M.! neigh</span>
+<span class="lineno">   70 </span><span class="spaces">    </span><span class="istickedoff">allNodes = map fst $ GM.toList grid</span>
+<span class="lineno">   71 </span><span class="spaces">    </span><span class="istickedoff">nodes = M.fromList $ zip allNodes (repeat Infinite)</span></span>
+<span class="lineno">   72 </span>
+<span class="lineno">   73 </span>endPosition :: Cavern -&gt; (Int, Int)
+<span class="lineno">   74 </span><span class="decl"><span class="istickedoff">endPosition = (pred *** pred) . size</span></span>
+<span class="lineno">   75 </span>
+<span class="lineno">   76 </span>addDist :: Num a =&gt; Distance a -&gt; Distance a -&gt; Distance a
+<span class="lineno">   77 </span><span class="decl"><span class="istickedoff">addDist (Distance a) (Distance b) = Distance (a + b)</span>
+<span class="lineno">   78 </span><span class="spaces"></span><span class="istickedoff">addDist Infinite (Distance b) = <span class="nottickedoff">Distance b</span></span>
+<span class="lineno">   79 </span><span class="spaces"></span><span class="istickedoff">addDist (Distance a) Infinite = <span class="nottickedoff">Distance a</span></span>
+<span class="lineno">   80 </span><span class="spaces"></span><span class="istickedoff">addDist Infinite Infinite = <span class="nottickedoff">Infinite</span></span></span>
+<span class="lineno">   81 </span>
+<span class="lineno">   82 </span>-- |Solution to part B
+<span class="lineno">   83 </span>part15B :: Text -&gt; Int
+<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">part15B (expandBy 5 . parse15 -&gt; grid) =</span>
+<span class="lineno">   85 </span><span class="spaces">  </span><span class="istickedoff">case flip (M.!) (endPosition grid) $ cheapestPath grid of</span>
+<span class="lineno">   86 </span><span class="spaces">    </span><span class="istickedoff">Distance d -&gt; d</span>
+<span class="lineno">   87 </span><span class="spaces">    </span><span class="istickedoff">Infinite -&gt; <span class="nottickedoff">error &quot;can't reach goal&quot;</span></span></span>
+<span class="lineno">   88 </span>
+<span class="lineno">   89 </span>expandBy :: Int -&gt; Cavern -&gt; Cavern
+<span class="lineno">   90 </span><span class="decl"><span class="istickedoff">expandBy n g</span>
+<span class="lineno">   91 </span><span class="spaces">  </span><span class="istickedoff">= GM.mapWithKey populate $ lazyGridMap (rectSquareGrid rows' cols') (repeat <span class="nottickedoff">0</span> :: [Int])</span>
+<span class="lineno">   92 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   93 </span><span class="spaces">    </span><span class="istickedoff">(rows, cols) = size g</span>
+<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">(rows', cols') = (rows * n, cols * n)</span>
+<span class="lineno">   95 </span><span class="spaces">    </span><span class="istickedoff">populate (x, y) _ = iterate elevate (g ! (x `mod` cols, y `mod` rows)) !! (extX + extY)</span>
+<span class="lineno">   96 </span><span class="spaces">      </span><span class="istickedoff">where (extX, extY) = (x `div` cols, y `div` rows)</span></span>
+<span class="lineno">   97 </span>
+<span class="lineno">   98 </span>elevate :: Integral a =&gt; a -&gt; a
+<span class="lineno">   99 </span><span class="decl"><span class="istickedoff">elevate n = max 1 ((n + 1) `mod` 10)</span></span>
+<span class="lineno">  100 </span>
+<span class="lineno">  101 </span>-- |Parse.
+<span class="lineno">  102 </span>parse15 :: Text -&gt; Cavern
+<span class="lineno">  103 </span><span class="decl"><span class="istickedoff">parse15 = fromRight . parseOnly (grid &lt;$&gt; parser)</span>
+<span class="lineno">  104 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  105 </span><span class="spaces">    </span><span class="istickedoff">grid [] = <span class="nottickedoff">error &quot;empty input&quot;</span></span>
+<span class="lineno">  106 </span><span class="spaces">    </span><span class="istickedoff">grid rows@(row:_) =</span>
+<span class="lineno">  107 </span><span class="spaces">      </span><span class="istickedoff">lazyGridMap (rectSquareGrid (length row) (length rows)) (concat $ transpose rows)</span>
+<span class="lineno">  108 </span><span class="spaces">    </span><span class="istickedoff">parser = line `sepBy1` endOfLine &lt;* atEnd</span>
+<span class="lineno">  109 </span><span class="spaces">    </span><span class="istickedoff">line = many1 (read . (: []) &lt;$&gt; digit)</span></span>
+
+</pre>
+</body>
+</html>
