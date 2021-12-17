@@ -229,4 +229,17 @@ benchmarks =
               ]
             ]
           ]
+    , env (getProblem "16") \sample -> do
+        bgroup "D16"
+          [ bgroup "A"
+            [ bgroup "initial"
+              [ bench "large" $ whnf part16A sample
+              ]
+            ]
+          , bgroup "B"
+            [ bgroup "initial"
+              [ bench "large" $ whnf part16B sample
+              ]
+            ]
+          ]
     ]
