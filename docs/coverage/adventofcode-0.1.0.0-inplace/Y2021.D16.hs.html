@@ -1,0 +1,146 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2021.D16
+<span class="lineno">    3 </span>Description: Advent of Code 2021 Day 16 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the 2021 day 16 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2021.D16
+<span class="lineno">   10 </span>  ( parse16
+<span class="lineno">   11 </span>  , part16A
+<span class="lineno">   12 </span>  , part16B
+<span class="lineno">   13 </span>  ) where
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>import Control.Applicative
+<span class="lineno">   16 </span>import Data.Attoparsec.Text as P
+<span class="lineno">   17 </span>import Data.Either.Utils       (fromRight)
+<span class="lineno">   18 </span>import Data.Foldable
+<span class="lineno">   19 </span>import Data.Monoid
+<span class="lineno">   20 </span>import Data.Text               (Text)
+<span class="lineno">   21 </span>
+<span class="lineno">   22 </span>import qualified Data.Text as T
+<span class="lineno">   23 </span>import qualified GHC.Exts  as L
+<span class="lineno">   24 </span>
+<span class="lineno">   25 </span>-- |Solution to part A
+<span class="lineno">   26 </span>part16A :: Text -&gt; Int
+<span class="lineno">   27 </span><span class="decl"><span class="istickedoff">part16A = sumVersion . parse16</span></span>
+<span class="lineno">   28 </span>
+<span class="lineno">   29 </span>sumVersion :: Packet -&gt; Int
+<span class="lineno">   30 </span><span class="decl"><span class="istickedoff">sumVersion (PacketLit v _) = v</span>
+<span class="lineno">   31 </span><span class="spaces"></span><span class="istickedoff">sumVersion (PacketOp v _ ps) = v + getSum (foldMap (Sum . sumVersion) ps)</span></span>
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>-- |Solution to part B
+<span class="lineno">   34 </span>part16B :: Text -&gt; Int
+<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">part16B = decodePacket . parse16</span></span>
+<span class="lineno">   36 </span>
+<span class="lineno">   37 </span>decodePacket :: Packet -&gt; Int
+<span class="lineno">   38 </span><span class="decl"><span class="istickedoff">decodePacket (PacketLit _ n) = n</span>
+<span class="lineno">   39 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 0 ps) = foldl' (\acc -&gt; (+) acc . decodePacket) 0 ps</span>
+<span class="lineno">   40 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 1 ps) = foldl' (\acc -&gt; (*) acc . decodePacket) 1 ps</span>
+<span class="lineno">   41 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 2 ps) = minimum (map decodePacket ps)</span>
+<span class="lineno">   42 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 3 ps) = maximum (map decodePacket ps)</span>
+<span class="lineno">   43 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 5 [p1, p2])</span>
+<span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">| decodePacket p1 &gt; decodePacket p2 = 1</span>
+<span class="lineno">   45 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = 0</span>
+<span class="lineno">   46 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 6 [p1, p2])</span>
+<span class="lineno">   47 </span><span class="spaces">  </span><span class="istickedoff">| decodePacket p1 &lt; decodePacket p2 = 1</span>
+<span class="lineno">   48 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = 0</span>
+<span class="lineno">   49 </span><span class="spaces"></span><span class="istickedoff">decodePacket (PacketOp _ 7 [p1, p2])</span>
+<span class="lineno">   50 </span><span class="spaces">  </span><span class="istickedoff">| decodePacket p1 == decodePacket p2 = 1</span>
+<span class="lineno">   51 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = 0</span>
+<span class="lineno">   52 </span><span class="spaces"></span><span class="istickedoff">decodePacket PacketOp {} = <span class="nottickedoff">error &quot;unknown operator packet&quot;</span></span></span>
+<span class="lineno">   53 </span>
+<span class="lineno">   54 </span>type Version = Int
+<span class="lineno">   55 </span>type PType = Int
+<span class="lineno">   56 </span>data Packet
+<span class="lineno">   57 </span>  = PacketLit Version Int
+<span class="lineno">   58 </span>  | PacketOp Version PType [Packet]
+<span class="lineno">   59 </span>  deriving <span class="decl"><span class="nottickedoff">Show</span></span>
+<span class="lineno">   60 </span>
+<span class="lineno">   61 </span>-- |Parse.
+<span class="lineno">   62 </span>parse16 :: Text -&gt; Packet
+<span class="lineno">   63 </span><span class="decl"><span class="istickedoff">parse16 = fromRight . parseOnly parser . hexToBin</span>
+<span class="lineno">   64 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   65 </span><span class="spaces">    </span><span class="istickedoff">parser = packet &lt;* atEnd</span>
+<span class="lineno">   66 </span><span class="spaces">    </span><span class="istickedoff">packet = packetLit &lt;|&gt; packetOp</span>
+<span class="lineno">   67 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">   68 </span><span class="spaces">    </span><span class="istickedoff">packetLit = PacketLit &lt;$&gt; bitN 3 &lt;* string &quot;100&quot; &lt;*&gt; (asInt . concat &lt;$&gt; litNumber)</span>
+<span class="lineno">   69 </span><span class="spaces">    </span><span class="istickedoff">litNumber = litQuad</span>
+<span class="lineno">   70 </span><span class="spaces">    </span><span class="istickedoff">litQuad = mappend &lt;$&gt; many litInit &lt;*&gt; ((: []) &lt;$&gt; litTail)</span>
+<span class="lineno">   71 </span><span class="spaces">    </span><span class="istickedoff">litInit = char '1' *&gt; count 4 bit</span>
+<span class="lineno">   72 </span><span class="spaces">    </span><span class="istickedoff">litTail = char '0' *&gt; count 4 bit</span>
+<span class="lineno">   73 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="istickedoff">packetOp = PacketOp &lt;$&gt; bitN 3 &lt;*&gt; bitN 3 &lt;*&gt; (lenPacket &lt;|&gt; numPacket)</span>
+<span class="lineno">   75 </span><span class="spaces">    </span><span class="istickedoff">lenPacket = do</span>
+<span class="lineno">   76 </span><span class="spaces">      </span><span class="istickedoff">_ &lt;- char '0'</span>
+<span class="lineno">   77 </span><span class="spaces">      </span><span class="istickedoff">len &lt;- bitN 15</span>
+<span class="lineno">   78 </span><span class="spaces">      </span><span class="istickedoff">parseOf (P.take len) (many1 packet)</span>
+<span class="lineno">   79 </span><span class="spaces">    </span><span class="istickedoff">numPacket = do</span>
+<span class="lineno">   80 </span><span class="spaces">      </span><span class="istickedoff">_ &lt;- char '1'</span>
+<span class="lineno">   81 </span><span class="spaces">      </span><span class="istickedoff">packets &lt;- bitN 11</span>
+<span class="lineno">   82 </span><span class="spaces">      </span><span class="istickedoff">count packets packet</span>
+<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">   84 </span><span class="spaces">    </span><span class="istickedoff">bitN n = asInt &lt;$&gt; count n bit</span>
+<span class="lineno">   85 </span><span class="spaces">    </span><span class="istickedoff">asInt = convert . reverse</span>
+<span class="lineno">   86 </span><span class="spaces">    </span><span class="istickedoff">bit = read . (: []) &lt;$&gt; binary</span>
+<span class="lineno">   87 </span><span class="spaces">    </span><span class="istickedoff">binary = char '0' &lt;|&gt; char '1'</span></span>
+<span class="lineno">   88 </span>
+<span class="lineno">   89 </span>constP :: Parser a -&gt; Text -&gt; Parser a
+<span class="lineno">   90 </span><span class="decl"><span class="istickedoff">constP p t = case parseOnly p t of</span>
+<span class="lineno">   91 </span><span class="spaces">  </span><span class="istickedoff">Left _ -&gt; <span class="nottickedoff">empty</span></span>
+<span class="lineno">   92 </span><span class="spaces">  </span><span class="istickedoff">Right a -&gt; return a</span></span>
+<span class="lineno">   93 </span>
+<span class="lineno">   94 </span>parseOf :: Parser Text -&gt; Parser a -&gt; Parser a
+<span class="lineno">   95 </span><span class="decl"><span class="istickedoff">parseOf ptxt pa = bothParse</span>
+<span class="lineno">   96 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   97 </span><span class="spaces">    </span><span class="istickedoff">bothParse = ptxt &gt;&gt;= constP pa</span></span>
+<span class="lineno">   98 </span>
+<span class="lineno">   99 </span>hexToBin :: Text -&gt; Text
+<span class="lineno">  100 </span><span class="decl"><span class="istickedoff">hexToBin = T.concat . map hexToBits  . L.toList</span></span>
+<span class="lineno">  101 </span>
+<span class="lineno">  102 </span>convert :: [Int] -&gt; Int
+<span class="lineno">  103 </span><span class="decl"><span class="istickedoff">convert [] = 0</span>
+<span class="lineno">  104 </span><span class="spaces"></span><span class="istickedoff">convert (x : xs) = x + 2 * convert xs</span></span>
+<span class="lineno">  105 </span>
+<span class="lineno">  106 </span>hexToBits :: Char -&gt; Text
+<span class="lineno">  107 </span><span class="decl"><span class="istickedoff">hexToBits '0' = &quot;0000&quot;</span>
+<span class="lineno">  108 </span><span class="spaces"></span><span class="istickedoff">hexToBits '1' = &quot;0001&quot;</span>
+<span class="lineno">  109 </span><span class="spaces"></span><span class="istickedoff">hexToBits '2' = &quot;0010&quot;</span>
+<span class="lineno">  110 </span><span class="spaces"></span><span class="istickedoff">hexToBits '3' = &quot;0011&quot;</span>
+<span class="lineno">  111 </span><span class="spaces"></span><span class="istickedoff">hexToBits '4' = &quot;0100&quot;</span>
+<span class="lineno">  112 </span><span class="spaces"></span><span class="istickedoff">hexToBits '5' = &quot;0101&quot;</span>
+<span class="lineno">  113 </span><span class="spaces"></span><span class="istickedoff">hexToBits '6' = &quot;0110&quot;</span>
+<span class="lineno">  114 </span><span class="spaces"></span><span class="istickedoff">hexToBits '7' = &quot;0111&quot;</span>
+<span class="lineno">  115 </span><span class="spaces"></span><span class="istickedoff">hexToBits '8' = &quot;1000&quot;</span>
+<span class="lineno">  116 </span><span class="spaces"></span><span class="istickedoff">hexToBits '9' = &quot;1001&quot;</span>
+<span class="lineno">  117 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'A' = &quot;1010&quot;</span>
+<span class="lineno">  118 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'B' = &quot;1011&quot;</span>
+<span class="lineno">  119 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'C' = &quot;1100&quot;</span>
+<span class="lineno">  120 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'D' = &quot;1101&quot;</span>
+<span class="lineno">  121 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'E' = &quot;1110&quot;</span>
+<span class="lineno">  122 </span><span class="spaces"></span><span class="istickedoff">hexToBits 'F' = &quot;1111&quot;</span>
+<span class="lineno">  123 </span><span class="spaces"></span><span class="istickedoff">hexToBits _ = &quot;&quot;</span></span>
+
+</pre>
+</body>
+</html>
