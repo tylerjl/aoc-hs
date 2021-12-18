@@ -92,6 +92,7 @@ library
                      , Y2021.D15
                      , Y2021.D16
                      , Y2021.D17
+                     , Y2021.D18
   build-depends:       advent-of-code-ocr
                      , aeson
                      , attoparsec
@@ -177,6 +178,7 @@ test-suite adventofcode-test
                      , Y2021.D15Spec
                      , Y2021.D16Spec
                      , Y2021.D17Spec
+                     , Y2021.D18Spec
   build-depends:       base
                      , adventofcode
                      , bytestring

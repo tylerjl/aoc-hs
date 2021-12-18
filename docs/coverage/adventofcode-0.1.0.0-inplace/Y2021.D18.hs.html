@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2021.D18
+<span class="lineno">    3 </span>Description: Advent of Code 2021 Day 18 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the 2021 day 18 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2021.D18
+<span class="lineno">   10 </span>  ( parse18
+<span class="lineno">   11 </span>  , part18A
+<span class="lineno">   12 </span>  , part18B
+<span class="lineno">   13 </span>  ) where
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>import Control.Applicative
+<span class="lineno">   16 </span>import Data.Attoparsec.Text hiding (take, takeWhile)
+<span class="lineno">   17 </span>import Data.Either.Utils           (fromRight)
+<span class="lineno">   18 </span>import Data.List                   (foldl1')
+<span class="lineno">   19 </span>import Data.Text                   (Text)
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>data SnailTree
+<span class="lineno">   22 </span>  = SnailNumber Int
+<span class="lineno">   23 </span>  | SnailPair SnailTree SnailTree
+<span class="lineno">   24 </span>  deriving <span class="decl"><span class="istickedoff">Eq</span></span>
+<span class="lineno">   25 </span>instance Show SnailTree where
+<span class="lineno">   26 </span>  <span class="decl"><span class="nottickedoff">show (SnailNumber n) = show n</span>
+<span class="lineno">   27 </span><span class="spaces">  </span><span class="nottickedoff">show (SnailPair a b) = &quot;[&quot; &lt;&gt; show a &lt;&gt; &quot;,&quot; &lt;&gt; show b &lt;&gt; &quot;]&quot;</span></span>
+<span class="lineno">   28 </span>
+<span class="lineno">   29 </span>-- |Solution to part A
+<span class="lineno">   30 </span>part18A :: Text -&gt; Int
+<span class="lineno">   31 </span><span class="decl"><span class="istickedoff">part18A = magnitude . reduce . foldl1' combine . map reduce . parse18</span></span>
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>combine :: SnailTree -&gt; SnailTree -&gt; SnailTree
+<span class="lineno">   34 </span><span class="decl"><span class="istickedoff">combine (reduce -&gt; a) (reduce -&gt; b) = snailAdd a b</span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>-- |Solution to part B
+<span class="lineno">   37 </span>part18B :: Text -&gt; Int
+<span class="lineno">   38 </span><span class="decl"><span class="istickedoff">part18B (parse18 -&gt; rows) =</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">maximum [(magnitude . reduce) (combine x y) | x &lt;- rows, y &lt;- rows, x /= y]</span></span>
+<span class="lineno">   40 </span>
+<span class="lineno">   41 </span>snailAdd :: SnailTree -&gt; SnailTree -&gt; SnailTree
+<span class="lineno">   42 </span><span class="decl"><span class="istickedoff">snailAdd = SnailPair</span></span>
+<span class="lineno">   43 </span>
+<span class="lineno">   44 </span>magnitude :: SnailTree -&gt; Int
+<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">magnitude (SnailNumber n) = n</span>
+<span class="lineno">   46 </span><span class="spaces"></span><span class="istickedoff">magnitude (SnailPair (magnitude -&gt; l) (magnitude -&gt; r)) = l * 3 + r * 2</span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>explode :: SnailTree -&gt; Either SnailTree SnailTree
+<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">explode = either (\(_, tree, _) -&gt; Left tree) Right . go (0 :: Int)</span>
+<span class="lineno">   50 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   51 </span><span class="spaces">    </span><span class="istickedoff">go _ (SnailNumber n) = pure <span class="nottickedoff">(SnailNumber n)</span></span>
+<span class="lineno">   52 </span><span class="spaces">    </span><span class="istickedoff">go d (SnailPair (SnailNumber l) (SnailNumber r)) | d &gt;= 4 = Left (l, SnailNumber 0, r)</span>
+<span class="lineno">   53 </span><span class="spaces">    </span><span class="istickedoff">go d (SnailPair l r) =</span>
+<span class="lineno">   54 </span><span class="spaces">      </span><span class="istickedoff">case go (succ d) l of</span>
+<span class="lineno">   55 </span><span class="spaces">        </span><span class="istickedoff">Left (ln, l', rn) -&gt; Left (ln, SnailPair l' (withLeft r rn), 0)</span>
+<span class="lineno">   56 </span><span class="spaces">        </span><span class="istickedoff">_ -&gt; case go (succ d) r of</span>
+<span class="lineno">   57 </span><span class="spaces">          </span><span class="istickedoff">Left (ln, r', rn) -&gt; Left (0, SnailPair (withRight l ln) r', rn)</span>
+<span class="lineno">   58 </span><span class="spaces">          </span><span class="istickedoff">_ -&gt; pure $ SnailPair l r</span>
+<span class="lineno">   59 </span><span class="spaces">    </span><span class="istickedoff">withLeft (SnailNumber v)  n = SnailNumber (v + n)</span>
+<span class="lineno">   60 </span><span class="spaces">    </span><span class="istickedoff">withLeft (SnailPair l r)  n = SnailPair (withLeft l n) r</span>
+<span class="lineno">   61 </span><span class="spaces">    </span><span class="istickedoff">withRight (SnailNumber v) n = SnailNumber (v + n)</span>
+<span class="lineno">   62 </span><span class="spaces">    </span><span class="istickedoff">withRight (SnailPair l r) n = SnailPair l (withRight r n)</span></span>
+<span class="lineno">   63 </span>
+<span class="lineno">   64 </span>split :: SnailTree -&gt; Either SnailTree SnailTree
+<span class="lineno">   65 </span><span class="decl"><span class="istickedoff">split s@(SnailNumber n)</span>
+<span class="lineno">   66 </span><span class="spaces">  </span><span class="istickedoff">| n &gt;= 10 = Left $ SnailPair (SnailNumber $ n `div` 2) (SnailNumber $ succ n `div` 2)</span>
+<span class="lineno">   67 </span><span class="spaces">  </span><span class="istickedoff">| <span class="tickonlytrue">otherwise</span> = Right <span class="nottickedoff">s</span></span>
+<span class="lineno">   68 </span><span class="spaces"></span><span class="istickedoff">split (SnailPair l r) =</span>
+<span class="lineno">   69 </span><span class="spaces">  </span><span class="istickedoff">case split l of</span>
+<span class="lineno">   70 </span><span class="spaces">    </span><span class="istickedoff">Left l' -&gt; Left (SnailPair l' r)</span>
+<span class="lineno">   71 </span><span class="spaces">    </span><span class="istickedoff">_ -&gt; case split r of</span>
+<span class="lineno">   72 </span><span class="spaces">      </span><span class="istickedoff">Left r' -&gt; Left (SnailPair l r')</span>
+<span class="lineno">   73 </span><span class="spaces">      </span><span class="istickedoff">_ -&gt; Right $ SnailPair l r</span></span>
+<span class="lineno">   74 </span>
+<span class="lineno">   75 </span>reduce :: SnailTree -&gt; SnailTree
+<span class="lineno">   76 </span><span class="decl"><span class="istickedoff">reduce (explode -&gt; Right (split -&gt; Right tree)) = tree</span>
+<span class="lineno">   77 </span><span class="spaces"></span><span class="istickedoff">reduce (explode -&gt; Right (split -&gt; Left tree)) = reduce tree</span>
+<span class="lineno">   78 </span><span class="spaces"></span><span class="istickedoff">reduce (explode -&gt; Left tree) = reduce tree</span></span>
+<span class="lineno">   79 </span>
+<span class="lineno">   80 </span>-- |Parse.
+<span class="lineno">   81 </span>parse18 :: Text -&gt; [SnailTree]
+<span class="lineno">   82 </span><span class="decl"><span class="istickedoff">parse18 = fromRight . parseOnly (parser &lt;* atEnd)</span>
+<span class="lineno">   83 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   84 </span><span class="spaces">    </span><span class="istickedoff">parser = snail `sepBy1` endOfLine</span>
+<span class="lineno">   85 </span><span class="spaces">    </span><span class="istickedoff">snail = SnailPair &lt;$&gt; (char '[' *&gt; sv &lt;* char ',') &lt;*&gt; (sv &lt;* char ']')</span>
+<span class="lineno">   86 </span><span class="spaces">    </span><span class="istickedoff">sv = (SnailNumber &lt;$&gt; decimal) &lt;|&gt; snail</span></span>
+
+</pre>
+</body>
+</html>
