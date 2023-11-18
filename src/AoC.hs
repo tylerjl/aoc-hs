@@ -29,8 +29,8 @@ solve 2015 2  _  (parsePresents . into @Text -> Nothing) = error "could not pars
 solve 2015 3 'a' (santaRun . T.filter (/= '\n') -> solution) = show solution
 solve 2015 3 'b' (roboRun  . T.filter (/= '\n') -> solution) = show solution
 
-solve 2015 4 'a' (flip crack 5 . into @ByteString -> solution) = show solution
-solve 2015 4 'b' (flip crack 6 . into @ByteString -> solution) = show solution
+solve 2015 4 'a' (flip crack 5 . into . into @(UTF_8 ByteString) -> solution) = show solution
+solve 2015 4 'b' (flip crack 6 . into . into @(UTF_8 ByteString) -> solution) = show solution
 
 solve 2015 5 'a' (length . filter isNice  . lines . into @String -> solution) = show solution
 solve 2015 5 'b' (length . filter isNicer . lines . into @String -> solution) = show solution
@@ -55,8 +55,8 @@ solve 2015 10 'b' (length . flip lookSay 50 . rstrip . into @String -> solution)
 solve 2015 11 'a' (rotate . rstrip . into @String -> solution) = show solution
 solve 2015 11 'b' (rotate . rotate . rstrip . into @String -> solution) = show solution
 
-solve 2015 12 'a' (jsonSum . into @L.ByteString -> solution) = show solution
-solve 2015 12 'b' (jsonSumFixed . into @L.ByteString -> solution) = show solution
+solve 2015 12 'a' (jsonSum . into . into @(UTF_8 L.ByteString) -> solution) = show solution
+solve 2015 12 'b' (jsonSumFixed . into . into @(UTF_8 L.ByteString) -> solution) = show solution
 
 solve 2015 13 'a' (solveSeating . into @String -> solution) = show solution
 solve 2015 13 'b' (into @String -> input) = show $ solveSeating withMe
@@ -176,6 +176,9 @@ solve 2021 18 'b' (part18B -> solution) = show solution
 
 solve 2021 19 'a' (part19A -> solution) = show solution
 solve 2021 19 'b' (part19B -> solution) = show solution
+
+solve 2021 20 'a' (part20A -> solution) = show solution
+solve 2021 20 'b' (part20B -> solution) = show solution
 
 solve y d p _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p

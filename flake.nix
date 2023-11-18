@@ -1,10 +1,22 @@
 {
   description = "Advent of Code solutions in Haskell";
-  inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
-  inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+
+  nixConfig = {
+  # This sets the flake to use the IOG nix cache.
+  # Nix should ask for permission before using it,
+  # but remove it here if you do not want it to.
+    extra-substituters = ["https://cache.iog.io"];
+    extra-trusted-public-keys = ["hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ="];
+  };
+
+  inputs = {
+    haskellNix.url = "github:input-output-hk/haskell.nix";
+    nixpkgs.follows = "haskellNix/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
   outputs = { self, nixpkgs, flake-utils, haskellNix }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
+    flake-utils.lib.eachDefaultSystem (system:
     let
       overlays = [ haskellNix.overlay
         (final: prev: {
@@ -12,21 +24,14 @@
           adventofcode =
             final.haskell-nix.project' {
               src = ./.;
-              compiler-nix-name = "ghc8107";
+              compiler-nix-name = "ghc928";
               # This is used by `nix develop .` to open a shell for use with
               # `cabal`, `hlint` and `haskell-language-server`
               shell.tools = {
                 cabal = {};
                 hindent = {};
                 hlint = {};
-                haskell-language-server = {
-                  version = "1.5.0.0";
-                  cabalProject = ''
-                    packages: .
-                    package haskell-language-server
-                      flags: +rename
-                  '';
-                };
+                haskell-language-server = {};
               };
               # Non-Haskell shell tools go here
               shell.buildInputs = with pkgs; [
@@ -34,6 +39,9 @@
                 cachix
                 haskellPackages.hspec-discover
                 lz4
+              ];
+              modules = [
+                { packages.markup-parse.doHaddock = false; }
               ];
             };
         })

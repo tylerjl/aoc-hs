@@ -16,7 +16,7 @@ $ direnv allow
 Or, if you like living as a caveman:
 
 ```console
-$ nix shell
+$ nix develop
 ```
 
 You'll have a bit of setup happen.
@@ -29,13 +29,8 @@ Once that's done, the dev environment should be functional with all dependencies
 
 Run the test suite to confirm the code conforms to the problem set examples:
 
-    stack test
+    make test
 
 If everything looks good, go ahead and either install the solver binary and run it against problem input (in my case, I've committed my problem input, so I can do this):
 
-    stack install
-    adventofcode 2015 1 dist/resources/2015/day1
-
-Alternatively, you can run standalone against problem set input:
-
-    stack exec adventofcode 2015 1 dist/resources/2015/day1
+    cabal run adventofcode -- 2015 1 dist/resources/2015/day1

@@ -12,11 +12,11 @@ Solutions to the day 12 set of problems for <adventofcode.com>.
 module Y2015.D12 (jsonSum, jsonSumFixed) where
 
 import           Data.Aeson           (Value(..), decode)
+import qualified Data.Aeson.KeyMap    as KM
 import           Data.ByteString.Lazy (ByteString)
 import           Data.Foldable        (foldl')
 import           Data.Scientific      (floatingOrInteger)
 import qualified Data.Vector          as V
-import qualified Data.HashMap.Strict as KM
 
 -- |Sum all numbers in a JSON-like structure
 jsonSum :: ByteString -- ^ JSON input string

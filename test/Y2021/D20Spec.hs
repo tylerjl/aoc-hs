@@ -1,4 +1,4 @@
-module Y2021.D19Spec (spec) where
+module Y2021.D20Spec (spec) where
 
 import Witch
 import Y2021
@@ -10,12 +10,11 @@ import Data.Text (Text)
 
 spec :: Spec
 spec = parallel $ do
-        describe "part19A" $ do
-          before (TIO.readFile "dist/resources/2021/day19_sample.txt") $ do
+        describe "part20A" $ do
+          before (TIO.readFile "dist/resources/2021/day20_sample.txt") $ do
             it "solves the example case" $ \input -> do
               pending
-              -- part19A input `shouldBe` 79
-        describe "part19B" $ do
-          before (TIO.readFile "dist/resources/2021/day19_sample.txt") $ do
+        describe "part20B" $ do
+          before (TIO.readFile "dist/resources/2021/day20_sample.txt") $ do
             it "solves the example case" $ \input -> do
               pending
