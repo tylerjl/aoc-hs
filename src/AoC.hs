@@ -105,6 +105,9 @@ solve 2016 1 'b' (visitedTwice  . into @String -> solution) = show solution
 solve 2016 2 'a' (bathroomCode grid1 (2,2) . into @String -> solution) = show solution
 solve 2016 2 'b' (bathroomCode grid2 (1,3) . into @String -> solution) = show solution
 
+solve 2016 9 'a' (inflate . T.strip -> Right solution) = show solution
+solve 2016 9 'a' (inflate -> Left error') = show error'
+
 solve 2018 1 'a' (frequency . into @String -> solution) = show solution
 solve 2018 1 'b' (twiceFrequency . into @String -> solution) = show solution
 

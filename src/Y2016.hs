@@ -16,3 +16,4 @@ module Y2016 (module X) where
 
 import Y2016.D01 as X
 import Y2016.D02 as X
+import Y2016.D09 as X

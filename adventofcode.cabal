@@ -70,6 +70,7 @@ library
                      , Y2015.D25
                      , Y2016.D01
                      , Y2016.D02
+                     , Y2016.D09
                      , Y2018.D01
                      , Y2018.D02
                      , Y2018.D03
@@ -158,6 +159,7 @@ test-suite adventofcode-test
                      , Y2015.D25Spec
                      , Y2016.D01Spec
                      , Y2016.D02Spec
+                     , Y2016.D09Spec
                      , Y2018.D01Spec
                      , Y2018.D02Spec
                      , Y2018.D03Spec
