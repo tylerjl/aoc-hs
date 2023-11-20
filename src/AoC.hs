@@ -107,6 +107,7 @@ solve 2016 2 'b' (bathroomCode grid2 (1,3) . into @String -> solution) = show so
 
 solve 2016 9 'a' (inflate . T.strip -> Right solution) = show solution
 solve 2016 9 'a' (inflate -> Left error') = show error'
+solve 2016 9 'b' (nestedInflate . T.strip -> solution) = show solution
 
 solve 2018 1 'a' (frequency . into @String -> solution) = show solution
 solve 2018 1 'b' (twiceFrequency . into @String -> solution) = show solution
