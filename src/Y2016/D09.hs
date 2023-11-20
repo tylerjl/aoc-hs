@@ -26,7 +26,7 @@ data Fragment = Marker Repetitions Text | Token Char
 type Compressed = Tree Repetitions
 
 nestedInflate :: Text -> Int
-nestedInflate = foldTree decompressedTree . compressedTree
+nestedInflate = foldTree decompressedTree . compressedTree . T.strip
 
 compressedTree :: Text -> Compressed
 compressedTree = unfoldTree asTree . Marker 1
@@ -50,7 +50,7 @@ compression = manyTill (marker' <|> (Token <$> letter)) endOfInput
       return $ Marker repeat' span'
 
 inflate :: Text -> Either String Int
-inflate input = T.length <$> parseOnly decompress input
+inflate (T.strip -> input) = T.length <$> parseOnly decompress input
 
 decompress :: Parser Text
 decompress = into . concat <$> manyTill (marker' <|> L.singleton <$> letter) endOfInput
