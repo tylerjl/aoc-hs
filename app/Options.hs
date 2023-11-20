@@ -21,7 +21,7 @@ type Day  = Int
 type Part = Char
 type Path = String
 
-newtype Flags = Flags { measure :: Bool } deriving Generic
+newtype Flags = Flags { timed :: Bool } deriving Generic
 instance ParseRecord Flags where
 
 data Arguments =
