@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeOperators #-}
 
 {-|
 Module:      Options
@@ -16,15 +15,19 @@ module Options where
 
 import Options.Generic
 
+type Measure = Bool
 type Year = Int
 type Day  = Int
 type Part = Char
 type Path = String
 
-data Options w =
-  Options (w ::: Year <?> "Year")
-          (w ::: Day  <?> "Day")
-          (w ::: Part <?> "Part")
-          (w ::: Path <?> "Input file path")
-  deriving Generic
-instance ParseRecord (Options Wrapped)
+newtype Flags = Flags { measure :: Bool } deriving Generic
+instance ParseRecord Flags where
+
+data Arguments =
+  Arguments Year Day Part Path deriving Generic
+instance ParseRecord Arguments
+
+data Options = Options Flags Arguments
+instance ParseRecord Options where
+  parseRecord = Options <$> parseRecord <*> parseRecord

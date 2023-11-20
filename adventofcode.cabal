@@ -22,9 +22,11 @@ executable adventofcode
   build-depends:       adventofcode
                      , base
                      , bytestring
+                     , deepseq
                      , optparse-generic
                      , safe
                      , text
+                     , timeit
                      , MissingH
                      , witch
   default-language:    Haskell2010
