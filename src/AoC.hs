@@ -112,6 +112,10 @@ solve 2016 9 'b' _ (nestedInflate -> solution) = show solution
 solve 2016 10 'a' args input = show $ findBot (map read args) input
 solve 2016 10 'b' args input = show $ findOutputs (map read args) input
 
+solve 2016 12 'a' [[register]] input = show $ assembunnyRegister register input
+solve 2016 12 'b' [[register]] input = show $ assembunnyRegisterInit cOne register input
+  where cOne r = if r == 'c' then 1 else 0
+
 solve 2018 1 'a' _ (frequency . into @String -> solution) = show solution
 solve 2018 1 'b' _ (twiceFrequency . into @String -> solution) = show solution
 

@@ -18,3 +18,4 @@ import Y2016.D01 as X
 import Y2016.D02 as X
 import Y2016.D09 as X
 import Y2016.D10 as X
+import Y2016.D12 as X

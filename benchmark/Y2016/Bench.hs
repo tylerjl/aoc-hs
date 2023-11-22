@@ -57,4 +57,13 @@ benchmarks =
                 [ bench "large" $ nf (findOutputs [0, 1, 2]) input
                 ]
               ]
+        , env (getProblem "12") $ \input -> do
+            bgroup "D12"
+              [ bgroup "partA"
+                [ bench "large" $ nf (assembunnyRegister 'a') input
+                ]
+              , bgroup "partB"
+                [ bench "large" $ nf (assembunnyRegisterInit (\x -> if x == 'c' then 1 else 0) 'a') input
+                ]
+              ]
         ]
