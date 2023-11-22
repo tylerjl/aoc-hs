@@ -28,9 +28,9 @@ usage = "Advent of Code solutions in Haskell"
 -}
 main :: IO ()
 main = do
-  Options (Flags { timed }) (Arguments year day part path) <- getRecord usage
+  Options (Flags { timed }) (Arguments year day part path args) <- getRecord usage
   input <- TIO.readFile path 
-  let solution = solve year day part
+  let solution = solve year day part args
   if timed then do
     (Measured { measTime }, _) <- measure (nf solution input) 1
     putStrLn $ "Elapsed: " ++ secs measTime

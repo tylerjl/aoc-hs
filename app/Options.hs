@@ -25,7 +25,7 @@ newtype Flags = Flags { timed :: Bool } deriving Generic
 instance ParseRecord Flags where
 
 data Arguments =
-  Arguments Year Day Part Path deriving Generic
+  Arguments Year Day Part Path [String] deriving Generic
 instance ParseRecord Arguments
 
 data Options = Options Flags Arguments
