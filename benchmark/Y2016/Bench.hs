@@ -48,4 +48,13 @@ benchmarks =
                 [ bench "large" $ nf nestedInflate input
                 ]
               ]
+        , env (getProblem "10") $ \input -> do
+            bgroup "D10"
+              [ bgroup "partA"
+                [ bench "large" $ nf (findBot [61, 17]) input
+                ]
+              , bgroup "partB"
+                [ bench "large" $ nf (findOutputs [0, 1, 2]) input
+                ]
+              ]
         ]
