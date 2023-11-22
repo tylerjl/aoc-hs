@@ -1,0 +1,87 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module:      Y2016.D09
+<span class="lineno">    3 </span>Description: Advent of Code Day 09 Solutions.
+<span class="lineno">    4 </span>License:     MIT
+<span class="lineno">    5 </span>Maintainer:  @tylerjl
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>Solutions to the day 09 set of problems for &lt;adventofcode.com&gt;.
+<span class="lineno">    8 </span>-}
+<span class="lineno">    9 </span>module Y2016.D09
+<span class="lineno">   10 </span>  ( inflate
+<span class="lineno">   11 </span>  , nestedInflate
+<span class="lineno">   12 </span>  ) where
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>import Control.Applicative (Alternative(..))
+<span class="lineno">   15 </span>import Data.Attoparsec.Combinator (count)
+<span class="lineno">   16 </span>import Data.Attoparsec.Text hiding (count)
+<span class="lineno">   17 </span>import Data.Text hiding (concat, count, filter, length, replicate)
+<span class="lineno">   18 </span>import Data.Tree
+<span class="lineno">   19 </span>import Witch
+<span class="lineno">   20 </span>import qualified Data.Attoparsec.Text as AT
+<span class="lineno">   21 </span>import qualified Data.List as L
+<span class="lineno">   22 </span>import qualified Data.Text as T
+<span class="lineno">   23 </span>
+<span class="lineno">   24 </span>type Repetitions = Int
+<span class="lineno">   25 </span>data Fragment = Marker Repetitions Text | Token Char
+<span class="lineno">   26 </span>type Compressed = Tree Repetitions
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>nestedInflate :: Text -&gt; Int
+<span class="lineno">   29 </span><span class="decl"><span class="istickedoff">nestedInflate = foldTree decompressedTree . compressedTree . T.strip</span></span>
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>compressedTree :: Text -&gt; Compressed
+<span class="lineno">   32 </span><span class="decl"><span class="istickedoff">compressedTree = unfoldTree asTree . Marker 1</span></span>
+<span class="lineno">   33 </span>
+<span class="lineno">   34 </span>asTree :: Fragment -&gt; (Repetitions, [Fragment])
+<span class="lineno">   35 </span><span class="decl"><span class="istickedoff">asTree (Token _) = (1, mempty)</span>
+<span class="lineno">   36 </span><span class="spaces"></span><span class="istickedoff">asTree (Marker repetition (parseOnly compression -&gt; Right fragments)) =</span>
+<span class="lineno">   37 </span><span class="spaces">  </span><span class="istickedoff">(repetition, fragments)</span>
+<span class="lineno">   38 </span><span class="spaces"></span><span class="istickedoff">asTree (Marker repetition _) = <span class="nottickedoff">(repetition, [])</span></span></span>
+<span class="lineno">   39 </span>
+<span class="lineno">   40 </span>decompressedTree :: Repetitions -&gt; [Repetitions] -&gt; Repetitions
+<span class="lineno">   41 </span><span class="decl"><span class="istickedoff">decompressedTree repeat' [] = repeat'</span>
+<span class="lineno">   42 </span><span class="spaces"></span><span class="istickedoff">decompressedTree repeat' acc = sum acc * repeat'</span></span>
+<span class="lineno">   43 </span>
+<span class="lineno">   44 </span>compression :: Parser [Fragment]
+<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">compression = manyTill (marker' &lt;|&gt; (Token &lt;$&gt; letter)) endOfInput</span>
+<span class="lineno">   46 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">marker' = do</span>
+<span class="lineno">   48 </span><span class="spaces">      </span><span class="istickedoff">(range', repeat') &lt;- marker</span>
+<span class="lineno">   49 </span><span class="spaces">      </span><span class="istickedoff">span' &lt;- AT.take range'</span>
+<span class="lineno">   50 </span><span class="spaces">      </span><span class="istickedoff">return $ Marker repeat' span'</span></span>
+<span class="lineno">   51 </span>
+<span class="lineno">   52 </span>inflate :: Text -&gt; Either String Int
+<span class="lineno">   53 </span><span class="decl"><span class="istickedoff">inflate (T.strip -&gt; input) = T.length &lt;$&gt; parseOnly decompress input</span></span>
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>decompress :: Parser Text
+<span class="lineno">   56 </span><span class="decl"><span class="istickedoff">decompress = into . concat &lt;$&gt; manyTill (marker' &lt;|&gt; L.singleton &lt;$&gt; letter) endOfInput</span>
+<span class="lineno">   57 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   58 </span><span class="spaces">    </span><span class="istickedoff">marker' = do</span>
+<span class="lineno">   59 </span><span class="spaces">      </span><span class="istickedoff">(range', repeat') &lt;- marker</span>
+<span class="lineno">   60 </span><span class="spaces">      </span><span class="istickedoff">span' &lt;- count range' anyChar</span>
+<span class="lineno">   61 </span><span class="spaces">      </span><span class="istickedoff">return $ concat $ replicate repeat' span'</span></span>
+<span class="lineno">   62 </span>
+<span class="lineno">   63 </span>marker :: Parser (Int, Int)
+<span class="lineno">   64 </span><span class="decl"><span class="istickedoff">marker = &quot;(&quot; *&gt; ((,) &lt;$&gt; decimal &lt;* &quot;x&quot; &lt;*&gt; decimal) &lt;* &quot;)&quot;</span></span>
+
+</pre>
+</body>
+</html>
