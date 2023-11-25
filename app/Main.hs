@@ -9,7 +9,7 @@ Entrypoint for the CLI interface to AoC solutions in Haskell.
 -}
 module Main where
 
-import Criterion.Measurement
+import Criterion.Measurement hiding (measured)
 import Criterion.Measurement.Types hiding (measure)
 import Data.Text       (Text)
 import Options.Generic (getRecord)
@@ -28,7 +28,8 @@ usage = "Advent of Code solutions in Haskell"
 -}
 main :: IO ()
 main = do
-  Options (Flags { timed, input }) (Arguments year day part args) <- getRecord usage
+  Options (Flags { measured, input }) (Arguments year day part args)
+    <- getRecord usage
 
   problemText <- case input of
     Nothing -> pure Nothing
@@ -37,7 +38,15 @@ main = do
       pure $ Just x
 
   let solution = solve year day part args
-  if timed then do
-    (Measured { measTime }, _) <- measure (nf solution problemText) 1
-    putStrLn $ "Elapsed: " ++ secs measTime
+
+  if measured then do
+    (m, _) <- measure (nf solution problemText) 1
+    putStrLn $ "Elapsed: " ++ secs (measTime m)
+    putStrLn $ "Peak memory: " ++
+      (show . fmap (flip (++) "MB" . show) . fromInt)
+      (measPeakMbAllocated m)
+    putStrLn $ "Garbage collection(s): " ++ show (measNumGcs m)
+    putStrLn $ "Wallclock GC: " ++
+      (show . fmap secs . fromDouble) (measGcWallSeconds m)
+
   else putStrLn (solution problemText)
