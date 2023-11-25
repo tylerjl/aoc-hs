@@ -74,6 +74,7 @@ library
                      , Y2016.D09
                      , Y2016.D10
                      , Y2016.D12
+                     , Y2016.D13
                      , Y2018.D01
                      , Y2018.D02
                      , Y2018.D03
@@ -109,6 +110,7 @@ library
                      , cryptohash
                      , deepseq
                      , extra
+                     , ghc
                      , grid
                      , hashable
                      , heaps
@@ -122,6 +124,7 @@ library
                      , parsec
                      , repa
                      , safe
+                     , search-algorithms
                      , scientific
                      , text
                      , time
@@ -166,6 +169,7 @@ test-suite adventofcode-test
                      , Y2016.D09Spec
                      , Y2016.D10Spec
                      , Y2016.D12Spec
+                     , Y2016.D13Spec
                      , Y2018.D01Spec
                      , Y2018.D02Spec
                      , Y2018.D03Spec

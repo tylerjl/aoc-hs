@@ -34,12 +34,14 @@
                 haskell-language-server = {};
               };
               # Non-Haskell shell tools go here
-              shell.buildInputs = with pkgs; [
+              shell.buildInputs = with pkgs; ([
                 cabal-install
                 cachix
-                haskellPackages.hspec-discover
                 lz4
-              ];
+              ] ++ (with haskellPackages; [
+                haskell-debug-adapter
+                hspec-discover
+              ]));
               modules = [
                 { packages.markup-parse.doHaddock = false; }
               ];

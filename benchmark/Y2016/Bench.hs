@@ -66,4 +66,12 @@ benchmarks =
                 [ bench "large" $ nf (assembunnyRegisterInit (\x -> if x == 'c' then 1 else 0) 'a') input
                 ]
               ]
+        , bgroup "D13"
+          [ bgroup "partA"
+            [ bench "large" $ nf (officePath 1358) (31, 39)
+            ]
+          , bgroup "partB"
+            [ bench "large" $ nf (floodOffice 1358) 50
+            ]
+          ]
         ]

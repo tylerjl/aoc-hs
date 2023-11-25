@@ -21,11 +21,11 @@ type Day  = Int
 type Part = Char
 type Path = String
 
-newtype Flags = Flags { timed :: Bool } deriving Generic
+data Flags = Flags { timed :: Bool, input :: Maybe Path } deriving Generic
 instance ParseRecord Flags where
 
 data Arguments =
-  Arguments Year Day Part Path [String] deriving Generic
+  Arguments Year Day Part [String] deriving Generic
 instance ParseRecord Arguments
 
 data Options = Options Flags Arguments

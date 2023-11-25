@@ -9,10 +9,14 @@ Solutions to the 2021 day 15 set of problems for <adventofcode.com>.
 -}
 module Y2021.D15
   ( parse15
+  , parse15'
   , part15A
   , part15B
+  , part15A'
+  , part15B'
   ) where
 
+import Algorithm.Search (dijkstra)
 import Control.Arrow
 import Data.Attoparsec.Text hiding  (take)
 import Data.Either.Utils            (fromRight)
@@ -20,6 +24,7 @@ import Data.Foldable
 import Data.List.Extra              (transpose)
 import Data.Map.Strict              (Map)
 import Data.Text                    (Text)
+import Data.Vector                  (Vector)
 import Math.Geometry.Grid hiding    (distance)
 import Math.Geometry.Grid.Square
 import Math.Geometry.GridMap hiding (foldl', map, filter)
@@ -27,6 +32,8 @@ import Math.Geometry.GridMap.Lazy
 
 import qualified Data.Heap as H
 import qualified Data.Map.Strict as M
+import qualified Data.Text as T
+import qualified Data.Vector as V
 import qualified Math.Geometry.GridMap as GM
 
 type Cavern = LGridMap RectSquareGrid Int
@@ -107,3 +114,42 @@ parse15 = fromRight . parseOnly (grid <$> parser)
       lazyGridMap (rectSquareGrid (length row) (length rows)) (concat $ transpose rows)
     parser = line `sepBy1` endOfLine <* atEnd
     line = many1 (read . (: []) <$> digit)
+
+-- Alternative implementation that's actually slower
+
+type Point = (Int, Int)
+type Tiles = Vector (Vector Int)
+
+part15A' :: Text -> Maybe Int
+part15A' (parse15' . T.strip -> tiles)
+  = fst <$> dijkstra neighbors' cost atGoal (0, 0)
+  where
+    neighbors' point = filter inBounds (neighbors point)
+    inBounds (x, y)
+      = x >= 0 && y >= 0 && y < V.length tiles && x < V.length row
+        where row = tiles V.! y
+    cost _ (x, y) = (tiles V.! y) V.! x
+    atGoal (x, y)
+      =  (y + 1) == V.length tiles
+      && (x + 1) == V.length row
+      where row = tiles V.! y
+
+part15B' :: Text -> Int
+part15B' _ = 0
+
+neighbors :: Point -> [Point]
+neighbors (x, y) =
+  [             (x, y - 1)
+  , (x - 1, y),            (x + 1, y)
+  ,             (x, y + 1)
+  ]
+
+parse15' :: Text -> Tiles
+parse15' (parseOnly cavernP -> Right tiles) = tiles
+parse15' (parseOnly cavernP -> Left _) = error "couldn't parse input"
+
+cavernP :: Parser Tiles
+cavernP = V.fromList <$> (xrow `sepBy` endOfLine)
+  where
+    xrow :: Parser (Vector Int)
+    xrow = V.fromList <$> many1 (read . (: []) <$> digit)
