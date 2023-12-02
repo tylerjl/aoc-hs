@@ -11,8 +11,8 @@ spec = parallel $ do
             describe "partA" $ do
               before (readFile "./dist/resources/2023/day1-test-a.txt") $ do
                 it "solves the example case" $ \input -> do
-                  Y2023.partA input `shouldBe` 142
+                  Y2023.part1A input `shouldBe` 142
             describe "partB" $ do
               before (readFile "./dist/resources/2023/day1-test-b.txt") $ do
                 it "solves the example case" $ \input -> do
-                  Y2023.partB input `shouldBe` 281
+                  Y2023.part1B input `shouldBe` 281

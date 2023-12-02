@@ -11,12 +11,12 @@ module Y2023.D01 where
 import Data.Maybe (mapMaybe)
 
 -- |Solve for part A
-partA :: String -> Int
-partA = sum . map base10Tuple . mapMaybe intoPair . calibrateA
+part1A :: String -> Int
+part1A = sum . map base10Tuple . mapMaybe intoPair . calibrateA
 
 -- |Solve for part B
-partB :: String -> Int
-partB = sum . map base10Tuple . mapMaybe intoPair . calibrateB
+part1B :: String -> Int
+part1B = sum . map base10Tuple . mapMaybe intoPair . calibrateB
 
 -- |Turn a tuple into a two-digit number
 base10Tuple :: (Int, Int) -> Int

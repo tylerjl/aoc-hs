@@ -201,8 +201,11 @@ solve 2021 19 'b' _ (Just (part19B -> solution)) = show solution
 solve 2021 20 'a' _ (Just (part20A -> solution)) = show solution
 solve 2021 20 'b' _ (Just (part20B -> solution)) = show solution
 
-solve 2023 1 'a' _ (Just (Y2023.partA . into @String -> solution)) = show solution
-solve 2023 1 'b' _ (Just (Y2023.partB . into @String -> solution)) = show solution
+solve 2023 1 'a' _ (Just (Y2023.part1A . into @String -> solution)) = show solution
+solve 2023 1 'b' _ (Just (Y2023.part1B . into @String -> solution)) = show solution
+
+solve 2023 2 'a' _ (Just (Y2023.part2A -> solution)) = show solution
+solve 2023 2 'b' _ (Just (Y2023.part2B -> solution)) = show solution
 
 solve y d p _ _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p
