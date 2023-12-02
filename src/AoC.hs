@@ -11,6 +11,7 @@ import Y2015
 import Y2016
 import Y2018
 import Y2021
+import qualified Y2023
 
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Text            as T
@@ -199,6 +200,9 @@ solve 2021 19 'b' _ (Just (part19B -> solution)) = show solution
 
 solve 2021 20 'a' _ (Just (part20A -> solution)) = show solution
 solve 2021 20 'b' _ (Just (part20B -> solution)) = show solution
+
+solve 2023 1 'a' _ (Just (Y2023.partA . into @String -> solution)) = show solution
+solve 2023 1 'b' _ (Just (Y2023.partB . into @String -> solution)) = show solution
 
 solve y d p _ _ = error $
   "I can't handle year " <> show y <> " day " <> show d <> " part " <> show p

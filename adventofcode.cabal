@@ -43,6 +43,7 @@ library
                      , Y2016
                      , Y2018
                      , Y2021
+                     , Y2023
                      , Y2015.Util
                      , Y2015.D01
                      , Y2015.D02
@@ -100,6 +101,7 @@ library
                      , Y2021.D18
                      , Y2021.D19
                      , Y2021.D20
+                     , Y2023.D01
   build-depends:       advent-of-code-ocr
                      , aeson
                      , attoparsec
@@ -195,6 +197,7 @@ test-suite adventofcode-test
                      , Y2021.D18Spec
                      , Y2021.D19Spec
                      , Y2021.D20Spec
+                     , Y2023.D01Spec
   build-depends:       base
                      , adventofcode
                      , bytestring
