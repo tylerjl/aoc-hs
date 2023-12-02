@@ -16,17 +16,17 @@ main = do
   (measurements, config) <- weighResults $ do
     wgroup "Y2021" do
       wgroup "D08" do
-        func "Y2021.D08.A" (solve 2021 8 'a') d8
-        func "Y2021.D08.B" (solve 2021 8 'b') d8
+        func "Y2021.D08.A" (solve 2021 8 'a' []) (pure d8)
+        func "Y2021.D08.B" (solve 2021 8 'b' []) (pure d8)
       wgroup "D09" do
-        func "Y2021.D09.A" (solve 2021 9 'a') d9
-        func "Y2021.D09.B" (solve 2021 9 'b') d9
+        func "Y2021.D09.A" (solve 2021 9 'a' []) (pure d9)
+        func "Y2021.D09.B" (solve 2021 9 'b' []) (pure d9)
       wgroup "D011" do
-        func "Y2021.D011.A" (solve 2021 11 'a') d11
-        func "Y2021.D011.B" (solve 2021 11 'b') d11
+        func "Y2021.D011.A" (solve 2021 11 'a' []) (pure d11)
+        func "Y2021.D011.B" (solve 2021 11 'b' []) (pure d11)
       wgroup "D012" do
-        func "Y2021.D012.A" (solve 2021 12 'a') d12
-        func "Y2021.D012.B" (solve 2021 12 'b') d12
+        func "Y2021.D012.A" (solve 2021 12 'a' []) (pure d12)
+        func "Y2021.D012.B" (solve 2021 12 'b' []) (pure d12)
 
   let (labels, allocs, gcs) = unzip3 $ flip concatMap measurements \(Grouped year days) -> concatMap sumData days
       points = zipWith Point allocs (map into gcs)
