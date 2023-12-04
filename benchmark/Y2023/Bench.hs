@@ -34,4 +34,14 @@ benchmarks =
           [ bgroup "A" [ bench "large" $ nf part2A sample ]
           , bgroup "B" [ bench "large" $ nf part2B sample ]
           ]
+    , env (getProblemText "3") $ \sample -> do
+        bgroup "D03"
+          [ bgroup "A" [ bench "large" $ nf part3A sample ]
+          , bgroup "B" [ bench "large" $ nf part3B sample ]
+          ]
+    , env (getProblemText "4") $ \sample -> do
+        bgroup "D04"
+          [ bgroup "A" [ bench "large" $ nf part4A sample ]
+          , bgroup "B" [ bench "large" $ nf part4B sample ]
+          ]
     ]
