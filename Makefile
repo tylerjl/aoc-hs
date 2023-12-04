@@ -26,7 +26,8 @@ coverage: test
 
 .PHONY: docs
 docs:
-	rm -rf docs/haddock/*
+	rm -rf docs/haddock
 	cabal new-haddock
 	find dist-newstyle -type d -path '*html/adventofcode' \
+		| head -n1 \
 		| xargs -I{} cp -r {}/. docs/haddock/
